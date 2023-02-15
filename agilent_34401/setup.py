@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='Agilent_34401_CAMELS',
+    name='camels_driver_agilent_34401',
     version='0.1',
     description='This packes provides everything to run an Agilent 34401 with'
                 'CAMELS',
