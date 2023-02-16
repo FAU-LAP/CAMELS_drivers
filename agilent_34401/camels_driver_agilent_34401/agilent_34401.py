@@ -1,4 +1,4 @@
-from agilent_34401.camels_driver_agilent_34401.agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
+from agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
 
 from main_classes import device_class
 
