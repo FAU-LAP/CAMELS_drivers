@@ -1,8 +1,8 @@
-from agilent_34401.agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
+from agilent_34401.camels_driver_agilent_34401.agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
 
 from main_classes import device_class
 
-from PyQt5.QtWidgets import QWidget, QGridLayout, QLabel, QLineEdit
+from PyQt5.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 
 class subclass(device_class.Device):
