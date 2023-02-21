@@ -2,7 +2,7 @@ import numpy as np
 
 from ophyd import Device
 from ophyd import Component as Cpt
-from bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from CAMELS.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
 
 def gauss(x, sig, a, mu):
     return a / sig / np.sqrt(2 * np.pi) * np.exp(-(x - mu)**2 / 2 / sig**2)

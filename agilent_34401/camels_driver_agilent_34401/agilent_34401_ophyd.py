@@ -1,9 +1,9 @@
 from ophyd import EpicsSignal, EpicsSignalRO, Device
 from ophyd import Component as Cpt
 
-from bluesky_handling import TriggerEpicsSignalRO
+from CAMELS.bluesky_handling import TriggerEpicsSignalRO
 
-from bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
+from CAMELS.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
 
 
 class Agilent_34401_EPICS(Device):
