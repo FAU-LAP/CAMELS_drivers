@@ -3,13 +3,13 @@ from PID_controller.PID_controller_manual import PID_manual_control
 
 from PID_controller.PID_controller_config_sub import subclass_config_sub
 
-from main_classes import device_class
+from CAMELS.main_classes import device_class
 import main_classes.loop_step as steps
 
 from PyQt5.QtWidgets import QComboBox
 
 from utility import variables_handling
-from main_classes import measurement_channel
+from CAMELS.main_classes import measurement_channel
 
 
 class subclass(device_class.Device):

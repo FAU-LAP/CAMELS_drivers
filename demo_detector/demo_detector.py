@@ -1,4 +1,4 @@
-from main_classes import device_class, measurement_channel
+from CAMELS.main_classes import device_class, measurement_channel
 
 class subclass(device_class.Device):
     def __init__(self):

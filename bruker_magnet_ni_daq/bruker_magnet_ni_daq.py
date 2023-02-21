@@ -1,4 +1,4 @@
-from main_classes import device_class
+from CAMELS.main_classes import device_class
 
 from bruker_magnet_ni_daq.bruker_magnet_ni_daq_ophyd import Bruker_Magnet_NI_DAQ
 from bruker_magnet_ni_daq.bruker_magnet_ni_daq_config import Ui_bruker_magnet_config
@@ -15,7 +15,7 @@ class subclass(device_class.Device):
         return {}
 
     def get_finalize_steps(self):
-        s = '\t\tfrom bluesky_handling import daq_signal\n'
+        s = '\t\tfrom CAMELS.bluesky_handling import daq_signal\n'
         s += '\t\tdaq_signal.close_tasks()\n'
         return s
 

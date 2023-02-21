@@ -1,8 +1,8 @@
 import numpy as np
 
 from ophyd import Component as Cpt
-from bluesky_handling.visa_signal import VISA_Device, VISA_Signal_Read, VISA_Signal_Write
-from bluesky_handling.custom_function_signal import Custom_Function_SignalRO, Custom_Function_Signal
+from CAMELS.bluesky_handling.visa_signal import VISA_Device, VISA_Signal_Read, VISA_Signal_Write
+from CAMELS.bluesky_handling.custom_function_signal import Custom_Function_SignalRO, Custom_Function_Signal
 
 ADC_range_values = ["100 nA", "1 uA", "10 uA", "100 uA", "1 mA", "10 mA"]
 

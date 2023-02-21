@@ -1,8 +1,8 @@
 from ophyd import EpicsSignal, EpicsSignalRO, Device
 from ophyd import Component as Cpt
-from bluesky_handling.visa_signal import VISA_Signal_Read, VISA_Signal_Write, VISA_Device
-from bluesky_handling import TriggerEpicsSignalRO
-from bluesky_handling.custom_function_signal import (Custom_Function_Signal,
+from CAMELS.bluesky_handling.visa_signal import VISA_Signal_Read, VISA_Signal_Write, VISA_Device
+from CAMELS.bluesky_handling import TriggerEpicsSignalRO
+from CAMELS.bluesky_handling.custom_function_signal import (Custom_Function_Signal,
                                                      Custom_Function_SignalRO)
 import time as ttime
 

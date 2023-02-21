@@ -10,7 +10,7 @@ import simple_pid
 from ophyd import Device
 from ophyd import Component as Cpt
 
-from bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from CAMELS.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
 from utility import device_handling
 
 from PyQt5.QtCore import QThread, pyqtSignal
@@ -124,7 +124,7 @@ class PID_Controller(Device):
         if name != 'test':
             self.pid_thread = PID_Thread(self)
             # if show_plot:
-            from main_classes.plot_widget import PlotWidget_NoBluesky
+            from CAMELS.main_classes.plot_widget import PlotWidget_NoBluesky
             y_axes = {'output': 2,
                       'k': 2,
                       'i': 2,

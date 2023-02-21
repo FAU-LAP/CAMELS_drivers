@@ -1,6 +1,6 @@
 import time
 
-from main_classes.add_on import AddOn
+from CAMELS.main_classes.add_on import AddOn
 from PID_controller.PID_controller_config_sub import subclass_config_sub
 from PID_controller.PID_controller_ophyd import PID_Controller
 
@@ -76,7 +76,7 @@ class PID_manual_control(AddOn):
         self.lineEdit_update.returnPressed.connect(self.change_update_time)
         self.lineEdit_setpoint.returnPressed.connect(self.change_setpoint)
 
-        from main_classes.plot_widget import PlotWidget_NoBluesky
+        from CAMELS.main_classes.plot_widget import PlotWidget_NoBluesky
         y_axes = {'output': 2,
                   'k': 2,
                   'i': 2,

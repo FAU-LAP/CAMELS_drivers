@@ -3,7 +3,7 @@ import copy
 from PyQt5.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame,\
     QTabWidget, QGridLayout, QWidget
 
-from main_classes import device_class
+from CAMELS.main_classes import device_class
 
 from DAQ_custom_device.DAQ_custom_device_ophyd import Custom_DAQ_Device
 
@@ -16,7 +16,7 @@ class subclass(device_class.Device):
                          **kwargs)
 
     def get_finalize_steps(self):
-        s = '\t\tfrom bluesky_handling import daq_signal\n'
+        s = '\t\tfrom CAMELS.bluesky_handling import daq_signal\n'
         s += '\t\tdaq_signal.close_tasks()\n'
         return s
 
