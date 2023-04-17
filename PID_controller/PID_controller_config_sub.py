@@ -2,8 +2,8 @@ import pandas as pd
 
 from PyQt5.QtWidgets import QGridLayout, QCheckBox, QComboBox, QLabel, QLineEdit
 
-from CAMELS.main_classes import device_class
-from CAMELS.main_classes import measurement_channel
+from nomad_camels.main_classes import device_class
+from nomad_camels.main_classes import measurement_channel
 
 from utility.add_remove_table import AddRemoveTable
 from utility.path_button_edit import Path_Button_Edit

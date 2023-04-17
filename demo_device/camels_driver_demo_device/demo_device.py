@@ -1,4 +1,4 @@
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 from .demo_device_ophyd import Demo_Device
 
 from PyQt5.QtWidgets import QTableWidget, QTableWidgetItem

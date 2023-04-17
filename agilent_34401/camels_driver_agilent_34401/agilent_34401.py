@@ -1,6 +1,6 @@
 from .agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
 
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 
 from PyQt5.QtWidgets import QGridLayout, QLabel, QLineEdit
 

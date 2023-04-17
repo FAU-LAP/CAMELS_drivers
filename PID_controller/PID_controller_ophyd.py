@@ -5,7 +5,7 @@ from ophyd import Device
 from ophyd import Component as Cpt
 from ophyd import EpicsSignal
 
-from CAMELS.bluesky_handling.EpicsFieldSignal import EpicsFieldSignal, EpicsFieldSignalRO
+from nomad_camels.bluesky_handling.EpicsFieldSignal import EpicsFieldSignal, EpicsFieldSignalRO
 
 import numpy as np
 from scipy.optimize import root

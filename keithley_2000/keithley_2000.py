@@ -1,6 +1,6 @@
 from keithley_2000.keithley_2000_ophyd import Keithley_2000
 
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):

@@ -1,6 +1,6 @@
 import time
 
-from CAMELS.main_classes.add_on import AddOn
+from nomad_camels.main_classes.add_on import AddOn
 from PID_python.PID_python_config_sub import subclass_config_sub
 from PID_python.PID_python_ophyd import PID_Controller
 

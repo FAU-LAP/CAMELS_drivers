@@ -1,4 +1,4 @@
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 import importlib
 from keithley_220.keithley_220_config import Ui_Form
 

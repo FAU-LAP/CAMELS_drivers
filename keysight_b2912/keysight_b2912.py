@@ -1,4 +1,4 @@
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 from keysight_b2912.keysight_b2912_channel_config import Ui_B2912_channel
 from keysight_b2912.keysight_b2912_ophyd import Keysight_B2912
 # from keysight_b2912_channel_config import Ui_B2912_channel

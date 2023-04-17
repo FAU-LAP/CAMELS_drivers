@@ -2,7 +2,7 @@ import copy
 
 from PyQt5.QtWidgets import QLineEdit, QLabel, QComboBox
 
-from CAMELS.main_classes import device_class
+from nomad_camels.main_classes import device_class
 
 from voltcraft_pps.voltcraft_pps_ophyd import Voltcraft_PPS
 
