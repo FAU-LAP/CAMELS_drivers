@@ -4,8 +4,6 @@ from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        files = []
-        req = []
         super().__init__(name='keithley_237', virtual=False, tags=['DMM', 'voltage', 'current',], directory='keithley_237', ophyd_device=Keithley_237, requirements=req, files=files, ophyd_class_name='Keithley_237', **kwargs)
         self.config['Four_wire'] = False
         self.config['Averages'] = "1"
