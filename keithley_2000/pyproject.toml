@@ -16,7 +16,9 @@ classifiers = [
     "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
     "Operating System :: Microsoft :: Windows",
 ]
-
+dependencies = [
+    "pyvisa",
+]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
 "Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/"
