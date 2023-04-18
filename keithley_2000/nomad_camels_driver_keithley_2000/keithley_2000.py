@@ -1,4 +1,4 @@
-from keithley_2000.keithley_2000_ophyd import Keithley_2000
+from nomad_camels_driver_keithley_2000.keithley_2000_ophyd import Keithley_2000
 
 from nomad_camels.main_classes import device_class
 
