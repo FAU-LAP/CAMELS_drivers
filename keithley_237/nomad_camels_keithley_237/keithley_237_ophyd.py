@@ -2,8 +2,8 @@ from ophyd import Component as Cpt
 import numpy as np
 import re
 
-from bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
-from bluesky_handling.custom_function_signal import Custom_Function_Signal
+from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
+from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
 
 
 def get_current_range_value(current_range_string):
