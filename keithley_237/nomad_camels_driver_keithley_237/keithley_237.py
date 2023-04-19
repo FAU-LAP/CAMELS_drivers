@@ -35,9 +35,10 @@ class subclass_config(device_class.Simple_Config):
                   'Voltage_compliance': 'Voltage compliance',
                   'Bias_delay': 'Bias delay',
                   'Sweep_Hysteresis': 'Sweep Hysteresis',
+                  "Averages": 'Averages',
                   }
-        super().__init__(parent, 'Keithley 237', data, settings_dict,
-                         config_dict, ioc_dict, additional_info, comboBoxes=comboBoxes, labels=labels)
+        super().__init__(parent, 'Keithley 237', data, settings_dict, config_dict, ioc_dict,
+                         additional_info, comboBoxes=comboBoxes, labels=labels)
         self.comboBox_connection_type.addItem('Local VISA')
         self.comboBox_connection_type.addItem('EPICS: USB-serial')
         self.load_settings()
