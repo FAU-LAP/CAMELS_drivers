@@ -2,7 +2,8 @@ from ophyd import Component as Cpt
 import numpy as np
 import re
 
-from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
+from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, \
+    VISA_Device
 from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
 
 
@@ -38,6 +39,7 @@ def get_integration_time_value(integration_time):
                              }
         return integration_times[integration_time]
 
+
 def read_sweep_array(read_string):
     read_data = np.array(read_string.split(','), dtype=float)
     source_data = []
@@ -49,12 +51,8 @@ def read_sweep_array(read_string):
             source_data.append(float(match_result[2]))
     source_data = np.array(source_data)
     measure_data = [float(x) for x in read_data[1::2]]
-    all_data = np.vstack((source_data,measure_data)).transpose()
+    all_data = np.vstack((source_data, measure_data)).transpose()
     return all_data
-
-
-
-
 
 
 class Keithley_237(VISA_Device):
@@ -82,10 +80,14 @@ class Keithley_237(VISA_Device):
     H: Send IEEE immediate trigger, H0X needed to actually trigger device
     X: Execute DDCs
     """
-    read_DC = Cpt(VISA_Signal_Read, name='read_DC', metadata={'units': 'unit of measure', 'test': '123test'})
-    set_DC = Cpt(VISA_Signal_Write, name='set_DC', metadata={'units': 'unit of source', 'test': '123test'})
-    start_sweep = Cpt(VISA_Signal_Write, name='start_sweep',)
-    read_sweep = Cpt(VISA_Signal_Read, name='read_sweep', query_text='X', metadata={'units': 'first colum is unit of source , second column is unit of measure', 'test': '123test'})
+    read_DC = Cpt(VISA_Signal_Read, name='read_DC',
+                  metadata={'units': 'unit of measure', 'test': '123test'})
+    set_DC = Cpt(VISA_Signal_Write, name='set_DC',
+                 metadata={'units': 'unit of source', 'test': '123test'})
+    start_sweep = Cpt(VISA_Signal_Write, name='start_sweep', )
+    read_sweep = Cpt(VISA_Signal_Read, name='read_sweep', query_text='X', metadata={
+        'units': 'first colum is unit of source , second column is unit of measure',
+        'test': '123test'})
     # Settings for Sweeps
     setSweep_Type = Cpt(Custom_Function_Signal, name='setSweep_Type', )
     setSweep_Level = Cpt(Custom_Function_Signal, name='setSweep_Level', )
@@ -97,16 +99,21 @@ class Keithley_237(VISA_Device):
     setSweep_T_on = Cpt(Custom_Function_Signal, name='setSweep_T_on', )
     setSweep_T_off = Cpt(Custom_Function_Signal, name='setSweep_T_off', )
     # Configuration settings
-    idn = Cpt(VISA_Signal_Read, name='idn', kind='config', query_text='U0X', match_return=False)
+    idn = Cpt(VISA_Signal_Read, name='idn', kind='config', query_text='U0X',
+              match_return=False)
     Source_Type = Cpt(Custom_Function_Signal, name='Source_Type', kind='config')
     Four_wire = Cpt(Custom_Function_Signal, name='Four_wire', kind='config')
     Averages = Cpt(Custom_Function_Signal, name='Averages', kind='config', )
     Bias_delay = Cpt(Custom_Function_Signal, name='Bias_delay', kind='config', )
     Integration_time = Cpt(Custom_Function_Signal, name='Integration_time', kind='config', )
-    Current_compliance_range = Cpt(Custom_Function_Signal, name='Current_compliance_range', kind='config', )
-    Current_compliance = Cpt(Custom_Function_Signal, name='Current_compliance', kind='config', )
-    Voltage_compliance_range = Cpt(Custom_Function_Signal, name='Voltage_compliance_range', kind='config', )
-    Voltage_compliance = Cpt(Custom_Function_Signal, name='Voltage_compliance', kind='config', )
+    Current_compliance_range = Cpt(Custom_Function_Signal, name='Current_compliance_range',
+                                   kind='config', )
+    Current_compliance = Cpt(Custom_Function_Signal, name='Current_compliance',
+                             kind='config', )
+    Voltage_compliance_range = Cpt(Custom_Function_Signal, name='Voltage_compliance_range',
+                                   kind='config', )
+    Voltage_compliance = Cpt(Custom_Function_Signal, name='Voltage_compliance',
+                             kind='config', )
     Sweep_Hysteresis = Cpt(Custom_Function_Signal, name='Sweep_Hysteresis', kind='config', )
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
@@ -127,7 +134,8 @@ class Keithley_237(VISA_Device):
         # Setting all the variables with the values of the config settings
         self.Averages.put_function = lambda x: self.Averages_put_function(x)
         self.Integration_time.put_function = lambda x: self.Integration_time_put_function(x)
-        self.Voltage_compliance.put_function = lambda x: self.Voltage_compliance_put_function(x)
+        self.Voltage_compliance.put_function = lambda x: self.Voltage_compliance_put_function(
+            x)
         self.Sweep_Hysteresis.put_function = lambda x: self.Sweep_Hysteresis_put_function(x)
         # set functions of the settable channels
         self.set_DC.put_conv_function = self.set_DC_function
@@ -137,9 +145,11 @@ class Keithley_237(VISA_Device):
     def Voltage_compliance_put_function(self, volt_value):
         value = self.Source_Type.get()
         if value == 'Voltage':
-            self.source_range_value = get_voltage_range_value(self.Voltage_compliance_range.get())
+            self.source_range_value = get_voltage_range_value(
+                self.Voltage_compliance_range.get())
             print(f'{self.source_range_value=}')
-            self.compliance_range_value = get_current_range_value(self.Current_compliance_range.get())
+            self.compliance_range_value = get_current_range_value(
+                self.Current_compliance_range.get())
             self.compliance_value = self.Current_compliance.get()
             self.set_DC.metadata['units'] = 'V'
             self.read_DC.metadata['units'] = 'V'
@@ -147,18 +157,22 @@ class Keithley_237(VISA_Device):
             self.visa_instrument.write('G4,2,0X')
             # print(f'{self.Current_compliance.get()=}')
         elif value == 'Current':
-            self.source_range_value = get_current_range_value(self.Current_compliance_range.get())
-            self.compliance_range_value = get_voltage_range_value(self.Voltage_compliance_range.get())
+            self.source_range_value = get_current_range_value(
+                self.Current_compliance_range.get())
+            self.compliance_range_value = get_voltage_range_value(
+                self.Voltage_compliance_range.get())
             self.compliance_value = self.Voltage_compliance.get()
             self.set_DC.metadata['units'] = 'A'
             self.read_DC.metadata['units'] = 'A'
             self.visa_instrument.write('F1,0X')
             self.visa_instrument.write('G4,2,0X')
         # self.visa_instrument.write(f'L{self.compliance_value},{self.compliance_range_value}X')
-            # self.visa_instrument.write(f'L{self.compliance_value},{self.compliance_range_value}')
+        # self.visa_instrument.write(f'L{self.compliance_value},{self.compliance_range_value}')
         elif value == "Sweep Voltage":
-            self.source_range_value = get_voltage_range_value(self.Voltage_compliance_range.get())
-            self.compliance_range_value = get_current_range_value(self.Current_compliance_range.get())
+            self.source_range_value = get_voltage_range_value(
+                self.Voltage_compliance_range.get())
+            self.compliance_range_value = get_current_range_value(
+                self.Current_compliance_range.get())
             self.compliance_value = self.Current_compliance.get()
             self.start_sweep.metadata['units'] = 'V'
             self.read_sweep.metadata['units'] = 'V'
@@ -167,8 +181,10 @@ class Keithley_237(VISA_Device):
             self.read_sweep.process_read_function = read_sweep_array
             # self.visa_instrument.write(f'L{self.compliance_value},{self.compliance_range_value}')
         elif value == "Sweep Current":
-            self.source_range_value = get_current_range_value(self.Current_compliance_range.get())
-            self.compliance_range_value = get_voltage_range_value(self.Voltage_compliance_range.get())
+            self.source_range_value = get_current_range_value(
+                self.Current_compliance_range.get())
+            self.compliance_range_value = get_voltage_range_value(
+                self.Voltage_compliance_range.get())
             self.compliance_value = self.Voltage_compliance.get()
             self.start_sweep.metadata['units'] = 'A'
             self.read_sweep.metadata['units'] = 'A'
@@ -180,12 +196,12 @@ class Keithley_237(VISA_Device):
     def Averages_put_function(self, value):
         self.averages_value = int(np.log2(int(value)))
 
-    def Sweep_Hysteresis_put_function(self,value):
+    def Sweep_Hysteresis_put_function(self, value):
         self.Sweep_Hysteresis_value = value
         print(f'{self.Sweep_Hysteresis_value=}')
 
-    def Integration_time_put_function(self,value):
-        self.Integration_time_value =get_integration_time_value(value)
+    def Integration_time_put_function(self, value):
+        self.Integration_time_value = get_integration_time_value(value)
         print(f'P{self.averages_value}XS{self.Integration_time_value}X')
         self.visa_instrument.write(f'P{self.averages_value}XS{self.Integration_time_value}X')
 
@@ -201,7 +217,7 @@ class Keithley_237(VISA_Device):
         print(self.averages_value)
         return write_string
 
-    def read_DC_function(self,):
+    def read_DC_function(self, ):
         self.visa_instrument.write('H0X')
         return ''
 
@@ -211,8 +227,9 @@ class Keithley_237(VISA_Device):
             write_string = (f'Q0,{self.setSweep_Level.get()},{self.compliance_range_value},'
                             f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
             if self.Sweep_Hysteresis_value:
-                write_string += (f'Q6,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                                 f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
+                write_string += (
+                    f'Q6,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                    f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
 
         # Linear stair
         elif self.setSweep_Type.get() == 1:
@@ -233,8 +250,9 @@ class Keithley_237(VISA_Device):
             write_string = (f'Q3,{self.setSweep_Level.get()},{self.compliance_range_value},'
                             f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()},{self.setSweep_T_off.get()}X')
             if self.Sweep_Hysteresis_value:
-                write_string += (f'Q9,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                                 f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+                write_string += (
+                    f'Q9,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                    f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
         # Linear Stair pulsed
         elif self.setSweep_Type.get() == 4:
             write_string = (f'Q4,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
@@ -256,7 +274,6 @@ class Keithley_237(VISA_Device):
         write_string += 'N1XH0X'
         print(write_string)
         return write_string
-
 
 
 if __name__ == '__main__':
