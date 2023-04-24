@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "pyvisa",
+    "nomad_camels_support_ni_daq_signal",
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
