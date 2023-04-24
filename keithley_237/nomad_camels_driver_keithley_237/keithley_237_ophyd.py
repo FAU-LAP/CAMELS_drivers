@@ -140,7 +140,7 @@ class Keithley_237(VISA_Device):
         # set functions of the settable channels
         self.set_DC.put_conv_function = self.set_DC_function
         self.read_DC.read_function = self.read_DC_function
-        self.start_sweep.put_conv_function = lambda x: self.start_sweep_function()
+        self.start_sweep.put_conv_function = lambda x: self.start_sweep_function(x)
 
     def Voltage_compliance_put_function(self, volt_value):
         value = self.Source_Type.get()
@@ -221,59 +221,60 @@ class Keithley_237(VISA_Device):
         self.visa_instrument.write('H0X')
         return ''
 
-    def start_sweep_function(self):
-        # Fixed level: points = counts
-        if self.setSweep_Type.get() == 0:
-            write_string = (f'Q0,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                            f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (
-                    f'Q6,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                    f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
+    def start_sweep_function(self, passed_value):
+        if passed_value == 1:
+            # Fixed level: points = counts
+            if self.setSweep_Type.get() == 0:
+                write_string = (f'Q0,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                                f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (
+                        f'Q6,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                        f'{int(self.Bias_delay.get())},{self.setSweep_Points.get()}X')
 
-        # Linear stair
-        elif self.setSweep_Type.get() == 1:
-            write_string = (f'Q1,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
-                            f'{self.setSweep_Step.get()},{self.compliance_range_value},{int(self.Bias_delay.get())}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (f'Q7,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
-                                 f'{self.setSweep_Step.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
-        # Logarithmic stair
-        elif self.setSweep_Type.get() == 2:
-            write_string = (f'Q2,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
-                            f'{self.setSweep_Points.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (f'Q8,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
-                                 f'{self.setSweep_Points.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
-        # Fixed level pulsed
-        elif self.setSweep_Type.get() == 3:
-            write_string = (f'Q3,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                            f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()},{self.setSweep_T_off.get()}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (
-                    f'Q9,{self.setSweep_Level.get()},{self.compliance_range_value},'
-                    f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
-        # Linear Stair pulsed
-        elif self.setSweep_Type.get() == 4:
-            write_string = (f'Q4,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
-                            f'{self.setSweep_Step.get()},{self.compliance_range_value}, '
-                            f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (f'Q10,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
-                                 f'{self.setSweep_Step.get()},{self.compliance_range_value}, '
-                                 f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
-        # Logarithmic stair pulsed
-        elif self.setSweep_Type.get() == 5:
-            write_string = (f'Q5,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
-                            f'{self.setSweep_Points.get()},{self.compliance_range_value}, '
-                            f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
-            if self.Sweep_Hysteresis_value:
-                write_string += (f'Q11,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
-                                 f'{self.setSweep_Points.get()},{self.compliance_range_value}, '
-                                 f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
-        write_string += 'N1XH0X'
-        print(write_string)
-        return write_string
+            # Linear stair
+            elif self.setSweep_Type.get() == 1:
+                write_string = (f'Q1,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
+                                f'{self.setSweep_Step.get()},{self.compliance_range_value},{int(self.Bias_delay.get())}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (f'Q7,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
+                                     f'{self.setSweep_Step.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
+            # Logarithmic stair
+            elif self.setSweep_Type.get() == 2:
+                write_string = (f'Q2,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
+                                f'{self.setSweep_Points.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (f'Q8,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
+                                     f'{self.setSweep_Points.get()},{self.compliance_range_value}, {int(self.Bias_delay.get())}X')
+            # Fixed level pulsed
+            elif self.setSweep_Type.get() == 3:
+                write_string = (f'Q3,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                                f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()},{self.setSweep_T_off.get()}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (
+                        f'Q9,{self.setSweep_Level.get()},{self.compliance_range_value},'
+                        f'{self.setSweep_Pulses.get()},{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+            # Linear Stair pulsed
+            elif self.setSweep_Type.get() == 4:
+                write_string = (f'Q4,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
+                                f'{self.setSweep_Step.get()},{self.compliance_range_value}, '
+                                f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (f'Q10,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
+                                     f'{self.setSweep_Step.get()},{self.compliance_range_value}, '
+                                     f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+            # Logarithmic stair pulsed
+            elif self.setSweep_Type.get() == 5:
+                write_string = (f'Q5,{self.setSweep_Start.get()},{self.setSweep_Stop.get()},'
+                                f'{self.setSweep_Points.get()},{self.compliance_range_value}, '
+                                f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+                if self.Sweep_Hysteresis_value:
+                    write_string += (f'Q11,{self.setSweep_Stop.get()},{self.setSweep_Start.get()},'
+                                     f'{self.setSweep_Points.get()},{self.compliance_range_value}, '
+                                     f',{self.setSweep_T_on.get()}, {self.setSweep_T_off.get()}X')
+            write_string += 'N1XH0X'
+            print(write_string)
+            return write_string
 
 
 if __name__ == '__main__':
