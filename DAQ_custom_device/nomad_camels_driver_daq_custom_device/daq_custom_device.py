@@ -1,11 +1,11 @@
 import copy
 
-from PySide6.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame,\
+from PySide6.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame, \
     QTabWidget, QGridLayout, QWidget
 
 from nomad_camels.main_classes import device_class
 
-from .DAQ_custom_device_ophyd import Custom_DAQ_Device
+from .daq_custom_device_ophyd import Custom_DAQ_Device
 
 
 class subclass(device_class.Device):
