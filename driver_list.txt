@@ -3,7 +3,7 @@ bruker_magnet_ni_daq==0.1.0
 DAQ_custom_device==0.1.0
 demo_device==0.1.0
 gap_burner_arduino==0.1.0
-keithley_237==0.1.6
+keithley_237==0.1.7
 keithley_2000==0.1.4
 keysight_b2912==0.1.0
 keysight_e5270b==0.1.0
