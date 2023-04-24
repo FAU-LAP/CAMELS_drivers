@@ -1,4 +1,4 @@
-from nomad_camels_driver_agilent_34401.agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
+from nomad_camels_driver_agilent_34401a.agilent_34401a_ophyd import Agilent_34401_EPICS, Agilent_34401
 
 from nomad_camels.main_classes import device_class
 
