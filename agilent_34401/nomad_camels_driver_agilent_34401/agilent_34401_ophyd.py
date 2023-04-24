@@ -3,7 +3,9 @@ from ophyd import Component as Cpt
 
 from nomad_camels.bluesky_handling import TriggerEpicsSignalRO
 
-from camels_support_visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
+from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, \
+    VISA_Device
+
 
 
 class Agilent_34401_EPICS(Device):
