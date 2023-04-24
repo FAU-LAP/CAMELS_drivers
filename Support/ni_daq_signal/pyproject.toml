@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nomad_camels_driver_demo_device"
+name = "nomad_camels_support_ni_daq_signal"
 version = "0.1.0"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
-description = "This packes provides everything to run a demo device for CAMELS"
+description = "Support files for communicating with National Instrument DAQ cards."
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [
@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "pyvisa",
+    "nidaqmx >= 0.6.3",
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"

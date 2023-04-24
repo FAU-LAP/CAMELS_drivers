@@ -5,4 +5,4 @@ Driver of the Agilent 34401A digital multimeter written for the measurement soft
 
 ## Documentation
 
-For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/).
+For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/docs/instruments.html).

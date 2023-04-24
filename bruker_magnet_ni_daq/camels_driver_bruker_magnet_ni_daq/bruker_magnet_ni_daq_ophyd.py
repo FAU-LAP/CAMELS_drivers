@@ -1,5 +1,5 @@
-from camels_support_ni_daq_signal import DAQ_Signal_Input, DAQ_Signal_Output, \
-    close_tasks
+from Support.ni_daq_signal.nomad_camels_support_ni_daq_signal.daq_signal import DAQ_Signal_Input, \
+    DAQ_Signal_Output, close_tasks
 from ophyd import Component as Cpt
 from ophyd.status import Status
 from ophyd import Signal, Device
@@ -8,8 +8,12 @@ import time
 
 
 class B_field_sign(Signal):
-    def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', reverse_time=25):
-        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
+    def __init__(self, name, value=0., timestamp=None, parent=None, labels=None, kind='hinted',
+                 tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='',
+                 reverse_time=25):
+        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent,
+                         labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance,
+                         metadata=metadata, cl=cl, attr_name=attr_name)
         self.reverse_time = reverse_time
         self.reverse = None
         self.polarity = None
@@ -23,7 +27,6 @@ class B_field_sign(Signal):
         self.polarity = polarity
         self.power_on = power_on
         self.power_off = power_off
-
 
     def set(self, value, **kwargs):
         if not isinstance(value, bool):
@@ -55,9 +58,14 @@ class B_field_sign(Signal):
         dictionary['value'] = -1 if dictionary['value'] > 0 else 1
         return {self.name: dictionary}
 
+
 class B_field_enable(Signal):
-    def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', wait_time=5):
-        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
+    def __init__(self, name, value=0., timestamp=None, parent=None, labels=None, kind='hinted',
+                 tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='',
+                 wait_time=5):
+        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent,
+                         labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance,
+                         metadata=metadata, cl=cl, attr_name=attr_name)
         self.wait_time = wait_time
         self.reverse = None
         self.power_read = None
@@ -121,7 +129,8 @@ class Bruker_Magnet_NI_DAQ(Device):
                  configuration_attrs=None, parent=None, power_read_line='',
                  polarity_read_line='', power_on_line='', power_off_line='',
                  reverse_line='', reverse_time=25, wait_time=5, **kwargs):
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs, configuration_attrs=configuration_attrs, parent=parent, **kwargs)
+        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs,
+                         configuration_attrs=configuration_attrs, parent=parent, **kwargs)
         if reverse_line:
             self.reverse.setup_line(reverse_line)
         if power_read_line:
@@ -149,7 +158,6 @@ class Bruker_Magnet_NI_DAQ(Device):
             c.close_task()
 
 
-
 if __name__ == '__main__':
     import bluesky.plan_stubs as bps
     from bluesky import RunEngine
@@ -163,7 +171,11 @@ if __name__ == '__main__':
     RE.subscribe(bec)
 
     try:
-        magnet = Bruker_Magnet_NI_DAQ(name='magnet', power_read_line='Bruker/port0/line0', polarity_read_line='Bruker/port0/line1', power_on_line='Bruker/port1/line0', power_off_line='Bruker/port1/line1', reverse_line='Bruker/port1/line2')
+        magnet = Bruker_Magnet_NI_DAQ(name='magnet', power_read_line='Bruker/port0/line0',
+                                      polarity_read_line='Bruker/port0/line1',
+                                      power_on_line='Bruker/port1/line0',
+                                      power_off_line='Bruker/port1/line1',
+                                      reverse_line='Bruker/port1/line2')
 
 
         def testplan(dev):
@@ -178,6 +190,7 @@ if __name__ == '__main__':
             yield from bps.abs_set(dev.enable, 0)
             yield from bps.trigger_and_read([dev.enable, dev.sign])
             yield from bps.close_run()
+
 
         RE(testplan(magnet))
     finally:
