@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='camels_driver_agilent_34401',
+    name='camels_driver_voltcraft_pps',
     version='1.0',
-    description='This packes provides everything to run an Agilent 34401 with'
-                'CAMELS',
+    description='This packes provides everything to run a Voltcraft PPS power'
+                'supply with CAMELS',
     author='Johannes Lehmeyer / Alexander Fuchs',
     author_email='johannes.lehmeyer@fau.de',
     packages=find_packages(),

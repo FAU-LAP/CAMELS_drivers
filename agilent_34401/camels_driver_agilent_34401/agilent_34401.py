@@ -2,7 +2,7 @@ from .agilent_34401_ophyd import Agilent_34401_EPICS, Agilent_34401
 
 from nomad_camels.main_classes import device_class
 
-from PyQt5.QtWidgets import QGridLayout, QLabel, QLineEdit
+from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 
 class subclass(device_class.Device):
@@ -46,5 +46,4 @@ class subclass_config_sub(device_class.Device_Config_Sub):
 
     def get_config(self):
         self.config_dict['nPLC'] = int(float(self.lineEdit_nPLC.text()))
-        return {}
         return self.config_dict

@@ -1,6 +1,6 @@
 import copy
 
-from PySide6.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame, \
+from PySide6.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame,\
     QTabWidget, QGridLayout, QWidget
 
 from nomad_camels.main_classes import device_class
