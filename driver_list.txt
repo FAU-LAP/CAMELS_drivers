@@ -1,7 +1,7 @@
 agilent_34401==0.1.0
 bruker_magnet_ni_daq==0.1.0
 DAQ_custom_device==0.1.0
-demo_device==0.1.0
+demo_device==0.1.2
 gap_burner_arduino==0.1.0
 keithley_237==0.1.7
 keithley_2000==0.1.4
