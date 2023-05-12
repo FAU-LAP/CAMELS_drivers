@@ -9,7 +9,7 @@ from nomad_camels.bluesky_handling.visa_signal import (VISA_Signal_Write,
 class instrument_name(VISA_Device):
 
     # This is an example for a standard identification query
-    get_ID = Cpt(VISA_Signal_Read, name='V_DC', query_text='*IDN?', metadata={'ID': 'string'})
+    get_ID = Cpt(VISA_Signal_Read, name='get_ID', query_text='*IDN?', metadata={'ID': 'string'})
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, resource_name='',
