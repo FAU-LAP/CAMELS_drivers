@@ -31,12 +31,10 @@ class subclass_config(device_class.Simple_Config):
                  config_dict=None, ioc_dict=None, additional_info=None):
         # Change the 'instrument name' string to the name of the instrument
         # this will be displayed when adding the instrument in CAMELS
-        super().__init__(parent, 'instrument name', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
         # Optional Configs
         comboBoxes = {'Source_Type': ["Voltage", "Current", "Sweep Voltage", "Sweep Current"]}
         labels = {'custom_signal_config': 'Custom Signal Config (V)'}
-        super().__init__(parent, 'Custom Signal Config', data, settings_dict, config_dict, ioc_dict,
+        super().__init__(parent, 'instrument name', data, settings_dict, config_dict, ioc_dict,
                          additional_info, comboBoxes=comboBoxes, labels=labels)
 
         # Keep the following line!
