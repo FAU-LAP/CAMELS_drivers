@@ -9,8 +9,11 @@ class subclass(device_class.Device):
                          directory='instrument_name',
                          ophyd_device=instrument_name,
                          ophyd_class_name='instrument_name', **kwargs)
+
         # Configs are optional
-        # This config setting is changeable in the 'Configure Instrument' window
+        # The config settings ona n instrument are changeable in the 'Configure Instrument' window
+        # These are the defualt values
+        # and tell the automatic UI generator what type of value is expected in the config field
         # It is a simple text edit field where you can enter new numbers
         self.config['custom_signal_config'] = 1
         # This is a checkbox to set to True or uncheck to set false
@@ -32,12 +35,13 @@ class subclass_config(device_class.Simple_Config):
         # Change the 'instrument name' string to the name of the instrument
         # this will be displayed when adding the instrument in CAMELS
         # Optional Configs
+        # Comboboxes with any number of options
         comboBoxes = {'Source_Type': ["Voltage", "Current", "Sweep Voltage", "Sweep Current"]}
+        # Optional labels for the self.config elements defined above. Useful to add units.
         labels = {'custom_signal_config': 'Custom Signal Config (V)'}
         super().__init__(parent, 'instrument name', data, settings_dict, config_dict, ioc_dict,
                          additional_info, comboBoxes=comboBoxes, labels=labels)
 
-        # Keep the following line!
-        # or you can not set the VISA communication configuration
+        # Keep the following line! or you can not set the VISA communication configuration
         self.comboBox_connection_type.addItem('Local VISA')
         self.load_settings()
