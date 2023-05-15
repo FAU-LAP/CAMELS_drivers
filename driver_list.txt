@@ -4,7 +4,7 @@ demo_detector==0.1.0
 demo_device==0.1.2
 keithley_237==0.1.7
 keithley_2000==0.1.4
-keysight_b2912a==0.1.0
+keysight_b2912a==0.1.1
 keysight_e5270b==0.1.0
 PID==0.1.0
 voltcraft_pps==0.1.0
