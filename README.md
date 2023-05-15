@@ -4,4 +4,4 @@ This is the officially maintained repository of the [NOMAD-CAMELS](https://fau-l
 The [NOMAD-CAMELS measurement software](https://fau-lap.github.io/NOMAD-CAMELS/)  reads this file as a default to list the installable instruments. 
 
 # How to Create new Instrument Drivers
-Visit our [documentation](https://fau-lap.github.io/NOMAD-CAMELS/docs/instrument_drivers.html) to learn how to create new instrument drivers.
+Visit our [documentation](https://fau-lap.github.io/NOMAD-CAMELS/docs/programmers_guide/instrument_drivers/instrument_drivers.html) to learn how to create new instrument drivers.
