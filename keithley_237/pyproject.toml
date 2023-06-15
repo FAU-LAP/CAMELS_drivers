@@ -18,6 +18,7 @@ classifiers = [
 ]
 dependencies = [
     "pyvisa",
+    "pyvisa-py"
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"

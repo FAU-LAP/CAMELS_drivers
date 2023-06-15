@@ -16,10 +16,14 @@ classifiers = [
     "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
     "Operating System :: Microsoft :: Windows",
 ]
+instrument_name = [
+    "nomad_camels_support_ni_daq_signal",
+]
 dependencies = [
     "pyvisa",
     "nomad_camels_support_ni_daq_signal",
 ]
+
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
 "Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/docs/instruments.html"
