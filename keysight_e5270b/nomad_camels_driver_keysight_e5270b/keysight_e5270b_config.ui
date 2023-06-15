@@ -65,7 +65,10 @@
    <item row="3" column="0">
     <widget class="QLabel" name="label_speedPLC">
      <property name="text">
-      <string>PLC</string>
+      <string>N</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
@@ -78,8 +81,14 @@
    </item>
    <item row="3" column="2">
     <widget class="QLabel" name="label_resPLC">
+     <property name="layoutDirection">
+      <enum>Qt::LeftToRight</enum>
+     </property>
      <property name="text">
-      <string>PLC</string>
+      <string>N</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
      </property>
     </widget>
    </item>
