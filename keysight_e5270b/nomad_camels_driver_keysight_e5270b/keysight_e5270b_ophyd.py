@@ -9,7 +9,7 @@ class Keysight_E5270B(VISA_Device):
     resADCPLC = Cpt(Custom_Function_Signal, name='resADCPLC', kind='config')
     speedADCmode = Cpt(VISA_Signal_Write, name='speedADCmode', kind='config')
     resADCmode = Cpt(VISA_Signal_Write, name='resADCmode', kind='config')
-    idn = Cpt(VISA_Signal_Read, name='idn', kind='config', 
+    idn = Cpt(VISA_Signal_Read, name='idn', kind='config',
               read_function= lambda:'*IDN?')
     err = Cpt(Custom_Function_Signal, name='err',)
     # --------------------Channel 1----------------------------------------
@@ -17,7 +17,8 @@ class Keysight_E5270B(VISA_Device):
     setI1 = Cpt(VISA_Signal_Write, name='setI1', metadata={'units': 'A'})
     mesI1 = Cpt(VISA_Signal_Read, name='mesI1', metadata={'units': 'A'})
     mesV1 = Cpt(VISA_Signal_Read, name='mesV1', metadata={'units': 'V'})
-    enable1 = Cpt(VISA_Signal_Write, name='enable1',)
+    enable_ch_1 = Cpt(VISA_Signal_Write, name='enable_ch_1',)
+    disable_ch_1 = Cpt(VISA_Signal_Write, name='disable_ch_1',)
     # Config settings of the device
     measMode1 = Cpt(VISA_Signal_Write, name='measMode1', kind='config',)
     # used in setting current DI and setting voltage DV, only a variable
@@ -40,7 +41,8 @@ class Keysight_E5270B(VISA_Device):
     setI2 = Cpt(VISA_Signal_Write, name='setI2', metadata={'units': 'A'})
     mesI2 = Cpt(VISA_Signal_Read, name='mesI2', metadata={'units': 'A'})
     mesV2 = Cpt(VISA_Signal_Read, name='mesV2', metadata={'units': 'V'})
-    enable2 = Cpt(VISA_Signal_Write, name='enable2', )
+    enable_ch_2 = Cpt(VISA_Signal_Write, name='enable_ch_2', )
+    disable_ch_2 = Cpt(VISA_Signal_Write, name='disable_ch_2', )
     # Config settings of the device
     measMode2 = Cpt(VISA_Signal_Write, name='measMode2', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -63,7 +65,8 @@ class Keysight_E5270B(VISA_Device):
     setI3 = Cpt(VISA_Signal_Write, name='setI3', metadata={'units': 'A'})
     mesI3 = Cpt(VISA_Signal_Read, name='mesI3', metadata={'units': 'A'})
     mesV3 = Cpt(VISA_Signal_Read, name='mesV3', metadata={'units': 'V'})
-    enable3 = Cpt(VISA_Signal_Write, name='enable3', )
+    enable_ch_3 = Cpt(VISA_Signal_Write, name='enable_ch_3', )
+    disable_ch_3 = Cpt(VISA_Signal_Write, name='disable_ch_3', )
     # Config settings of the device
     measMode3 = Cpt(VISA_Signal_Write, name='measMode3', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -86,7 +89,8 @@ class Keysight_E5270B(VISA_Device):
     setI4 = Cpt(VISA_Signal_Write, name='setI4', metadata={'units': 'A'})
     mesI4 = Cpt(VISA_Signal_Read, name='mesI4', metadata={'units': 'A'})
     mesV4 = Cpt(VISA_Signal_Read, name='mesV4', metadata={'units': 'V'})
-    enable4 = Cpt(VISA_Signal_Write, name='enable4', )
+    enable_ch_4 = Cpt(VISA_Signal_Write, name='enable_ch_4', )
+    disable_ch_4 = Cpt(VISA_Signal_Write, name='disable_ch_4', )
     # Config settings of the device
     measMode4 = Cpt(VISA_Signal_Write, name='measMode4', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -109,7 +113,8 @@ class Keysight_E5270B(VISA_Device):
     setI5 = Cpt(VISA_Signal_Write, name='setI5', metadata={'units': 'A'})
     mesI5 = Cpt(VISA_Signal_Read, name='mesI5', metadata={'units': 'A'})
     mesV5 = Cpt(VISA_Signal_Read, name='mesV5', metadata={'units': 'V'})
-    enable5 = Cpt(VISA_Signal_Write, name='enable5', )
+    enable_ch_5 = Cpt(VISA_Signal_Write, name='enable_ch_5', )
+    disable_ch_5 = Cpt(VISA_Signal_Write, name='disable_ch_5', )
     # Config settings of the device
     measMode5 = Cpt(VISA_Signal_Write, name='measMode5', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -132,7 +137,8 @@ class Keysight_E5270B(VISA_Device):
     setI6 = Cpt(VISA_Signal_Write, name='setI6', metadata={'units': 'A'})
     mesI6 = Cpt(VISA_Signal_Read, name='mesI6', metadata={'units': 'A'})
     mesV6 = Cpt(VISA_Signal_Read, name='mesV6', metadata={'units': 'V'})
-    enable6 = Cpt(VISA_Signal_Write, name='enable6', )
+    enable_ch_6 = Cpt(VISA_Signal_Write, name='enable_ch_6', )
+    disable_ch_6 = Cpt(VISA_Signal_Write, name='disable_ch_6', )
     # Config settings of the device
     measMode6 = Cpt(VISA_Signal_Write, name='measMode6', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -155,7 +161,8 @@ class Keysight_E5270B(VISA_Device):
     setI7 = Cpt(VISA_Signal_Write, name='setI7', metadata={'units': 'A'})
     mesI7 = Cpt(VISA_Signal_Read, name='mesI7', metadata={'units': 'A'})
     mesV7 = Cpt(VISA_Signal_Read, name='mesV7', metadata={'units': 'V'})
-    enable7 = Cpt(VISA_Signal_Write, name='enable7', )
+    enable_ch_7 = Cpt(VISA_Signal_Write, name='enable_ch_7', )
+    disable_ch_7 = Cpt(VISA_Signal_Write, name='disable_ch_7', )
     # Config settings of the device
     measMode7 = Cpt(VISA_Signal_Write, name='measMode7', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -178,7 +185,8 @@ class Keysight_E5270B(VISA_Device):
     setI8 = Cpt(VISA_Signal_Write, name='setI8', metadata={'units': 'A'})
     mesI8 = Cpt(VISA_Signal_Read, name='mesI8', metadata={'units': 'A'})
     mesV8 = Cpt(VISA_Signal_Read, name='mesV8', metadata={'units': 'V'})
-    enable8 = Cpt(VISA_Signal_Write, name='enable8', )
+    enable_ch_8 = Cpt(VISA_Signal_Write, name='enable_ch_8', )
+    disable_ch_8 = Cpt(VISA_Signal_Write, name='disable_ch_8', )
     # Config settings of the device
     measMode8 = Cpt(VISA_Signal_Write, name='measMode8', kind='config', )
     # used in setting current DI and setting voltage DV, only a variable
@@ -235,7 +243,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp1.put_function = lambda x: self.set_currCompliance(x, 1, )
         self.setV1.put_conv_function = lambda x: self.source_voltage(x, 1, self.VoutRange1)
-        self.enable1.put_conv_function = lambda x: f'CN 1'
+        self.enable_ch_1.put_conv_function = lambda x: f'CN 1'
+        self.disable_ch_1.put_conv_function = lambda x: f'CL 1'
         self.setADC1.put_conv_function = lambda x: self.setADC_function(1, x)
         self.outputFilter1.put_conv_function = lambda x: f'FL {x},1'
         # Read single voltage value using MM, CMM and XE command
@@ -260,7 +269,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp2.put_function = lambda x: self.set_currCompliance(x, 2, )
         self.setV2.put_conv_function = lambda x: self.source_voltage(x, 2, self.VoutRange2)
-        self.enable2.put_conv_function = lambda x: f'CN 2'
+        self.enable_ch_2.put_conv_function = lambda x: f'CN 2'
+        self.disable_ch_2.put_conv_function = lambda x: f'CL 2'
         self.setADC2.put_conv_function = lambda x: self.setADC_function(2, x)
         self.outputFilter2.put_conv_function = lambda x: f'FL {x},2'
         # Read single voltage value using MM, CMM and XE command
@@ -284,7 +294,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp3.put_function = lambda x: self.set_currCompliance(x, 3, )
         self.setV3.put_conv_function = lambda x: self.source_voltage(x, 3, self.VoutRange3)
-        self.enable3.put_conv_function = lambda x: f'CN 3'
+        self.enable_ch_3.put_conv_function = lambda x: f'CN 3'
+        self.disable_ch_3.put_conv_function = lambda x: f'CL 3'
         self.setADC3.put_conv_function = lambda x: self.setADC_function(3, x)
         self.outputFilter3.put_conv_function = lambda x: f'FL {x},3'
         # Read single voltage value using MM, CMM and XE command
@@ -308,7 +319,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp4.put_function = lambda x: self.set_currCompliance(x, 4, )
         self.setV4.put_conv_function = lambda x: self.source_voltage(x, 4, self.VoutRange4)
-        self.enable4.put_conv_function = lambda x: f'CN 4'
+        self.enable_ch_4.put_conv_function = lambda x: f'CN 4'
+        self.disable_ch_4.put_conv_function = lambda x: f'CL 4'
         self.setADC4.put_conv_function = lambda x: self.setADC_function(4, x)
         self.outputFilter4.put_conv_function = lambda x: f'FL {x},4'
         # Read single voltage value using MM, CMM and XE command
@@ -332,7 +344,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp5.put_function = lambda x: self.set_currCompliance(x, 5, )
         self.setV5.put_conv_function = lambda x: self.source_voltage(x, 5, self.VoutRange5)
-        self.enable5.put_conv_function = lambda x: f'CN 5'
+        self.enable_ch_5.put_conv_function = lambda x: f'CN 5'
+        self.disable_ch_5.put_conv_function = lambda x: f'CL 5'
         self.setADC5.put_conv_function = lambda x: self.setADC_function(5, x)
         self.outputFilter5.put_conv_function = lambda x: f'FL {x},5'
         # Read single voltage value using MM, CMM and XE command
@@ -356,7 +369,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp6.put_function = lambda x: self.set_currCompliance(x, 6, )
         self.setV6.put_conv_function = lambda x: self.source_voltage(x, 6, self.VoutRange6)
-        self.enable6.put_conv_function = lambda x: f'CN 6'
+        self.enable_ch_6.put_conv_function = lambda x: f'CN 6'
+        self.disable_ch_6.put_conv_function = lambda x: f'CL 6'
         self.setADC6.put_conv_function = lambda x: self.setADC_function(6, x)
         self.outputFilter6.put_conv_function = lambda x: f'FL {x},6'
         # Read single voltage value using MM, CMM and XE command
@@ -380,7 +394,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp7.put_function = lambda x: self.set_currCompliance(x, 7, )
         self.setV7.put_conv_function = lambda x: self.source_voltage(x, 7, self.VoutRange7)
-        self.enable7.put_conv_function = lambda x: f'CN 7'
+        self.enable_ch_7.put_conv_function = lambda x: f'CN 7'
+        self.disable_ch_7.put_conv_function = lambda x: f'CL 7'
         self.setADC7.put_conv_function = lambda x: self.setADC_function(7, x)
         self.outputFilter7.put_conv_function = lambda x: f'FL {x},7'
         # Read single voltage value using MM, CMM and XE command
@@ -404,7 +419,8 @@ class Keysight_E5270B(VISA_Device):
         # set array element of curr compliance to the value entered
         self.currComp8.put_function = lambda x: self.set_currCompliance(x, 8, )
         self.setV8.put_conv_function = lambda x: self.source_voltage(x, 8, self.VoutRange8)
-        self.enable8.put_conv_function = lambda x: f'CN 8'
+        self.enable_ch_8.put_conv_function = lambda x: f'CN 8'
+        self.disable_ch_8.put_conv_function = lambda x: f'CL 8'
         self.setADC8.put_conv_function = lambda x: self.setADC_function(8, x)
         self.outputFilter8.put_conv_function = lambda x: f'FL {x},8'
         # Read single voltage value using MM, CMM and XE command
