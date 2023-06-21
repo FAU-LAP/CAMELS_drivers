@@ -130,15 +130,14 @@ class Keithley_237(VISA_Device):
         self.Sweep_Hysteresis_value = None
         self.averages_value = None
         # Setting all the variables with the values of the config settings
-        self.Averages.write = lambda x: self.Averages_put_function(x)
-        self.Integration_time.write = lambda x: self.Integration_time_put_function(x)
-        self.Voltage_compliance.write = lambda x: self.Voltage_compliance_put_function(
-            x)
-        self.Sweep_Hysteresis.write = lambda x: self.Sweep_Hysteresis_put_function(x)
+        self.Averages.put_function = self.Averages_put_function
+        self.Integration_time.put_function = self.Integration_time_put_function
+        self.Voltage_compliance.put_function = self.Voltage_compliance_put_function
+        self.Sweep_Hysteresis.put_function = self.Sweep_Hysteresis_put_function
         # set functions of the settable channels
         self.set_DC.write = self.set_DC_function
         self.read_DC.query = self.read_DC_function
-        self.start_sweep.write = lambda x: self.start_sweep_function(x)
+        self.start_sweep.write = self.start_sweep_function
 
     def Voltage_compliance_put_function(self, volt_value):
         value = self.Source_Type.get()
@@ -189,7 +188,6 @@ class Keithley_237(VISA_Device):
             self.visa_instrument.write('F1,1X')
             self.visa_instrument.write('G5,2,2X')
             self.read_sweep.process_query = read_sweep_array
-        return
 
     def Averages_put_function(self, value):
         self.averages_value = int(np.log2(int(value)))

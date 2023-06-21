@@ -10,7 +10,7 @@ class Keysight_E5270B(VISA_Device):
     speedADCmode = Cpt(VISA_Signal, name='speedADCmode', kind='config')
     resADCmode = Cpt(VISA_Signal, name='resADCmode', kind='config')
     idn = Cpt(VISA_Signal_RO, name='idn', kind='config', query=lambda:'*IDN?')
-    err = Cpt(Custom_Function_Signal, name='err',)
+    err = Cpt(VISA_Signal_RO, name='err', query='ERR?')
     # --------------------Channel 1----------------------------------------
     setV1 = Cpt(VISA_Signal, name='setV1', metadata={'units': 'V'})
     setI1 = Cpt(VISA_Signal, name='setI1', metadata={'units': 'A'})
@@ -234,13 +234,12 @@ class Keysight_E5270B(VISA_Device):
         self.resADCmode.write = lambda x: self.set_resADC_mode(1, x)
         #Mode and NPLC of the High Speed AD converters for the entire SMU
         self.speedADCmode.write = lambda x: self.set_speedADC_mode(0, x)
-        self.err.write = lambda: 'ERR?'
         # --------------------Channel 1----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp1.write = lambda x: self.set_voltCompliance(x, 1)
+        self.voltComp1.put_function = lambda x: self.set_voltCompliance(x, 1)
         self.setI1.write = lambda x: self.source_current(x, 1, self.IoutRange1, )
         # set array element of curr compliance to the value entered
-        self.currComp1.write = lambda x: self.set_currCompliance(x, 1, )
+        self.currComp1.put_function = lambda x: self.set_currCompliance(x, 1, )
         self.setV1.write = lambda x: self.source_voltage(x, 1, self.VoutRange1)
         self.enable_ch_1.write = lambda x: f'CN 1'
         self.disable_ch_1.write = lambda x: f'CL 1'
@@ -263,10 +262,10 @@ class Keysight_E5270B(VISA_Device):
 
         # --------------------Channel 2----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp2.write = lambda x: self.set_voltCompliance(x, 2)
+        self.voltComp2.put_function = lambda x: self.set_voltCompliance(x, 2)
         self.setI2.write = lambda x: self.source_current(x, 2, self.IoutRange2, )
         # set array element of curr compliance to the value entered
-        self.currComp2.write = lambda x: self.set_currCompliance(x, 2, )
+        self.currComp2.put_function = lambda x: self.set_currCompliance(x, 2, )
         self.setV2.write = lambda x: self.source_voltage(x, 2, self.VoutRange2)
         self.enable_ch_2.write = lambda x: f'CN 2'
         self.disable_ch_2.write = lambda x: f'CL 2'
@@ -288,10 +287,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange2.write = lambda x: f'RV 2,{x}'
         # --------------------Channel 3----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp3.write = lambda x: self.set_voltCompliance(x, 3)
+        self.voltComp3.put_function = lambda x: self.set_voltCompliance(x, 3)
         self.setI3.write = lambda x: self.source_current(x, 3, self.IoutRange3, )
         # set array element of curr compliance to the value entered
-        self.currComp3.write = lambda x: self.set_currCompliance(x, 3, )
+        self.currComp3.put_function = lambda x: self.set_currCompliance(x, 3, )
         self.setV3.write = lambda x: self.source_voltage(x, 3, self.VoutRange3)
         self.enable_ch_3.write = lambda x: f'CN 3'
         self.disable_ch_3.write = lambda x: f'CL 3'
@@ -313,10 +312,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange3.write = lambda x: f'RV 3,{x}'
         # --------------------Channel 4----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp4.write = lambda x: self.set_voltCompliance(x, 4)
+        self.voltComp4.put_function = lambda x: self.set_voltCompliance(x, 4)
         self.setI4.write = lambda x: self.source_current(x, 4, self.IoutRange4, )
         # set array element of curr compliance to the value entered
-        self.currComp4.write = lambda x: self.set_currCompliance(x, 4, )
+        self.currComp4.put_function = lambda x: self.set_currCompliance(x, 4, )
         self.setV4.write = lambda x: self.source_voltage(x, 4, self.VoutRange4)
         self.enable_ch_4.write = lambda x: f'CN 4'
         self.disable_ch_4.write = lambda x: f'CL 4'
@@ -338,10 +337,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange4.write = lambda x: f'RV 4,{x}'
         # --------------------Channel 5----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp5.write = lambda x: self.set_voltCompliance(x, 5)
+        self.voltComp5.put_function = lambda x: self.set_voltCompliance(x, 5)
         self.setI5.write = lambda x: self.source_current(x, 5, self.IoutRange5, )
         # set array element of curr compliance to the value entered
-        self.currComp5.write = lambda x: self.set_currCompliance(x, 5, )
+        self.currComp5.put_function = lambda x: self.set_currCompliance(x, 5, )
         self.setV5.write = lambda x: self.source_voltage(x, 5, self.VoutRange5)
         self.enable_ch_5.write = lambda x: f'CN 5'
         self.disable_ch_5.write = lambda x: f'CL 5'
@@ -363,10 +362,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange5.write = lambda x: f'RV 5,{x}'
         # --------------------Channel 6----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp6.write = lambda x: self.set_voltCompliance(x, 6)
+        self.voltComp6.put_function = lambda x: self.set_voltCompliance(x, 6)
         self.setI6.write = lambda x: self.source_current(x, 6, self.IoutRange6, )
         # set array element of curr compliance to the value entered
-        self.currComp6.write = lambda x: self.set_currCompliance(x, 6, )
+        self.currComp6.put_function = lambda x: self.set_currCompliance(x, 6, )
         self.setV6.write = lambda x: self.source_voltage(x, 6, self.VoutRange6)
         self.enable_ch_6.write = lambda x: f'CN 6'
         self.disable_ch_6.write = lambda x: f'CL 6'
@@ -388,10 +387,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange6.write = lambda x: f'RV 6,{x}'
         # --------------------Channel 7----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp7.write = lambda x: self.set_voltCompliance(x, 7)
+        self.voltComp7.put_function = lambda x: self.set_voltCompliance(x, 7)
         self.setI7.write = lambda x: self.source_current(x, 7, self.IoutRange7, )
         # set array element of curr compliance to the value entered
-        self.currComp7.write = lambda x: self.set_currCompliance(x, 7, )
+        self.currComp7.put_function = lambda x: self.set_currCompliance(x, 7, )
         self.setV7.write = lambda x: self.source_voltage(x, 7, self.VoutRange7)
         self.enable_ch_7.write = lambda x: f'CN 7'
         self.disable_ch_7.write = lambda x: f'CL 7'
@@ -413,10 +412,10 @@ class Keysight_E5270B(VISA_Device):
         self.VmeasRange7.write = lambda x: f'RV 7,{x}'
         # --------------------Channel 8----------------------------------------
         # set array element of volt compliance to the value entered
-        self.voltComp8.write = lambda x: self.set_voltCompliance(x, 8)
+        self.voltComp8.put_function = lambda x: self.set_voltCompliance(x, 8)
         self.setI8.write = lambda x: self.source_current(x, 8, self.IoutRange8, )
         # set array element of curr compliance to the value entered
-        self.currComp8.write = lambda x: self.set_currCompliance(x, 8, )
+        self.currComp8.put_function = lambda x: self.set_currCompliance(x, 8, )
         self.setV8.write = lambda x: self.source_voltage(x, 8, self.VoutRange8)
         self.enable_ch_8.write = lambda x: f'CN 8'
         self.disable_ch_8.write = lambda x: f'CL 8'
