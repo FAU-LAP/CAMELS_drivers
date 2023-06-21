@@ -1,7 +1,7 @@
 import numpy as np
 
 from ophyd import Component as Cpt
-from camels_support_visa_signal import VISA_Device
+from nomad_camels.bluesky_handling.visa_signal import VISA_Device
 from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_SignalRO, Custom_Function_Signal
 
 ADC_range_values = ["100 nA", "1 uA", "10 uA", "100 uA", "1 mA", "10 mA"]
@@ -37,25 +37,25 @@ class Gap_Burner_Arduino(VISA_Device):
                          write_termination=write_termination,
                          read_termination=read_termination, **kwargs)
 
-        self.ramp_time.put_function = lambda x: self.param('ramp_time', x)
-        self.offset.put_function = lambda x: self.param('offset', x)
-        self.min_current.put_function = lambda x: self.param('min_current', x)
-        self.min_voltage.put_function = lambda x: self.param('min_voltage', x)
-        self.dac_ref_zero.put_function = lambda x: self.param('dac_ref_zero', x)
-        self.dac_zero.put_function = lambda x: self.param('dac_zero', x)
+        self.ramp_time.write = lambda x: self.param('ramp_time', x)
+        self.offset.write = lambda x: self.param('offset', x)
+        self.min_current.write = lambda x: self.param('min_current', x)
+        self.min_voltage.write = lambda x: self.param('min_voltage', x)
+        self.dac_ref_zero.write = lambda x: self.param('dac_ref_zero', x)
+        self.dac_zero.write = lambda x: self.param('dac_zero', x)
 
-        self.idn.read_function = lambda: self.query('*IDN?')
+        self.idn.query = lambda: self.query('*IDN?')
 
-        self.lowpass_samples.put_function = lambda x: self.param("lowpass_samples", x)
-        self.threshold.put_function = lambda x: self.param("threshold", x)
-        self.output_range.put_function = self.out_range_func
-        self.input_range.put_function = self.input_range_func
+        self.lowpass_samples.write = lambda x: self.param("lowpass_samples", x)
+        self.threshold.write = lambda x: self.param("threshold", x)
+        self.output_range.write = self.out_range_func
+        self.input_range.write = self.input_range_func
 
-        self.burn_command.put_function = self.burn
-        self.iv_curve_adc.read_function = lambda: self.current_iv_long
-        self.iv_curve_dac.read_function = self.get_iv_dac
-        self.burn_ok.read_function = lambda: self.burn_ok_val
-        self.current_diff.read_function = lambda: np.abs(self.current_iv[-1] - self.current_iv[0])
+        self.burn_command.write = self.burn
+        self.iv_curve_adc.query = lambda: self.current_iv_long
+        self.iv_curve_dac.query = self.get_iv_dac
+        self.burn_ok.query = lambda: self.burn_ok_val
+        self.current_diff.query = lambda: np.abs(self.current_iv[-1] - self.current_iv[0])
 
         self.current_iv_long = np.ones(3700) * 950
         self.current_iv = [0,1]

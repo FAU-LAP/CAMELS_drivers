@@ -10,10 +10,9 @@ from .daq_custom_device_ophyd import Custom_DAQ_Device
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        files = []
-        req = []
-        super().__init__(name='DAQ_custom_device', virtual=False, tags=['DAQ'], directory='DAQ_custom_device', ophyd_device=Custom_DAQ_Device, requirements=req, files=files, ophyd_class_name='Custom_DAQ_Device',
-                         **kwargs)
+        super().__init__(name='DAQ_custom_device', virtual=False, tags=['DAQ'],
+                         ophyd_device=Custom_DAQ_Device,
+                         ophyd_class_name='Custom_DAQ_Device', **kwargs)
 
     def get_finalize_steps(self):
         s = '\t\tfrom nomad_camels.bluesky_handling import daq_signal\n'
@@ -38,19 +37,13 @@ class subclass(device_class.Device):
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         super().__init__(parent, 'Custom DAQ device', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
+                         config_dict, additional_info)
         self.layout().removeWidget(self.comboBox_connection_type)
         self.comboBox_connection_type.deleteLater()
         self.layout().removeWidget(self.label_connection)
         self.label_connection.deleteLater()
-        self.layout().removeWidget(self.checkBox_use_local_ioc)
-        self.checkBox_use_local_ioc.deleteLater()
-        self.layout().removeWidget(self.lineEdit_ioc_name)
-        self.lineEdit_ioc_name.deleteLater()
-        self.layout().removeWidget(self.label_ioc_name)
-        self.label_ioc_name.deleteLater()
 
         self.tabwidge = QTabWidget()
         self.input_widge = Channel_Widget(settings=settings_dict)
@@ -59,9 +52,6 @@ class subclass_config(device_class.Device_Config):
         self.tabwidge.addTab(self.input_widge, 'Input')
         self.tabwidge.addTab(self.output_widge, 'Output')
         self.layout().addWidget(self.tabwidge, 20, 0, 1, 5)
-
-    def get_ioc_settings(self):
-        return {}
 
     def get_settings(self):
         sets = self.input_widge.get_settings()

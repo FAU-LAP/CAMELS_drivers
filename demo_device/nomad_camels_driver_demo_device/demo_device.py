@@ -3,20 +3,20 @@ from .demo_device_ophyd import Demo_Device
 
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
-
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(name='demo_device', virtual=True,
                          tags=['virtual', 'demo', 'ophyd', 'detector'],
-                         ophyd_device=Demo_Device, ophyd_class_name='Demo_Device',
-                         directory='demo_device', **kwargs)
+                         ophyd_device=Demo_Device,
+                         ophyd_class_name='Demo_Device',
+                         **kwargs)
 
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None, **kwargs):
+                 config_dict=None, additional_info=None, **kwargs):
         super().__init__(parent, 'Demo Device', data, settings_dict,
-                         config_dict, ioc_dict, additional_info, **kwargs)
+                         config_dict, additional_info, **kwargs)
         self.table = QTableWidget()
         self.table.setRowCount(7)
         self.table.setColumnCount(3)

@@ -76,7 +76,7 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         set_conv = ''
         if 'set_conv_func' in settings_dict:
             set_conv = str(settings_dict['set_conv_func']) or ''
-        self.lineEdit_read_function = QLineEdit(read_conv)
+        self.lineEdit_query = QLineEdit(read_conv)
         self.lineEdit_set_function = QLineEdit(set_conv)
 
         self.checkBox_plot = QCheckBox('Plot PID values?')

@@ -1,4 +1,4 @@
-from nomad_camels_driver_agilent_34401a.agilent_34401a_ophyd import Agilent_34401_EPICS, Agilent_34401
+from .agilent_34401a_ophyd import Agilent_34401
 
 from nomad_camels.main_classes import device_class
 
@@ -7,16 +7,16 @@ from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        files = ['agilent_34401.db', 'agilent_34401.proto']
-        req = ['prologixSup']
-        super().__init__(name='agilent_34401', virtual=False, tags=['DMM', 'voltage', 'current'], directory='agilent_34401', ophyd_device=Agilent_34401_EPICS, requirements=req, files=files, ophyd_class_name='Agilent_34401_EPICS', non_epics_class=Agilent_34401, **kwargs)
+        super().__init__(name='agilent_34401', virtual=False,
+                         tags=['DMM', 'voltage', 'current'],
+                         ophyd_device=Agilent_34401,
+                         ophyd_class_name='Agilent_34401', **kwargs)
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         super().__init__(parent, 'Agilent 34401', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
-        self.comboBox_connection_type.addItem('EPICS: prologix-GPIB')
+                         config_dict, additional_info)
         self.comboBox_connection_type.addItem('Local VISA')
         self.sub_widget = subclass_config_sub(config_dict=self.config_dict, parent=self)
         self.layout().addWidget(self.sub_widget, 20, 0, 1, 5)

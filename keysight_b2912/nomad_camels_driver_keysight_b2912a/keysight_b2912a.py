@@ -31,15 +31,17 @@ default_settings = {'source': 'Voltage',
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='keysight_b2912', virtual=False, tags=['SMU', 'voltage', 'current', 'resistance'], directory='keysight_b2912', ophyd_device=Keysight_B2912, ophyd_class_name='Keysight_B2912', **kwargs)
+        super().__init__(name='keysight_b2912', virtual=False,
+                         tags=['SMU', 'voltage', 'current', 'resistance'],
+                         ophyd_device=Keysight_B2912,
+                         ophyd_class_name='Keysight_B2912', **kwargs)
         for key, val in default_settings.items():
             self.config[f'{key}1'] = val
             self.config[f'{key}2'] = val
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None, config_dict=None, additional_info=None, **kwargs):
-        super().__init__(parent, 'Keysight B2912', data, settings_dict=settings_dict, config_dict=config_dict, additional_info=additional_info, no_ioc_connection=True, **kwargs)
-        self.comboBox_connection_type.addItem('EPICS: LAN')
+        super().__init__(parent, 'Keysight B2912', data, settings_dict=settings_dict, config_dict=config_dict, additional_info=additional_info, **kwargs)
         self.comboBox_connection_type.addItem('Local VISA')
         self.tab_widget = QTabWidget()
         conf1 = {}

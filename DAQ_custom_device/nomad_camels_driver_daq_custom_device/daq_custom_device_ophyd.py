@@ -1,4 +1,5 @@
-from nomad_camels_driver_ni_daq_signal.daq_signal import DAQ_Signal_Input, DAQ_Signal_Output
+from Support.ni_daq_signal.nomad_camels_support_ni_daq_signal.daq_signal import DAQ_Signal_Input, \
+    DAQ_Signal_Output
 
 from ophyd import Component as Cpt
 from ophyd import Device

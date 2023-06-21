@@ -18,12 +18,12 @@ def close_resources():
         open_resources[res].close()
     open_resources.clear()
 
-class VISA_Signal_Write(Signal):
+class VISA_Signal(Signal):
     def __init__(self,  name, value=0., timestamp=None, parent=None,
                  labels=None, kind='hinted', tolerance=None, rtolerance=None,
                  metadata=None, cl=None, attr_name='', write_termination='\n',
                  baud_rate=9600, resource_name='', additional_put_text='',
-                 put_conv_function=None, put_format_string=''):
+                 write=None, put_format_string=''):
         super().__init__(name=name, value=value, timestamp=timestamp, parent=parent,
                          labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance,
                          metadata=metadata, cl=cl, attr_name=attr_name)
@@ -37,7 +37,7 @@ class VISA_Signal_Write(Signal):
         #         open_resources[resource_name] = self.visa_instrument
         #     self.visa_instrument.write_termination = write_termination
         #     self.visa_instrument.baud_rate = baud_rate
-        self.put_conv_function = put_conv_function or None
+        self.write = put_conv_function or None
         self.additional_put_text = additional_put_text
         self.put_format_string = put_format_string
 
@@ -68,11 +68,11 @@ class VISA_Signal_Write(Signal):
 
 
 
-class VISA_Signal_Read(SignalRO):
+class VISA_Signal_RO(SignalRO):
     def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None,
                  kind='hinted', tolerance=None, rtolerance=None, metadata=None,
                  cl=None, attr_name='', read_termination='\n', write_termination='\n',
-                 baud_rate=9600, resource_name='', query_text='', match_return=False,
+                 baud_rate=9600, resource_name='', query='', match_return=False,
                  read_function=None, process_read_function=None):
         super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
         self.visa_instrument = None
@@ -87,9 +87,9 @@ class VISA_Signal_Read(SignalRO):
         #     self.visa_instrument.read_termination = read_termination
         #     self.visa_instrument.write_termination = write_termination
         #     self.visa_instrument.baud_rate = baud_rate
-        self.read_function = read_function or None
-        self.process_read_function = process_read_function or None
-        self.query_text = query_text
+        self.query = read_function or None
+        self.process_query = process_read_function or None
+        self.query = query
         self.reading = False
 
     def get(self):
@@ -100,7 +100,7 @@ class VISA_Signal_Read(SignalRO):
             if self.read_function:
                 val = self.visa_instrument.query(self.read_function())
             else:
-                val = self.visa_instrument.query(self.query_text)
+                val = self.visa_instrument.query(self.query)
         except:
             val = np.nan
         self.visa_instrument.currently_reading = False
@@ -156,6 +156,6 @@ class VISA_Device(Device):
 if __name__ == '__main__':
     print(list_resources())
     tester = 'USB0::0x0957::0x8E18::MY51140626::INSTR'
-    # testsig = VISA_Signal_Write('testsig', write_termination='\r\n', resource_name=tester)
-    testsigR = VISA_Signal_Read('testsigR', read_termination='\r\n', write_termination='\r\n', resource_name=tester, query_text='MEAS:VOLT:DC?')
+    # testsig = VISA_Signal('testsig', write_termination='\r\n', resource_name=tester)
+    testsigR = VISA_Signal_RO('testsigR', read_termination='\r\n', write_termination='\r\n', resource_name=tester, query='MEAS:VOLT:DC?')
     print(testsigR.get())

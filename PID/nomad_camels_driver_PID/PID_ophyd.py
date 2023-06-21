@@ -86,7 +86,7 @@ class PID_Controller(Device):
         def read_function():
             x = read_signal.get()
             return read_conv_func(x)
-        self.read_function = read_function
+        self.query = read_function
 
         def set_function(x):
             x = set_conv_func(x)
@@ -100,17 +100,17 @@ class PID_Controller(Device):
         else:
             self.bias_func = None
 
-        self.current_value.read_function = self.current_value_read
-        self.output_value.read_function = self.get_output
-        self.pid_stable.read_function = self.stable_check
-        self.kp.put_function = self.set_Kp
-        self.ki.put_function = self.set_Ki
-        self.kd.put_function = self.set_Kd
-        self.dt.put_function = self.set_dt
-        self.min_value.put_function = self.set_minval
-        self.max_value.put_function = self.set_maxval
-        self.pid_on.put_function = self.set_pid_on
-        self.setpoint.put_function = self.update_PID_vals
+        self.current_value.query = self.current_value_read
+        self.output_value.query = self.get_output
+        self.pid_stable.query = self.stable_check
+        self.kp.write = self.set_Kp
+        self.ki.write = self.set_Ki
+        self.kd.write = self.set_Kd
+        self.dt.write = self.set_dt
+        self.min_value.write = self.set_minval
+        self.max_value.write = self.set_maxval
+        self.pid_on.write = self.set_pid_on
+        self.setpoint.write = self.update_PID_vals
 
         if pid_val_table is None:
             pid_val_table = pd.DataFrame({'setpoint': [0], 'kp': [0], 'ki': [0], 'kd': [0], 'max_value': [np.inf], 'min_value': [-np.inf], 'bias': [0], 'stability-delta': [0], 'stability-time': [0]})
