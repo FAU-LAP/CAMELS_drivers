@@ -1,5 +1,5 @@
-agilent_34401==0.1.1
-daq_custom_device==0.1.1
+agilent_34401a==0.1.1
+DAQ_custom_device==0.1.1
 demo_device==0.1.2
 keithley_237==0.1.7
 keithley_2000==0.1.4

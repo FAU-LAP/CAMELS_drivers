@@ -45,7 +45,7 @@ class subclass_config(device_class.Device_Config):
         modes = ['voltage', 'power']
         self.comboBox_output_mode = QComboBox()
         self.comboBox_output_mode.addItems(modes)
-        if config_dict['outputMode'] in modes:
+        if 'outputMode' in config_dict and config_dict['outputMode'] in modes:
             self.comboBox_output_mode.setCurrentText(config_dict['outputMode'])
         self.comboBox_output_mode.currentTextChanged.connect(self.mode_change)
 

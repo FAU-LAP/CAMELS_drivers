@@ -31,7 +31,7 @@ default_settings = {'source': 'Voltage',
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='keysight_b2912', virtual=False,
+        super().__init__(name='keysight_b2912a', virtual=False,
                          tags=['SMU', 'voltage', 'current', 'resistance'],
                          ophyd_device=Keysight_B2912,
                          ophyd_class_name='Keysight_B2912', **kwargs)

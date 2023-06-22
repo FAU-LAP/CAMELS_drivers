@@ -7,7 +7,7 @@ from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='agilent_34401', virtual=False,
+        super().__init__(name='agilent_34401a', virtual=False,
                          tags=['DMM', 'voltage', 'current'],
                          ophyd_device=Agilent_34401,
                          ophyd_class_name='Agilent_34401', **kwargs)

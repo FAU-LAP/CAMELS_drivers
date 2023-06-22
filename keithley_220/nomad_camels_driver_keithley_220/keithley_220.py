@@ -2,7 +2,7 @@ from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(name='keithley_220', virtual=False, **kwargs)
 
 
 class subclass_config(device_class.Device_Config):
