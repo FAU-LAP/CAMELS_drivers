@@ -6,4 +6,4 @@ Implements the `VISA_Device`, `VISA_Signal_RO`, and `VISA_Signal` classes used i
 
 ## Documentation
 
-For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/docs/instruments.html).
+For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).

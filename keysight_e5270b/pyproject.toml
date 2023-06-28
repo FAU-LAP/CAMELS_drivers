@@ -22,4 +22,4 @@ dependencies = [
 
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
-"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/docs/instruments.html"
+"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"

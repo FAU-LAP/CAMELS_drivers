@@ -5,4 +5,4 @@ Supporting files for communicating with National Instrument DAQ cards written fo
 
 ## Documentation
 
-For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/docs/instruments.html).
+For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
