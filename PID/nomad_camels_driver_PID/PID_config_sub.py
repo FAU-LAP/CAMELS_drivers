@@ -136,12 +136,13 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.settings_dict['val_file'] = self.file_box.get_path()
         self.settings_dict['read_conv_func'] = self.lineEdit_read_function.text()
         self.settings_dict['set_conv_func'] = self.lineEdit_set_function.text()
-        inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
-        out_chan = variables_handling.channels[self.comboBox_output.currentText()]
-        bias_chan = variables_handling.channels[self.comboBox_bias.currentText()]
-        self.settings_dict['!non_string!_read_signal'] = inp_chan.get_bluesky_name()
-        self.settings_dict['!non_string!_set_signal'] = out_chan.get_bluesky_name()
-        self.settings_dict['!non_string!_bias_signal'] = bias_chan.get_bluesky_name()
+        if variables_handling.channels:
+            inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
+            out_chan = variables_handling.channels[self.comboBox_output.currentText()]
+            bias_chan = variables_handling.channels[self.comboBox_bias.currentText()]
+            self.settings_dict['!non_string!_read_signal'] = inp_chan.get_bluesky_name()
+            self.settings_dict['!non_string!_set_signal'] = out_chan.get_bluesky_name()
+            self.settings_dict['!non_string!_bias_signal'] = bias_chan.get_bluesky_name()
         self.settings_dict['read_signal_name'] = self.comboBox_input.currentText()
         self.settings_dict['set_signal_name'] = self.comboBox_output.currentText()
         self.settings_dict['bias_signal_name'] = self.comboBox_bias.currentText()

@@ -2,8 +2,7 @@ from ophyd import Component as Cpt
 import numpy as np
 import re
 
-from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, \
-    VISA_Device
+from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, VISA_Signal_RO, VISA_Device
 from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
 
 
@@ -80,12 +79,12 @@ class Keithley_237(VISA_Device):
     H: Send IEEE immediate trigger, H0X needed to actually trigger device
     X: Execute DDCs
     """
-    read_DC = Cpt(VISA_Signal_Read, name='read_DC',
+    read_DC = Cpt(VISA_Signal_RO, name='read_DC',
                   metadata={'units': 'unit of measure', 'test': '123test'})
-    set_DC = Cpt(VISA_Signal_Write, name='set_DC',
+    set_DC = Cpt(VISA_Signal, name='set_DC',
                  metadata={'units': 'unit of source', 'test': '123test'})
-    start_sweep = Cpt(VISA_Signal_Write, name='start_sweep', )
-    read_sweep = Cpt(VISA_Signal_Read, name='read_sweep', query_text='X', metadata={
+    start_sweep = Cpt(VISA_Signal, name='start_sweep', )
+    read_sweep = Cpt(VISA_Signal_RO, name='read_sweep', query='X', metadata={
         'units': 'first colum is unit of source , second column is unit of measure',
         'test': '123test'})
     # Settings for Sweeps
@@ -99,8 +98,7 @@ class Keithley_237(VISA_Device):
     setSweep_T_on = Cpt(Custom_Function_Signal, name='setSweep_T_on', )
     setSweep_T_off = Cpt(Custom_Function_Signal, name='setSweep_T_off', )
     # Configuration settings
-    idn = Cpt(VISA_Signal_Read, name='idn', kind='config', query_text='U0X',
-              match_return=False)
+    idn = Cpt(VISA_Signal_RO, name='idn', kind='config', query='U0X')
     Source_Type = Cpt(Custom_Function_Signal, name='Source_Type', kind='config')
     Four_wire = Cpt(Custom_Function_Signal, name='Four_wire', kind='config')
     Averages = Cpt(Custom_Function_Signal, name='Averages', kind='config', )
@@ -132,15 +130,14 @@ class Keithley_237(VISA_Device):
         self.Sweep_Hysteresis_value = None
         self.averages_value = None
         # Setting all the variables with the values of the config settings
-        self.Averages.put_function = lambda x: self.Averages_put_function(x)
-        self.Integration_time.put_function = lambda x: self.Integration_time_put_function(x)
-        self.Voltage_compliance.put_function = lambda x: self.Voltage_compliance_put_function(
-            x)
-        self.Sweep_Hysteresis.put_function = lambda x: self.Sweep_Hysteresis_put_function(x)
+        self.Averages.put_function = self.Averages_put_function
+        self.Integration_time.put_function = self.Integration_time_put_function
+        self.Voltage_compliance.put_function = self.Voltage_compliance_put_function
+        self.Sweep_Hysteresis.put_function = self.Sweep_Hysteresis_put_function
         # set functions of the settable channels
-        self.set_DC.put_conv_function = self.set_DC_function
-        self.read_DC.read_function = self.read_DC_function
-        self.start_sweep.put_conv_function = lambda x: self.start_sweep_function(x)
+        self.set_DC.write = self.set_DC_function
+        self.read_DC.query = self.read_DC_function
+        self.start_sweep.write = self.start_sweep_function
 
     def Voltage_compliance_put_function(self, volt_value):
         value = self.Source_Type.get()
@@ -178,7 +175,7 @@ class Keithley_237(VISA_Device):
             self.read_sweep.metadata['units'] = 'V'
             self.visa_instrument.write('F0,1X')
             self.visa_instrument.write('G5,2,2X')
-            self.read_sweep.process_read_function = read_sweep_array
+            self.read_sweep.process_query = read_sweep_array
             # self.visa_instrument.write(f'L{self.compliance_value},{self.compliance_range_value}')
         elif value == "Sweep Current":
             self.source_range_value = get_current_range_value(
@@ -190,8 +187,7 @@ class Keithley_237(VISA_Device):
             self.read_sweep.metadata['units'] = 'A'
             self.visa_instrument.write('F1,1X')
             self.visa_instrument.write('G5,2,2X')
-            self.read_sweep.process_read_function = read_sweep_array
-        return
+            self.read_sweep.process_query = read_sweep_array
 
     def Averages_put_function(self, value):
         self.averages_value = int(np.log2(int(value)))

@@ -6,7 +6,6 @@ class subclass(device_class.Device):
         super().__init__(name='instrument_name', virtual=False,
                          # Change the tags to fit your device
                          tags=['Function', 'Sine', 'Waveform', 'Generator', 'Voltage'],
-                         directory='instrument_name',
                          ophyd_device=instrument_name,
                          ophyd_class_name='instrument_name', **kwargs)
 
@@ -31,7 +30,7 @@ class subclass_config(device_class.Simple_Config):
     This is perfect for simple devices with just a few settings.
     """
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         # Change the 'instrument name' string to the name of the instrument
         # this will be displayed when adding the instrument in CAMELS
         # Optional Configs
@@ -39,8 +38,9 @@ class subclass_config(device_class.Simple_Config):
         comboBoxes = {'Source_Type': ["Voltage", "Current", "Sweep Voltage", "Sweep Current"]}
         # Optional labels for the self.config elements defined above. Useful to add units.
         labels = {'custom_signal_config': 'Custom Signal Config (V)'}
-        super().__init__(parent, 'instrument name', data, settings_dict, config_dict, ioc_dict,
-                         additional_info, comboBoxes=comboBoxes, labels=labels)
+        super().__init__(parent, 'instrument name', data, settings_dict,
+                         config_dict, additional_info, comboBoxes=comboBoxes,
+                         labels=labels)
 
         # Keep the following line! or you can not set the VISA communication configuration
         self.comboBox_connection_type.addItem('Local VISA')

@@ -4,17 +4,14 @@ from PySide6.QtWidgets import QLineEdit, QLabel, QComboBox
 
 from nomad_camels.main_classes import device_class
 
-from .voltcraft_pps_ophyd import Voltcraft_PPS_EPICS, Voltcraft_PPS
+from .voltcraft_pps_ophyd import Voltcraft_PPS
 
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        files = ['voltcraft_pps.db', 'voltcraft_pps.proto']
-        req = ['drvAsynSerialPort']
         super().__init__(name='voltcraft_pps', tags=['power supply', 'voltage'],
-                         directory='voltcraft_pps', ophyd_device=Voltcraft_PPS_EPICS,
-                         ophyd_class_name='Voltcraft_PPS_EPICS', files=files,
-                         requirements=req, non_epics_class=Voltcraft_PPS,
+                         ophyd_device=Voltcraft_PPS,
+                         ophyd_class_name='Voltcraft_PPS',
                          **kwargs)
 
     def get_channels(self):
@@ -36,10 +33,10 @@ class subclass(device_class.Device):
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         super().__init__(parent, 'Voltcraft PPS', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
-        self.comboBox_connection_type.addItem('EPICS: USB-serial')
+                         config_dict, additional_info)
+        self.comboBox_connection_type.addItem('Local VISA')
         self.lineEdit_R = QLineEdit()
         self.lineEdit_R.setText(str(config_dict['setR']))
         self.labelR = QLabel('Resistance:')
@@ -48,7 +45,7 @@ class subclass_config(device_class.Device_Config):
         modes = ['voltage', 'power']
         self.comboBox_output_mode = QComboBox()
         self.comboBox_output_mode.addItems(modes)
-        if config_dict['outputMode'] in modes:
+        if 'outputMode' in config_dict and config_dict['outputMode'] in modes:
             self.comboBox_output_mode.setCurrentText(config_dict['outputMode'])
         self.comboBox_output_mode.currentTextChanged.connect(self.mode_change)
 

@@ -1,19 +1,19 @@
 from ophyd import Component as Cpt
 
-from nomad_camels.bluesky_handling.visa_signal import VISA_Signal_Write, VISA_Signal_Read, VISA_Device
+from nomad_camels.bluesky_handling.visa_signal import VISA_Device, VISA_Signal, VISA_Signal_RO
 
 
 
 class Keithley_2000(VISA_Device):
-    V_DC = Cpt(VISA_Signal_Read, name='V_DC', metadata={'units': 'V'})
-    V_AC = Cpt(VISA_Signal_Read, name='V_AC', metadata={'units': 'V'})
-    I_DC = Cpt(VISA_Signal_Read, name='I_DC', metadata={'units': 'A'})
-    I_AC = Cpt(VISA_Signal_Read, name='I_AC', metadata={'units': 'A'})
-    resistance = Cpt(VISA_Signal_Read, name='resistance', metadata={'units': 'Ohm'})
-    resistance_4_wire = Cpt(VISA_Signal_Read, name='resistance_4_wire', metadata={'units': 'Ohm'})
+    V_DC = Cpt(VISA_Signal_RO, name='V_DC', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'V'})
+    V_AC = Cpt(VISA_Signal_RO, name='V_AC', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'V'})
+    I_DC = Cpt(VISA_Signal_RO, name='I_DC', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'A'})
+    I_AC = Cpt(VISA_Signal_RO, name='I_AC', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'A'})
+    resistance = Cpt(VISA_Signal_RO, name='resistance', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'Ohm'})
+    resistance_4_wire = Cpt(VISA_Signal_RO, name='resistance_4_wire', parse=r".*?([-+eE\d.]+).*", metadata={'units': 'Ohm'})
 
-    idn = Cpt(VISA_Signal_Read, name='idn', kind='config', query_text='*IDN?')
-    NPLC = Cpt(VISA_Signal_Write, name='NPLC', kind='config')
+    idn = Cpt(VISA_Signal_RO, name='idn', kind='config', query='*IDN?')
+    NPLC = Cpt(VISA_Signal, name='NPLC', kind='config')
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, resource_name='',
@@ -26,19 +26,13 @@ class Keithley_2000(VISA_Device):
                          read_termination=read_termination, **kwargs)
         self.last_meas = ''
         self.nplc = 1
-        self.V_DC.read_function = lambda: self.query_function('VOLT:DC')
-        self.V_AC.read_function = lambda: self.query_function('VOLT:AC')
-        self.I_DC.read_function = lambda: self.query_function('CURR:DC')
-        self.I_AC.read_function = lambda: self.query_function('CURR:AC')
-        self.resistance.read_function = lambda: self.query_function('RES')
-        self.resistance_4_wire.read_function = lambda: self.query_function('FRES')
-        self.NPLC.put_conv_function = self.NPLC_func
-        # self.visa_instrument.write('*RST')
-        # a = self.visa_instrument.query('*idn?')
-        # print(a)
-        for comp in self.walk_signals():
-            it = comp.item
-            it.match_return = True
+        self.V_DC.query = lambda: self.query_function('VOLT:DC')
+        self.V_AC.query = lambda: self.query_function('VOLT:AC')
+        self.I_DC.query = lambda: self.query_function('CURR:DC')
+        self.I_AC.query = lambda: self.query_function('CURR:AC')
+        self.resistance.query = lambda: self.query_function('RES')
+        self.resistance_4_wire.query = lambda: self.query_function('FRES')
+        self.NPLC.write = self.NPLC_func
 
     def NPLC_func(self, val):
         self.nplc = val
@@ -58,5 +52,7 @@ class Keithley_2000(VISA_Device):
         else:
             self.visa_instrument.write('INIT')
         return 'DATA?'
+
+
 if __name__ == '__main__':
     testk = Keithley_2000(name='testk')

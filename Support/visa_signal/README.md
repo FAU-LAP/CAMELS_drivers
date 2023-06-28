@@ -2,7 +2,7 @@
 
 Supporting files for communicating with devices using the VISA protocol written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
-Implements the `VISA_Device`, `VISA_Signal_Read`, and `VISA_Signal_Write` classes used in many device drivers.
+Implements the `VISA_Device`, `VISA_Signal_RO`, and `VISA_Signal` classes used in many device drivers.
 
 ## Documentation
 

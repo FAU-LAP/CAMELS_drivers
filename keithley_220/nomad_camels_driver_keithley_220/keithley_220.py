@@ -1,15 +1,13 @@
 from nomad_camels.main_classes import device_class
-from keithley_220_config import Ui_Form
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(**kwargs)
+        super().__init__(name='keithley_220', virtual=False, **kwargs)
 
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None, additional_info=None):
         super().__init__(parent, 'Keithley 220', data, settings_dict, additional_info)
-        self.comboBox_connection_type.addItem('EPICS: prologix-GPIB')
         self.load_settings()
 
 # TODO This device is not implemented at all! Do not build!

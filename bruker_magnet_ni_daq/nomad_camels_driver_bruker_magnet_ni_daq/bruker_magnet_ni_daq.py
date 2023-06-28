@@ -7,7 +7,7 @@ from .bruker_magnet_ni_daq_config import Ui_bruker_magnet_config
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(name='bruker_magnet_ni_daq',
-                         tags=['magnet'], directory='bruker_magnet_ni_daq',
+                         tags=['magnet'],
                          ophyd_device=Bruker_Magnet_NI_DAQ,
                          ophyd_class_name='Bruker_Magnet_NI_DAQ', **kwargs)
 
@@ -22,19 +22,13 @@ class subclass(device_class.Device):
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         super().__init__(parent, 'Bruker Magnet (DAQ)', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
+                         config_dict, additional_info)
         self.layout().removeWidget(self.comboBox_connection_type)
         self.comboBox_connection_type.deleteLater()
         self.layout().removeWidget(self.label_connection)
         self.label_connection.deleteLater()
-        self.layout().removeWidget(self.checkBox_use_local_ioc)
-        self.checkBox_use_local_ioc.deleteLater()
-        self.layout().removeWidget(self.lineEdit_ioc_name)
-        self.lineEdit_ioc_name.deleteLater()
-        self.layout().removeWidget(self.label_ioc_name)
-        self.label_ioc_name.deleteLater()
         self.sub_widget = subclass_config_sub(config_dict, self, settings_dict)
         self.layout().addWidget(self.sub_widget, 20, 0, 1, 5)
         self.load_settings()
@@ -44,9 +38,6 @@ class subclass_config(device_class.Device_Config):
 
     def get_config(self):
         return self.sub_widget.get_config()
-
-    def get_ioc_settings(self):
-        return {}
 
 
 class subclass_config_sub(device_class.Device_Config_Sub, Ui_bruker_magnet_config):

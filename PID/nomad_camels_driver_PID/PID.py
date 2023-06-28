@@ -22,9 +22,9 @@ default_pid_val_table = {'setpoint': [0],
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        files = ['']
-        req = ['']
-        super().__init__(name='PID', virtual=True, tags=['PID', 'control'], files=files, directory='PID', ophyd_device=PID_Controller, ophyd_class_name='PID_Controller', requirements=req, **kwargs)
+        super().__init__(name='PID', virtual=True, tags=['PID', 'control'],
+                         ophyd_device=PID_Controller,
+                         ophyd_class_name='PID_Controller', **kwargs)
         self.settings['pid_val_table'] = default_pid_val_table
         self.settings['auto_pid'] = True
         self.settings['show_plot'] = True
@@ -44,12 +44,6 @@ class subclass(device_class.Device):
 
     def get_special_steps(self):
         return {'PID wait for stable': [PID_wait_for_stable, PID_wait_for_stable_config]}
-
-    def get_substitutions_string(self, ioc_name:str, communication:str):
-        substring = f'file "db/{self.name}.db" {{\n'
-        substring += f'    {{SETUP = "{ioc_name}", device = "{self.custom_name}"}}\n'
-        substring += '}'
-        return substring
 
     def get_necessary_devices(self):
         inp_dev = variables_handling.channels[self.settings['read_signal_name']].device
@@ -73,9 +67,9 @@ class subclass(device_class.Device):
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         super().__init__(parent, 'PID_Controller', data, settings_dict,
-                         config_dict, ioc_dict, additional_info)
+                         config_dict, additional_info)
         # self.comboBox_connection_type.addItem()
         # self.layout().removeWidget(self.comboBox_connection_type)
         # self.comboBox_connection_type.deleteLater()
@@ -90,12 +84,6 @@ class subclass_config(device_class.Device_Config):
 
     def get_config(self):
         return self.sub_widget.get_config()
-
-    # def get_ioc_settings(self):
-    #     self.ioc_settings.clear()
-    #     self.ioc_settings.update({'use_local_ioc': self.checkBox_use_local_ioc.isChecked(),
-    #                               'ioc_name': self.lineEdit_ioc_name.text()})
-    #     return self.ioc_settings
 
 
 

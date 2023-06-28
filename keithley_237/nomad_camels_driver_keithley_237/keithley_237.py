@@ -4,7 +4,10 @@ from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='keithley_237', virtual=False, tags=['DMM', 'voltage', 'current',], directory='keithley_237', ophyd_device=Keithley_237, ophyd_class_name='Keithley_237', **kwargs)
+        super().__init__(name='keithley_237', virtual=False,
+                         tags=['DMM', 'voltage', 'current',],
+                         ophyd_device=Keithley_237,
+                         ophyd_class_name='Keithley_237', **kwargs)
         self.config['Four_wire'] = False
         self.config['Averages'] = "1"
         self.config['Integration_time'] = "20ms"
@@ -18,7 +21,7 @@ class subclass(device_class.Device):
 
 class subclass_config(device_class.Simple_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, ioc_dict=None, additional_info=None):
+                 config_dict=None, additional_info=None):
         comboBoxes = {'Source_Type': ["Voltage", "Current", "Sweep Voltage", "Sweep Current"],
                       'Current_compliance_range': ["Auto", "1nA", "10nA", "100nA", "1uA",
                                              "10uA", "100uA", "1mA", "10mA", "100mA"],
@@ -37,8 +40,8 @@ class subclass_config(device_class.Simple_Config):
                   'Sweep_Hysteresis': 'Sweep Hysteresis',
                   "Averages": 'Averages',
                   }
-        super().__init__(parent, 'Keithley 237', data, settings_dict, config_dict, ioc_dict,
-                         additional_info, comboBoxes=comboBoxes, labels=labels)
+        super().__init__(parent, 'Keithley 237', data, settings_dict,
+                         config_dict, additional_info, comboBoxes=comboBoxes,
+                         labels=labels)
         self.comboBox_connection_type.addItem('Local VISA')
-        self.comboBox_connection_type.addItem('EPICS: USB-serial')
         self.load_settings()
