@@ -1,5 +1,5 @@
 agilent_34401a==0.1.0
-demo_dinstrument==0.1.0
+demo_instrument==0.1.0
 keithley_237==0.1.0
 keithley_2000==0.1.0
 keysight_b2912a==0.1.0

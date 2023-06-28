@@ -5,7 +5,7 @@ from PySide6.QtWidgets import QCheckBox, QLineEdit, QComboBox, QLabel, QFrame, \
 
 from nomad_camels.main_classes import device_class
 
-from .daq_custom_device_ophyd import Custom_DAQ_Device
+from .ni_daq_ophyd import Custom_DAQ_Device
 
 
 class subclass(device_class.Device):
