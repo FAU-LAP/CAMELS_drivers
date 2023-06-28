@@ -1,11 +1,11 @@
 from nomad_camels.main_classes import device_class
-from .demo_device_ophyd import Demo_Device
+from .demo_instrument_ophyd import Demo_Device
 
 from PySide6.QtWidgets import QTableWidget, QTableWidgetItem
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='demo_device', virtual=True,
+        super().__init__(name='demo_instrument', virtual=True,
                          tags=['virtual', 'demo', 'ophyd', 'detector'],
                          ophyd_device=Demo_Device,
                          ophyd_class_name='Demo_Device',
