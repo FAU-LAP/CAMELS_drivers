@@ -3,19 +3,26 @@ import os.path
 from PySide6.QtCore import QItemSelectionModel, Qt
 import sys
 import pytest
+import importlib
 
-camels_path = r'C:\Users\od93yces\FAIRmat\CAMELS'
-sys.path.append(camels_path)
+from nomad_camels.frontpanels import manage_instruments
+from nomad_camels.utility import variables_handling
+driver_path = os.path.dirname(os.path.dirname(__file__))
+variables_handling.device_driver_path = driver_path
 
-with open('../driver_list.txt') as f:
-    instr_list = [x.split('==')[0] for x in f.readlines()]
+try:
+    with open('../driver_list.txt') as f:
+        instr_list = [x.split('==')[0] for x in f.readlines()]
+except:
+    with open('driver_list.txt') as f:
+        instr_list = [x.split('==')[0] for x in f.readlines()]
 
 
 @pytest.mark.parametrize('instr_under_test', instr_list)
 def test_instruments(qtbot, instr_under_test):
-    from nomad_camels.frontpanels import manage_instruments
-    from nomad_camels.utility import variables_handling
-    variables_handling.device_driver_path = os.path.dirname(os.path.dirname(__file__))
+    sys.path.append(f'{driver_path}/{instr_under_test}')
+    module = importlib.import_module(f'.{instr_under_test}', f'nomad_camels_driver_{instr_under_test}')
+    instr = module.subclass()
 
     manager = manage_instruments.ManageInstruments()
     qtbot.addWidget(manager)
