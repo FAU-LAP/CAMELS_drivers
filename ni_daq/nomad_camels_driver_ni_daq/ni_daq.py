@@ -10,7 +10,7 @@ from .ni_daq_ophyd import Custom_DAQ_Device
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='NI_DAQ', virtual=False, tags=['DAQ'],
+        super().__init__(name='ni_daq', virtual=False, tags=['DAQ'],
                          ophyd_device=Custom_DAQ_Device,
                          ophyd_class_name='Custom_DAQ_Device', **kwargs)
 

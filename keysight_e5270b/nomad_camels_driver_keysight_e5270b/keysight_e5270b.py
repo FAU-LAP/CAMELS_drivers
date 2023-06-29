@@ -63,7 +63,7 @@ class subclass(device_class.Device):
         channels = copy.deepcopy(super().get_channels())
         removes = []
         for i in range(1, 9):
-            if not self.config[f'active{i}']:
+            if f'active{i}' not in self.config or not self.config[f'active{i}']:
                 for key in self.channels:
                     if key.endswith(str(i)):
                         removes.append(key)
