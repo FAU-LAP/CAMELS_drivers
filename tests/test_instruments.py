@@ -4,11 +4,16 @@ from PySide6.QtCore import QItemSelectionModel, Qt
 import sys
 import pytest
 import importlib
+import pip
+import tomllib
+import pkg_resources
 
-from nomad_camels.frontpanels import manage_instruments
+from nomad_camels.frontpanels import instrument_config
 from nomad_camels.utility import variables_handling
 driver_path = os.path.dirname(os.path.dirname(__file__))
 variables_handling.device_driver_path = driver_path
+
+installed_packages = {pkg.key for pkg in pkg_resources.working_set}
 
 try:
     with open('../driver_list.txt') as f:
@@ -20,14 +25,25 @@ except:
 
 @pytest.mark.parametrize('instr_under_test', instr_list)
 def test_instruments(qtbot, instr_under_test):
-    sys.path.append(f'{driver_path}/{instr_under_test}')
+    global installed_packages
+    instr_path = f'{driver_path}/{instr_under_test}'
+    toml_file = f'{instr_path}/pyproject.toml'
+    if os.path.isfile(toml_file):
+        with open(toml_file, 'rb') as toml_f:
+            toml = tomllib.load(toml_f)
+        if 'project' in toml and 'dependencies' in toml['project']:
+            for d in toml['project']['dependencies']:
+                if d in installed_packages:
+                    continue
+                pip.main(['install', d])
+                installed_packages.add(d)
+    sys.path.append(instr_path)
     module = importlib.import_module(f'.{instr_under_test}', f'nomad_camels_driver_{instr_under_test}')
     instr = module.subclass()
+    assert instr is not None
 
-    manager = manage_instruments.ManageInstruments()
-    qtbot.addWidget(manager)
-
-    conf = manager.config_widget
+    conf = instrument_config.Instrument_Config()
+    qtbot.addWidget(conf)
     conf.build_table()
 
 
