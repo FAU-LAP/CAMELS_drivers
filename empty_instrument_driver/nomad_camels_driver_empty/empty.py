@@ -1,4 +1,4 @@
-from nomad_camels_driver_instrument_name.instrument_name_ophyd import instrument_name
+from .empty_ophyd import Instrument_Name
 from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
@@ -6,7 +6,7 @@ class subclass(device_class.Device):
         super().__init__(name='instrument_name', virtual=False,
                          # Change the tags to fit your device
                          tags=['Function', 'Sine', 'Waveform', 'Generator', 'Voltage'],
-                         ophyd_device=instrument_name,
+                         ophyd_device=Instrument_Name,
                          ophyd_class_name='instrument_name', **kwargs)
 
         # Configs are optional
