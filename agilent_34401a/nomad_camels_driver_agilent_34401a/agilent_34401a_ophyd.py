@@ -6,15 +6,31 @@ from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, VISA_Signal_R
 
 
 class Agilent_34401(VISA_Device):
-    measure_voltage_DC = Cpt(VISA_Signal_RO, name='measure_voltage_DC', query="MEAS:VOLT:DC?", metadata={'units': 'V', 'description': 'Measures DC voltage. Sends the MEAS:VOLT:DC? command.'})
-    measure_current_DC = Cpt(VISA_Signal_RO, name='measure_current_DC', query="MEAS:CURR:DC?", metadata={'units': 'A', 'description': 'Measures DC current. Sends the MEAS:CURR:DC? command.'})
-    measure_voltage_AC = Cpt(VISA_Signal_RO, name='measure_voltage_AC', query="MEAS:VOLT:AC?", metadata={'units': 'V'})
-    measure_current_AC = Cpt(VISA_Signal_RO, name='measure_current_AC', query="MEAS:CURR:AC?", metadata={'units': 'A'})
-    measure_resistance = Cpt(VISA_Signal_RO, name='measure_resistance', query="MEAS:RES?", metadata={'units': 'Ohm'})
-    measure_resistance_4wire = Cpt(VISA_Signal_RO, name='measure_resistance_4wire', query="MEAS:FRES?", metadata={'units': 'Ohm'})
-    device_ID = Cpt(VISA_Signal_RO, name='device_ID', kind='config', query='*IDN?')
-    nPLC = Cpt(VISA_Signal, name='nPLC', kind='config',
-               write='VOLT:DC:NPLC {value};CURR:DC:NPLC {value};RES:NPLC {value}')
+    measure_voltage_DC = Cpt(VISA_Signal_RO,
+                             name='measure_voltage_DC', query="MEAS:VOLT:DC?",
+                             metadata={'units': 'V', 'description': 'Measures DC voltage. Sends the MEAS:VOLT:DC? command.'})
+    measure_current_DC = Cpt(VISA_Signal_RO,
+                             name='measure_current_DC', query="MEAS:CURR:DC?",
+                             metadata={'units': 'A', 'description': 'Measures DC current. Sends the MEAS:CURR:DC? command.'})
+    measure_voltage_AC = Cpt(VISA_Signal_RO,
+                             name='measure_voltage_AC', query="MEAS:VOLT:AC?",
+                             metadata={'units': 'V', 'description':'Measures AC voltage. Sends the MEAS:VOLT:AC? command.'})
+    measure_current_AC = Cpt(VISA_Signal_RO,
+                             name='measure_current_AC', query="MEAS:CURR:AC?",
+                             metadata={'units': 'A', 'description':'Measures AC current. Sends the MEAS:CURR:AC? command.'})
+    measure_resistance = Cpt(VISA_Signal_RO,
+                             name='measure_resistance', query="MEAS:RES?",
+                             metadata={'units': 'Ohm', 'description':'Measures DC resistance. Sends the MEAS:RES? command.'})
+    measure_resistance_4wire = Cpt(VISA_Signal_RO,
+                                   name='measure_resistance_4wire', query="MEAS:FRES?",
+                                   metadata={'units': 'Ohm', 'description':'Measures four wire DC resistance. Sends the MEAS:FRES? command.'})
+    device_ID = Cpt(VISA_Signal_RO,
+                    name='device_ID', kind='config', query='*IDN?',
+                    metadata={'description':'Device ID. Sends the *IDN? command.'})
+    nPLC = Cpt(VISA_Signal,
+               name='nPLC', kind='config',
+               write='VOLT:DC:NPLC {value};CURR:DC:NPLC {value};RES:NPLC {value};FRES:NPLC {value}',
+               metadata={'description':''})
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, resource_name='',
