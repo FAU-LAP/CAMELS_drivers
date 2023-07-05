@@ -10,13 +10,13 @@ def gauss(x, sig, a, mu):
 
 
 class Demo_Device(Device):
-    motorX = Cpt(Custom_Function_Signal, name='motorX', metadata={'units': 'm', 'description': 'This is the X-axis of the not actually existing motor.'})
-    motorY = Cpt(Custom_Function_Signal, name='motorY', metadata={'units': 'm'})
-    motorZ = Cpt(Custom_Function_Signal, name='motorZ', metadata={'units': 'm'})
-    detectorX = Cpt(Custom_Function_SignalRO, name='detectorX', metadata={'units': 'counts/s'})
-    detectorY = Cpt(Custom_Function_SignalRO, name='detectorY', metadata={'units': 'kg'})
-    detectorZ = Cpt(Custom_Function_SignalRO, name='detectorZ', metadata={'units': 'eV'})
-    detectorComm = Cpt(Custom_Function_SignalRO, name='detectorComm', metadata={'units': '$'})
+    motorX = Cpt(Custom_Function_Signal, name='motorX', metadata={'units': 'm', 'description': 'This is the X-axis of the virtual motor.'})
+    motorY = Cpt(Custom_Function_Signal, name='motorY', metadata={'units': 'm', 'description': 'This is the Y-axis of the virtual motor.'})
+    motorZ = Cpt(Custom_Function_Signal, name='motorZ', metadata={'units': 'm', 'description': 'This is the Z-axis of the virtual motor.'})
+    detectorX = Cpt(Custom_Function_SignalRO, name='detectorX', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorX value.'})
+    detectorY = Cpt(Custom_Function_SignalRO, name='detectorY', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorY value.'})
+    detectorZ = Cpt(Custom_Function_SignalRO, name='detectorZ', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorZ value.'})
+    detectorComm = Cpt(Custom_Function_SignalRO, name='detectorComm', metadata={'units': 'counts/s', 'description': 'Returns sum of gaussian functions of detector X, Y and Z.'})
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, motor_noises=None,
