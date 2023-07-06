@@ -87,13 +87,13 @@ class Keithley_237(VISA_Device):
     X: Execute DDCs
     """
     read_voltage = Cpt(VISA_Signal_RO, name='read_voltage',
-                  metadata={'units': 'V',})
+                  metadata={'units': 'V', 'description': 'Reads a single voltage value.'})
     read_current = Cpt(VISA_Signal_RO, name='read_current',
-                  metadata={'units': 'A',})
+                  metadata={'units': 'A', 'description': 'Reads a single current value.'})
     set_voltage = Cpt(VISA_Signal, name='set_voltage',
-                 metadata={'units': 'V',})
+                 metadata={'units': 'V', 'description': 'Sets a single voltage value.'})
     set_current = Cpt(VISA_Signal, name='set_current',
-                      metadata={'units': 'V', })
+                      metadata={'units': 'A', 'description': 'Sets a single current value.'})
     start_voltage_sweep = Cpt(VISA_Signal, name='start_voltage_sweep',
                               metadata={'description': 'Set to 1 to start the sweep after all required values '
                                                        'are set with a Set Channels step.', })
