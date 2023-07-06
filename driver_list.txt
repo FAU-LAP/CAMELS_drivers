@@ -1,9 +1,10 @@
 agilent_34401a==0.1.0
 demo_instrument==0.1.0
-keithley_237==0.1.0
+keithley_237==0.1.1
 keithley_2000==0.1.0
 keysight_b2912a==0.1.0
 keysight_e5270b==0.1.0
-NI_DAQ==0.1.1
-PID==0.1.1
-voltcraft_pps==0.1.1
+ni_daq==0.1.0
+PID==0.1.0
+voltcraft_pps==0.1.0
+

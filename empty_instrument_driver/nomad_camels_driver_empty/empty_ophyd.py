@@ -7,7 +7,7 @@ from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function
 
 
 
-class instrument_name(VISA_Device):
+class Instrument_Name(VISA_Device):
 
     # This is an example for a standard identification query
     get_ID = Cpt(VISA_Signal_RO, name='get_ID', query='*IDN?', metadata={'ID': 'string'})
@@ -29,10 +29,13 @@ class instrument_name(VISA_Device):
                          resource_name=resource_name, baud_rate=baud_rate,
                          write_termination=write_termination,
                          read_termination=read_termination, **kwargs)
+        # Hand the complicated_set_function as the function to produce the
+        # write string
+        self.complicated_set.write = self.complicated_set_function
 
 
     def complicated_set_function(self, set_value) -> str:
-        # Create a string ehre that is passed to the instrument
+        # Create a string here that is passed to the instrument
         # Function must return a string
 
         # Here we get the config saved in 'custom_signal_config'
@@ -40,6 +43,3 @@ class instrument_name(VISA_Device):
         created_string = f'set this {set_value} with this setting {setting_value}'
         return created_string
 
-
-if __name__ == '__main__':
-    testk = instrument_name(name='test_instrument_name')

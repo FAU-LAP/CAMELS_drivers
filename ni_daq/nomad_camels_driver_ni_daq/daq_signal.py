@@ -37,8 +37,12 @@ def get_an_config(terminal_config='default'):
 class DAQ_Signal_Output(Signal):
     def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', line_name='', digital=False, minV=-10, maxV=10, terminal_config='default', wait_time=0):
         super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
-        self.task = nidaqmx.Task()
-        tasks.append(self.task)
+        try:
+            self.task = nidaqmx.Task()
+            tasks.append(self.task)
+        except:
+            print('could not use an nidaqmx task!')
+            self.task = None
         self.digital = digital
         self.terminal_config = terminal_config
         self.minV = minV
@@ -84,7 +88,12 @@ class DAQ_Signal_Output(Signal):
 class DAQ_Signal_Input(SignalRO):
     def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', line_name='', digital=False, minV=-10, maxV=10, terminal_config='default'):
         super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
-        self.task = nidaqmx.Task()
+        try:
+            self.task = nidaqmx.Task()
+            tasks.append(self.task)
+        except:
+            print('could not use an nidaqmx task!')
+            self.task = None
         tasks.append(self.task)
         self.digital = digital
         self.minV = minV
