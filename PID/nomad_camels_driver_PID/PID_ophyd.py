@@ -71,6 +71,8 @@ class PID_Controller(Device):
             read_signal = device_handling.get_channel_from_string(read_signal)
         if isinstance(set_signal, str):
             set_signal = device_handling.get_channel_from_string(set_signal)
+        if bias_signal == 'None':
+            bias_signal = None
         if isinstance(bias_signal, str):
             bias_signal = device_handling.get_channel_from_string(bias_signal)
 
@@ -138,6 +140,7 @@ class PID_Controller(Device):
             # for y in y_axes:
             #     self.plot.plot.current_lines[y].setLinestyle('None')
             self.pid_thread.new_data.connect(self.data_update)
+            self.pid_thread.finished.connect(self.plot.close)
             self.pid_thread.start()
             self.update_PID_vals(self.pid_thread.pid.setpoint)
 
@@ -201,7 +204,7 @@ class PID_Controller(Device):
 
     def finalize_steps(self):
         self.pid_thread.still_running = False
-        self.plot.close()
+        # self.plot.close()
 
 
     def update_PID_vals(self, setpoint, force=False):

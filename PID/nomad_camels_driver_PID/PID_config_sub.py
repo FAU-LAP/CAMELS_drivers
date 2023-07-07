@@ -50,6 +50,7 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.comboBox_bias = QComboBox()
         self.lineEdit_time = QLineEdit('1')
         self.comboBox_input.addItems(sorted(variables_handling.channels.keys(), key=lambda x: x.lower()))
+        self.comboBox_bias.addItem('None')
         for chan in sorted(variables_handling.channels.keys(), key=lambda x: x.lower()):
             if variables_handling.channels[chan].output:
                 self.comboBox_output.addItem(chan)
@@ -139,13 +140,20 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         if variables_handling.channels:
             inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
             out_chan = variables_handling.channels[self.comboBox_output.currentText()]
-            bias_chan = variables_handling.channels[self.comboBox_bias.currentText()]
             self.settings_dict['!non_string!_read_signal'] = inp_chan.get_bluesky_name()
             self.settings_dict['!non_string!_set_signal'] = out_chan.get_bluesky_name()
-            self.settings_dict['!non_string!_bias_signal'] = bias_chan.get_bluesky_name()
+            bias_text = self.comboBox_bias.currentText()
+            if bias_text != 'None':
+                bias_chan = variables_handling.channels[bias_text]
+                self.settings_dict['!non_string!_bias_signal'] = bias_chan.get_bluesky_name()
+            else:
+                self.settings_dict['!non_string!_bias_signal'] = None
         self.settings_dict['read_signal_name'] = self.comboBox_input.currentText()
         self.settings_dict['set_signal_name'] = self.comboBox_output.currentText()
-        self.settings_dict['bias_signal_name'] = self.comboBox_bias.currentText()
+        if bias_text == 'None':
+            self.settings_dict['bias_signal_name'] = None
+        else:
+            self.settings_dict['bias_signal_name'] = bias_text
         self.settings_dict['show_plot'] = self.checkBox_plot.isChecked()
         return self.settings_dict
 
