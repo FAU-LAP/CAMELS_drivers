@@ -45,7 +45,7 @@ class PID_Controller(Device):
     current_value = Cpt(Custom_Function_SignalRO, name='current_value')
     setpoint = Cpt(Custom_Function_Signal, name='setpoint')
     pid_stable = Cpt(Custom_Function_SignalRO, name='pid_stable')
-    pid_on = Cpt(Custom_Function_Signal, name='pid_on')
+    pid_on = Cpt(Custom_Function_Signal, value=False, name='pid_on')
     p_value = Cpt(Custom_Function_SignalRO, name='p_value')
     i_value = Cpt(Custom_Function_SignalRO, name='i_value')
     d_value = Cpt(Custom_Function_SignalRO, name='d_value')

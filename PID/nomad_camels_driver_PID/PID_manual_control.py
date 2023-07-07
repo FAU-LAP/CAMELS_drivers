@@ -198,14 +198,14 @@ class PID_update_thread(QThread):
         self.device = device
         self.update_time = device.dt.get()
         self.stopping = False
-        self.starttime = 0
+        self.starttime = 0.0
         self.still_running = True
 
     def run(self):
         self.starttime = time.time()
         self.do_reading()
         while self.still_running:
-            if self.update_time < 0:
+            if self.update_time < 0.0:
                 time.sleep(5)
                 continue
             time.sleep(self.update_time)
