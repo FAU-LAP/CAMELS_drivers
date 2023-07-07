@@ -215,5 +215,5 @@ class PID_update_thread(QThread):
         setp = self.device.setpoint.get()
         pid_val = self.device.current_value.get()
         output = self.device.output_value.get()
-        on = self.device.pid_on.get()
+        on = bool(self.device.pid_on.get())
         self.data_sig.emit(setp, pid_val, output, on)
