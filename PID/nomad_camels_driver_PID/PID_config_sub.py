@@ -137,6 +137,7 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.settings_dict['val_file'] = self.file_box.get_path()
         self.settings_dict['read_conv_func'] = self.lineEdit_read_function.text()
         self.settings_dict['set_conv_func'] = self.lineEdit_set_function.text()
+        bias_text = 'None'
         if variables_handling.channels:
             inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
             out_chan = variables_handling.channels[self.comboBox_output.currentText()]
