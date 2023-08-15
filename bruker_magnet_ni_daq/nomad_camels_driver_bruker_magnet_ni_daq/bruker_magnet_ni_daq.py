@@ -14,11 +14,6 @@ class subclass(device_class.Device):
     def get_config(self):
         return {}
 
-    def get_finalize_steps(self):
-        s = '\t\tfrom nomad_camels.bluesky_handling import daq_signal\n'
-        s += '\t\tdaq_signal.close_tasks()\n'
-        return s
-
 
 class subclass_config(device_class.Device_Config):
     def __init__(self, parent=None, data='', settings_dict=None,

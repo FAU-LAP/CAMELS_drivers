@@ -14,11 +14,6 @@ class subclass(device_class.Device):
                          ophyd_device=Custom_DAQ_Device,
                          ophyd_class_name='Custom_DAQ_Device', **kwargs)
 
-    def get_finalize_steps(self):
-        s = '\t\tfrom nomad_camels.bluesky_handling import daq_signal\n'
-        s += '\t\tdaq_signal.close_tasks()\n'
-        return s
-
     def get_settings(self):
         return {'component_setups': self.settings}
 
