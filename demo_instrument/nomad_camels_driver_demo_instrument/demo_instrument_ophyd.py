@@ -75,6 +75,9 @@ class Demo_Device(Device):
             g = g_new
         return g + self.detector_noises[n] * (1 - np.random.rand())
 
+    def finalize_steps(self):
+        print(f'{self.name} is being closed')
+
 
 if __name__ == '__main__':
     dem = Demo_Device(name='dem')
