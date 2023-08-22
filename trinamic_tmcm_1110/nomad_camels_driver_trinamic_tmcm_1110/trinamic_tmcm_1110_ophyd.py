@@ -62,6 +62,7 @@ class TMCM_1110(Device):
                          **kwargs)
         if name == 'test':
             return
+        print('hi')
         self.search_reference_on_start = search_reference_on_start
         try:
             self.interface = ConnectionManager(f'--port {connection_port}').connect()
@@ -69,8 +70,8 @@ class TMCM_1110(Device):
             arg_string = f"--interface serial_tmcl --port {connection_port} --data-rate 115200"
             self.interface = ConnectionManager(arg_string).connect()
         self.module = TMCM1140(self.interface)
-        self.motor_number = motor_number
-        self.motor = self.module.motors[motor_number]
+        self.motor_number = int(motor_number)
+        self.motor = self.module.motors[self.motor_number]
 
         ap = self.motor.AP
         self.ap_names = {'ref_search_mode': ap.ReferenceSearchMode,
@@ -113,15 +114,15 @@ class TMCM_1110(Device):
             value = reference_search_modes[value]
         elif name == 'microstep_resolution':
             value = step_mode[value]
-        elif name in ['right_lim_switch_disable', 'left_lim_switch_disable',
-                      'soft_stop_flag']:
+        else:
             value = int(value)
         self.motor.set_axis_parameter(self.ap_names[name], value)
 
     def configure(self, d):
-        super().configure(d)
+        conf = super().configure(d)
         if self.search_reference_on_start:
             self.find_reference()
+        return conf
 
     def find_reference(self):
         self.interface.reference_search(0, self.motor_number, self.module.module_id)
@@ -131,148 +132,10 @@ class TMCM_1110(Device):
         self.motor.actual_position = 0
 
     def move_position(self, value):
-        self.motor.move_to(value)
+        self.motor.move_to(int(value))
         while not self.motor.get_position_reached():
             time.sleep(0.1)
 
+    def finalize_steps(self):
+        self.interface.close()
 
-
-if __name__ == '__main__':
-
-    # for serial interface
-    #with ConnectionManager("--interface serial_tmcl --port COM6 --data-rate 115200").connect() as my_interface:
-    # for usb interface
-    stage = TMCM_1110(name='stage')
-    with ConnectionManager('--port COM11').connect() as my_interface:
-        print(my_interface)
-        module = TMCM1140(my_interface)
-        motor = module.motors[0]
-
-
-        # The configuration is based on our PD42-1-1140-TMCL
-        # If you use a different motor be sure you have the right configuration setup otherwise the script may not working.
-
-        print("Preparing parameters...")
-
-        motor.set_axis_parameter(motor.AP.ReferenceSearchMode, reference_search_modes['left switch'])
-        motor.set_axis_parameter(motor.AP.RightLimitSwitchDisable, 1)
-        motor.set_axis_parameter(motor.AP.LeftLimitSwitchDisable, 1)
-        motor.set_axis_parameter(motor.AP.ReferenceSearchSpeed, 100)
-        motor.set_axis_parameter(motor.AP.ReferenceSwitchSpeed, 10)
-        motor.set_axis_parameter(motor.AP.MaxAcceleration, 100)
-        motor.set_axis_parameter(motor.AP.MaxVelocity, 100)
-        motor.set_axis_parameter(motor.AP.PowerDownDelay, 2000)
-        motor.set_axis_parameter(motor.AP.StandbyCurrent, 0)
-        motor.set_axis_parameter(motor.AP.MaxCurrent, 200)
-        motor.set_axis_parameter(motor.AP.FreewheelingDelay, 2000)
-        motor.set_axis_parameter(motor.AP.PulseDivisor, 4)
-        motor.set_axis_parameter(motor.AP.RampDivisor, 7)
-        motor.set_axis_parameter(motor.AP.SoftStopFlag, 1)
-        motor.set_axis_parameter(motor.AP.MicrostepResolution, step_mode['8 micro'])
-
-        # preparing drive settings
-        # motor.drive_settings.max_current = 200
-        # motor.drive_settings.standby_current = 0
-        # # motor.drive_settings.boost_current = 0
-        # motor.drive_settings.microstep_resolution = motor.ENUM.MicrostepResolution256Microsteps
-        # motor.set_axis_parameter()
-        # # print(motor.drive_settings)
-
-        # preparing linear ramp settings
-        # motor.linear_ramp.max_acceleration = 1000
-        # motor.linear_ramp.max_velocity = 1000
-        # print(motor.linear_ramp)
-
-        time.sleep(1.0)
-
-        motor.move_to(5000)
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        my_interface.reference_search(0, 0, module.module_id)
-        print(my_interface.reference_search(2, 0, module.module_id))
-        while my_interface.reference_search(2, 0, module.module_id):
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            print(my_interface.reference_search(2, 0, module.module_id))
-            time.sleep(0.2)
-        # time.sleep(5)
-        print(my_interface.reference_search(2, 0, module.module_id))
-        raise Exception('break')
-        # clear position counter
-        motor.actual_position = 0
-        # start rotating motor for 5 sek
-        # print("Rotating...")
-        # motor.rotate(1000)
-        # time.sleep(5)
-
-        # # stop rotating motor
-        # print("Stopping...")
-        # motor.stop()
-
-        # # read actual position
-        # print("ActualPosition = {}".format(motor.actual_position))
-        # time.sleep(2)
-
-        # print("Doubling moved distance.")
-        # motor.move_by(motor.actual_position)
-
-        # # wait till position_reached
-        # while not motor.get_position_reached():
-        #     print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-        #     time.sleep(0.2)
-
-        # print("Furthest point reached.")
-        # print("ActualPosition = {}".format(motor.actual_position))
-
-        # # short delay and move back to start
-        # time.sleep(3)
-        print("Moving back to 0...")
-        motor.move_to(3473)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position 0.")
-        time.sleep(5)
-
-        motor.move_to(2432)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position 1.")
-        time.sleep(5)
-
-        motor.move_to(1400)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position 2.")
-        time.sleep(5)
-
-        motor.move_to(418)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position 3.")
-        time.sleep(5)
-
-        motor.move_to(-600)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position 4.")
-        time.sleep(5)
-
-        motor.move_to(-1600)
-        # wait until position 0 is reached
-        while not motor.get_position_reached():
-            print("target position: " + str(motor.target_position) + " actual position: " + str(motor.actual_position))
-            time.sleep(0.2)
-        print("Reached position block.")
-        time.sleep(5)
-
-    print("\nReady.")
