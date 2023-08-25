@@ -62,7 +62,6 @@ class TMCM_1110(Device):
                          **kwargs)
         if name == 'test':
             return
-        print('hi')
         self.search_reference_on_start = search_reference_on_start
         try:
             self.interface = ConnectionManager(f'--port {connection_port}').connect()
