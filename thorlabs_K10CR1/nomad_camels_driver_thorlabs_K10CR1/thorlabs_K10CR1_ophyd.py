@@ -38,7 +38,7 @@ class Thorlabs_K10CR1(Device):
 
     def set_pos(self, value):
         self.stage.move_to(value)
-        self.stage.wait_move()
+        # self.stage.wait_move()
 
     def finalize_steps(self):
         self.stage.close()
