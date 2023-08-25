@@ -9,6 +9,7 @@ class subclass(device_class.Device):
                          tags=['virtual', 'demo', 'ophyd', 'detector'],
                          ophyd_device=Demo_Device,
                          ophyd_class_name='Demo_Device',
+                         non_channel_functions=['printing_function'],
                          **kwargs)
 
 

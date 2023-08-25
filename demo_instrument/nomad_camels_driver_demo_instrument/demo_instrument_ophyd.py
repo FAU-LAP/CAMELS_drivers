@@ -75,6 +75,24 @@ class Demo_Device(Device):
             g = g_new
         return g + self.detector_noises[n] * (1 - np.random.rand())
 
+    def printing_function(self, new_lines=True):
+        if new_lines:
+            end = '\n'
+        else:
+            end = '; '
+        print(f'motor_vals: {self.motor_vals}', end=end)
+        print(f'motor_last_vals: {self.motor_last_vals}', end=end)
+        print(f'motor_noises: {self.motor_noises}', end=end)
+        print(f'detector_noises: {self.detector_noises}', end=end)
+        print(f'set_delays: {self.set_delays}', end=end)
+        print(f'system_delays: {self.system_delays}', end=end)
+        print(f'motor_set_times: {self.motor_set_times}', end=end)
+        print(f'motor_old_vals: {self.motor_old_vals}', end=end)
+        print(f'system_old_vals: {self.system_old_vals}', end=end)
+        print(f'sigmas: {self.sigmas}', end=end)
+        print(f'mus: {self.mus}', end=end)
+        print(f'amps: {self.amps}', end=end)
+
     def finalize_steps(self):
         print(f'{self.name} is being closed')
 
