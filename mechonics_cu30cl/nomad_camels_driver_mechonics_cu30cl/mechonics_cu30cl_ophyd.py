@@ -140,6 +140,26 @@ class Mechonics_CU30CL(Device):
     def finalize_steps(self):
         self.stage.close()
 
+    def manual_move_start_x(self, speed=None):
+        self._manual_move_start(0, speed)
+
+    def manual_move_start_y(self, speed=None):
+        self._manual_move_start(1, speed)
+
+    def manual_move_start_z(self, speed=None):
+        self._manual_move_start(2, speed)
+
+    def _manual_move_start(self, ax, speed=None):
+        speed = speed or self._speeds[ax]
+        speeds = [0, 0, 0]
+        directions = [0, 0, 0]
+        if speed < 0:
+            speed *= -1
+            directions[ax] = 1
+        speeds[ax] = speed
+        self.stage.direction_move(speeds, directions)
+
+
 
 
 if __name__ == '__main__':

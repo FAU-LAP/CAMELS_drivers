@@ -7,7 +7,10 @@ class subclass(device_class.Device):
                          tags=['Rotation Stage'],
                          ophyd_device=Mechonics_CU30CL,
                          ophyd_class_name='Mechonics_CU30CL',
-                         non_channel_functions=['find_reference', 'stop'],
+                         non_channel_functions=['find_reference', 'stop',
+                                                'manual_move_start_x',
+                                                'manual_move_start_y',
+                                                'manual_move_start_z',],
                          **kwargs)
         self.config['speed_x'] = 100
         self.config['speed_y'] = 100

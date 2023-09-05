@@ -321,6 +321,11 @@ class Servo3AxUSB2Wrapper:
                            sp[1], ds[1], ms[1], ps[1],
                            sp[2], ds[2], ms[2], ps[2])
 
+    def direction_move(self, speeds=None, directions=None):
+        self._manual_servo_move(speeds, directions, [0, 0, 0])
+
+
+
     def _open(self):
         dllOpen(*self.devRec)
     
