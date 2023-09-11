@@ -2,6 +2,9 @@
 
 Driver for the TMCM 1110 control board by Trinamic written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
+## Features
+Setting and reading the steppers position. Support of different reference search modes, setting of acceleration and velocity.
+
 
 ## Documentation
 

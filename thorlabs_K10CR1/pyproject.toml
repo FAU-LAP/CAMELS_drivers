@@ -3,21 +3,25 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nomad_camels_driver_demo_instrument"
-version = "0.1.1"
+name = "nomad_camels_driver_thorlabs_K10CR1"
+version = "0.1.0"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
-description = "This packes provides everything to run a demo instrument for CAMELS"
+description = "Instrument driver for the Thorlabs K10CR1 rotation mount for NOMAD-CAMELS"
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 
 ]
 dependencies = [
+    "pylablib",
+    "nomad-camels"
 ]
+
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
+"GitHub Drivers" = "https://github.com/FAU-LAP/CAMELS_drivers"
 "Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"

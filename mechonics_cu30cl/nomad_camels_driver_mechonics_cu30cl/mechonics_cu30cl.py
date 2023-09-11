@@ -4,10 +4,11 @@ from nomad_camels.main_classes import device_class
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(name='mechonics_cu30cl', virtual=False,
-                         tags=['Rotation Stage'],
+                         tags=['Stage'],
                          ophyd_device=Mechonics_CU30CL,
                          ophyd_class_name='Mechonics_CU30CL',
-                         non_channel_functions=['find_reference', 'stop',
+                         non_channel_functions=['find_reference',
+                                                'stop_movement',
                                                 'manual_move_start_x',
                                                 'manual_move_start_y',
                                                 'manual_move_start_z',],

@@ -38,14 +38,17 @@ class PI_E709(Device):
             self.pidevice.ConnectTCPIPByDescription(resource)
         print('connected: {}'.format(self.pidevice.qIDN().strip()))
         if autozero_on_start:
-            self.pidevice.ATZ()
-            pitools.waitonautozero(self.pidevice)
+            self.find_reference()
         
         self.position_set.put_function = self.set_pos
         self.position_get.read_function = self.get_pos
         self.servo_on.put_function = self.set_servo
         self.max_pos.read_function = lambda: pitools.getmaxtravelrange(self.pidevice, 'Z')['Z']
         self.min_pos.read_function = lambda: pitools.getmintravelrange(self.pidevice, 'Z')['Z']
+
+    def find_reference(self):
+        self.pidevice.ATZ()
+        pitools.waitonautozero(self.pidevice)
     
     def set_servo(self, value):
         pitools.setservo(self.pidevice, 'Z', value)
