@@ -107,3 +107,6 @@ class Custom_DAQ_Device(Device):
                                 for obj, description in funcs.items())
             reasons.append(f'Pending operations: {pending}')
         raise TimeoutError('; '.join(reasons))
+
+    def __del__(self):
+        self.finalize_steps()
