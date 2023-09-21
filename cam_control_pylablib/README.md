@@ -2,6 +2,19 @@
 
 Connects to the server of Cam-Control to save, snap and request frames. Written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
+## Changelog
+
+### 0.1.2
+Removed `read_wait` as it is no longer needed.
+
+### 0.1.1
+Optimized reading of frames into python. Drastically increased reading speed.
+
+### 0.1.0
+Core functions. Not optimized.
+
+
+
 
 ## Documentation
 The backbone of this driver is the cam-control software by [PyLabLib](https://pylablib-cam-control.readthedocs.io/). The software must be running and set up to [allow server communication](https://pylablib-cam-control.readthedocs.io/en/latest/expanding.html#control-server).
