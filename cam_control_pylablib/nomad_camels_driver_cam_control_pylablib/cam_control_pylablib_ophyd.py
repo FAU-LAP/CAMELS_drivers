@@ -5,7 +5,6 @@ import re
 import numpy as np
 import time
 import json
-from datetime import date
 from nomad_camels.bluesky_handling.custom_function_signal import \
     Custom_Function_Signal, Custom_Function_SignalRO
 
@@ -134,7 +133,7 @@ class Cam_Control_Pylablib(Device):
         # If path_suffix is set with Set_Channels than this name is used to save the file.
         if self.path_suffix.get() != None:
             self.sock.sendall(bytes(
-                r'{    "id": 0,    "purpose": "request",    "parameters": {  "name": "save/snap", "args": {"path": ' f'"{self.default_save_path}_{self.path_suffix.get()}_{date.today()}"' '}  }}',
+                r'{    "id": 0,    "purpose": "request",    "parameters": {  "name": "save/snap", "args": {"path": ' f'"{self.default_save_path}_{self.path_suffix.get()}_{time.time()}"' '}  }}',
                 'utf-8'))
             self.sock.recv(self.byte_length)
         # If no path_suffix is set, then the regular snap saving behaviour of the GUI is used
