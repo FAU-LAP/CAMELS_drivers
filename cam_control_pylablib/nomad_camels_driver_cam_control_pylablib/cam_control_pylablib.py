@@ -1,14 +1,14 @@
-from nomad_camels_driver_cam_control.cam_control_ophyd import Cam_Control_Pylablib
+from nomad_camels_driver_cam_control_pylablib.cam_control_pylablib_ophyd import Cam_Control_Pylablib
 from nomad_camels.main_classes import device_class
 
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='cam_control', virtual=False,
+        super().__init__(name='cam_control_pylablib', virtual=False,
                          tags=['Camera'],
-                         ophyd_device=Cam_Control,
-                         ophyd_class_name='Cam_Control',
-                         non_channel_functions=['start_saving', 'stop_saving', 'save_snapshot'],
+                         ophyd_device=Cam_Control_Pylablib,
+                         ophyd_class_name='Cam_Control_Pylablib',
+                         non_channel_functions=['start_saving', 'stop_saving', 'save_snapshot', 'grab_background'],
                          **kwargs)
         self.config['exposure_time'] = 100  # in ms
         self.settings['host_ip'] = '127.0.0.1'
