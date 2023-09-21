@@ -14,7 +14,6 @@ class subclass(device_class.Device):
         self.settings['host_ip'] = '127.0.0.1'
         self.settings['port'] = 18923
         self.settings['byte_length'] = 9000000
-        self.settings['read_wait'] = 1000  # in ms
 
 
 
@@ -25,7 +24,7 @@ class subclass_config(device_class.Simple_Config):
                   'port': 'Port',
                   'byte_length': 'Byte length',
                   'exposure_time': 'Exposure time (ms)',
-                  'read_wait': 'Wait for frame (ms)'}
+                  }
         super().__init__(parent, 'Cam Control', data, settings_dict,
                          config_dict, additional_info,labels=labels )
         self.load_settings()
