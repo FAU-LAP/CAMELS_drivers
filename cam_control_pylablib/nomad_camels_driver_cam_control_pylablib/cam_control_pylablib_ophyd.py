@@ -34,7 +34,6 @@ class Cam_Control_Pylablib(Device):
                  host_ip='127.0.0.1',
                  port=18923,
                  byte_length=9000000,
-                 read_wait=1000,
                  **kwargs):
         super().__init__(prefix=prefix, name=name, kind=kind,
                          read_attrs=read_attrs,
@@ -43,7 +42,6 @@ class Cam_Control_Pylablib(Device):
         self.host_ip = host_ip
         self.port = port
         self.byte_length = byte_length
-        self.read_wait = float(read_wait)/1000
         self.exposure_time.put_function = lambda x: self.exposure_time_function(exposure_time=x)
         self.get_single_frame.read_function = self.get_single_frame_function
         self.get_background_frame.read_function = self.get_background_frame_function
@@ -86,8 +84,6 @@ class Cam_Control_Pylablib(Device):
         self.sock.sendall(bytes(
             r'{    "id": 2,    "purpose": "request",    "parameters": {        "name": "stream/buffer/read" , "args": {"n": 1}  }}',
             'utf-8'))
-        # time.sleep(self.read_wait+self.exposure_time.get()/1000)
-        # time.sleep(self.exposure_time.get()/1000)
         time.sleep(0.1)
         full_read = self.sock.recv(self.byte_length)
         match = re.match(rb'^.*"nbytes": \d*}}', full_read)
@@ -114,7 +110,6 @@ class Cam_Control_Pylablib(Device):
             self.sock.sendall(bytes(
                 r'{    "id": 0,    "purpose": "request",    "parameters": {  "name": "proc/bgsub/get_snapshot_background"   }}',
                 'utf-8'))
-            # time.sleep(self.read_wait+self.exposure_time.get()/1000)
             time.sleep(0.1)
             full_read = self.sock.recv(self.byte_length)
             match = re.match(rb'^.*"nbytes": \d*}}', full_read)
