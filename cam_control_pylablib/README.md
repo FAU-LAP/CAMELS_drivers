@@ -5,7 +5,8 @@ Connects to the server of Cam-Control to save, snap and request frames. Written 
 ## Changelog
 
 ### 0.1.2
-Removed `read_wait` as it is no longer needed.
+- Removed `read_wait` as it is no longer needed.
+- Changed the end of the file name when using suffixes to be `time.time()` and not `datetime.date.today()`
 
 ### 0.1.1
 Optimized reading of frames into python. Drastically increased reading speed.
