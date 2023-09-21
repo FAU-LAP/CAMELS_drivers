@@ -1,8 +1,10 @@
 agilent_34401a==0.1.1
+cam_control==0.1.1
 demo_instrument==0.1.1
 keithley_237==0.1.1
 keithley_2000==0.1.0
 keithley_2182a==0.0.1
+keithley_2400==0.1.0
 keithley_6221==0.0.1
 keysight_b2912a==0.1.0
 keysight_e5270b==0.1.1
