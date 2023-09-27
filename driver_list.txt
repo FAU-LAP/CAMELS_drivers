@@ -1,5 +1,5 @@
 agilent_34401a==0.1.1
-cam_control==0.1.1
+cam_control_pylablib==0.1.1
 demo_instrument==0.1.1
 keithley_237==0.1.1
 keithley_2000==0.1.0

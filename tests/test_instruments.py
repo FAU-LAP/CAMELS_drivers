@@ -10,6 +10,16 @@ from nomad_camels.utility import variables_handling
 driver_path = os.path.dirname(os.path.dirname(__file__))
 variables_handling.device_driver_path = driver_path
 
+# drivers that need special files from manufacturer (e.g. dll)
+except_drivers = ['pi_stage_e709',
+                  'swabianinstruments_timetagger']
+
+if os.name != 'nt':
+    # drivers that run only on windows
+    except_drivers += ['mechonics_cu30cl']
+else:
+    # drivers that don't run on windows
+    except_drivers += []
 
 try:
     with open('../driver_list.txt') as f:
@@ -17,6 +27,10 @@ try:
 except:
     with open('driver_list.txt') as f:
         instr_list = [x.split('==')[0] for x in f.readlines()]
+
+for driver in except_drivers:
+    if driver in instr_list:
+        instr_list.remove(driver)
 
 @pytest.mark.parametrize('instr_under_test', instr_list)
 def test_instruments(qtbot, instr_under_test):
