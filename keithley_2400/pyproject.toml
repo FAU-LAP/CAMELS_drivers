@@ -17,7 +17,7 @@ classifiers = [
 
 ]
 dependencies = [
-    'nomad-camels < 0.2',
+    'nomad-camels >= 0.2',
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
