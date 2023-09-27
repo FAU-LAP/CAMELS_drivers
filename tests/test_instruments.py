@@ -12,7 +12,9 @@ variables_handling.device_driver_path = driver_path
 
 # drivers that need special files from manufacturer (e.g. dll)
 except_drivers = ['pi_stage_e709',
-                  'swabianinstruments_timetagger']
+                  'swabianinstruments_timetagger',
+                  'thorlabs_K10CR1',
+                  'thorlabs_MFF']
 
 if os.name != 'nt':
     # drivers that run only on windows
