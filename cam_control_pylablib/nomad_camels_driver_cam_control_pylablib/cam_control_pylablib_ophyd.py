@@ -33,6 +33,7 @@ class Cam_Control_Pylablib(Device):
                  host_ip='127.0.0.1',
                  port=18923,
                  byte_length=9000000,
+                 overwrite_exposure_time=True,
                  **kwargs):
         super().__init__(prefix=prefix, name=name, kind=kind,
                          read_attrs=read_attrs,
@@ -41,6 +42,7 @@ class Cam_Control_Pylablib(Device):
         self.host_ip = host_ip
         self.port = port
         self.byte_length = byte_length
+        self.overwrite_exposure_time = overwrite_exposure_time
         self.exposure_time.put_function = lambda x: self.exposure_time_function(exposure_time=x)
         self.get_single_frame.read_function = self.get_single_frame_function
         self.get_background_frame.read_function = self.get_background_frame_function
@@ -65,10 +67,11 @@ class Cam_Control_Pylablib(Device):
         time.sleep(0.1)
 
     def exposure_time_function(self, exposure_time=100):
-        self.sock.sendall(bytes(
-            r'{    "id": 0,    "purpose": "request",    "parameters": {"name": "gui/set/value", "args": {"name": "cam/cam/exposure", "value": ' + f'{exposure_time}' + '}}}' + "\n",
-            "utf-8"))
-        received = self.sock.recv(self.byte_length)
+        if self.overwrite_exposure_time:
+            self.sock.sendall(bytes(
+                r'{    "id": 0,    "purpose": "request",    "parameters": {"name": "gui/set/value", "args": {"name": "cam/cam/exposure", "value": ' + f'{exposure_time}' + '}}}' + "\n",
+                "utf-8"))
+            received = self.sock.recv(self.byte_length)
 
     def get_single_frame_function(self, ):
         self.sock.sendall(bytes(
@@ -155,7 +158,9 @@ class Cam_Control_Pylablib(Device):
             r'{    "id": 0,    "purpose": "request",    "parameters": { "name": "gui/get/value"  }}',
             "utf-8"))
         complete_settings_string = str(self.sock.recv(self.byte_length), 'utf-8')
-        return complete_settings_string
+        complete_settings_dict = json.loads(complete_settings_string)
+        pretty_string_complete_settings = json.dumps(complete_settings_dict, sort_keys=True, indent=4)
+        return pretty_string_complete_settings
 
     def set_roi_function(self, value):
         self.sock.sendall(bytes(
@@ -168,6 +173,20 @@ class Cam_Control_Pylablib(Device):
         r'{    "id": 0,    "purpose": "request",    "parameters": {"name": "gui/set/value", "args": {"name": "proc/grab_background", "value": "True"}}}',
         "utf-8"))
         self.sock.recv(self.byte_length)
+        time.sleep(0.5)
+        self.sock.sendall(bytes(
+            r'{    "id": 0,    "purpose": "request",    "parameters": { "name": "gui/get/value"  , "args": {"name": "proc/background_state"}}}',
+            "utf-8"))
+        status = self.sock.recv(self.byte_length)
+        status_dict = json.loads(str(status, 'utf-8'))
+        while status_dict['parameters']['args']['value'] == 'Accumulating':
+            self.sock.sendall(bytes(
+                r'{    "id": 0,    "purpose": "request",    "parameters": { "name": "gui/get/value"  , "args": {"name": "proc/background_state"}}}',
+                "utf-8"))
+            status = self.sock.recv(self.byte_length)
+            status_dict = json.loads(str(status, 'utf-8'))
+
+
 
     def finalize_steps(self):
         self.sock.close()
