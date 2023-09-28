@@ -4,6 +4,11 @@ Connects to the server of Cam-Control to save, snap and request frames. Written 
 
 ## Changelog
 
+### 0.1.3
+- Changed `grab_background` to wait for the background to be grabbed before continuing.
+- Changed `get_single_frame` and `get_background_frame` to wait for the frames to actually be available and then read them.
+- Added device setting that allows you to choose if you want to overwrite the exposure time set in the GUI.
+
 ### 0.1.2
 - Removed `read_wait` as it is no longer needed.
 - Changed the end of the file name when using suffixes to be `time.time()` and not `datetime.date.today()`
