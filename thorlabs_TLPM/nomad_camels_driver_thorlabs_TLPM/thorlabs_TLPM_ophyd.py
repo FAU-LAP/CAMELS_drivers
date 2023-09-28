@@ -2,8 +2,13 @@ from ophyd import Component as Cpt
 from ophyd import Device
 from nomad_camels.bluesky_handling.custom_function_signal import \
     Custom_Function_Signal, Custom_Function_SignalRO
-from .TLPM import TLPM
-from ctypes import cdll,c_long, c_ulong, c_uint32,byref,create_string_buffer,c_bool,c_char_p,c_int,c_int16,c_double, sizeof, c_voidp
+try:
+    from .TLPM import TLPM
+except ModuleNotFoundError as e:
+    import os
+    import warnings
+    warnings.warn(f'It seems you have not installed the Thorlabs support for TLPM!\nMake sure it is installed, if it is not working, copy the files "TLPM.py" and "TLPM_64.dll" to {os.path.dirname(__file__)}\n\n{e}"')
+from ctypes import c_uint32, byref, create_string_buffer, c_bool, c_char_p, c_int, c_double
 
 class Thorlabs_TLPM(Device):
     power = Cpt(Custom_Function_SignalRO, name='power')

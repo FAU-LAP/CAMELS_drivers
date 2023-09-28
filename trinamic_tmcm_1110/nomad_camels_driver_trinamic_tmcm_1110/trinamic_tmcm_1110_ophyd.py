@@ -6,6 +6,7 @@ from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function
 from pytrinamic.connections import ConnectionManager
 from pytrinamic.modules import TMCM1140
 import time
+import re
 
 
 reference_search_modes = {'left switch': 1,
@@ -63,10 +64,11 @@ class TMCM_1110(Device):
         if name == 'test':
             return
         self.search_reference_on_start = search_reference_on_start
+        connection_port_match = re.match(r'ASRL(\d*)::INSTR',connection_port)
         try:
-            self.interface = ConnectionManager(f'--port {connection_port}').connect()
+            self.interface = ConnectionManager(f'--port COM{connection_port_match.group(1)}').connect()
         except:
-            arg_string = f"--interface serial_tmcl --port {connection_port} --data-rate 115200"
+            arg_string = f"--interface serial_tmcl --port COM{connection_port_match.group(1)} --data-rate 115200"
             self.interface = ConnectionManager(arg_string).connect()
         self.module = TMCM1140(self.interface)
         self.motor_number = int(motor_number)
@@ -134,6 +136,7 @@ class TMCM_1110(Device):
         self.motor.move_to(int(value))
         while not self.motor.get_position_reached():
             time.sleep(0.1)
+            print()
 
     def finalize_steps(self):
         self.interface.close()

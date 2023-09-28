@@ -6,10 +6,10 @@ from PySide6.QtWidgets import QLabel, QComboBox
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(name='pi_stage_e709', virtual=False,
-                         # Change the tags to fit your device
-                         tags=['Function', 'Sine', 'Waveform', 'Generator', 'Voltage'],
+                         tags=['Stage'],
                          ophyd_device=PI_E709,
-                         ophyd_class_name='PI_E709', **kwargs)
+                         ophyd_class_name='PI_E709',
+                         non_channel_functions='find_reference', **kwargs)
         self.settings['autozero_on_start'] = True
         self.settings['resource'] = ''
         self.config['servo_on'] = True

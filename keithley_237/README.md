@@ -3,9 +3,13 @@
 Driver of the Keithley 237 SMU written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
 
+## Features
+The driver supports reading and setting voltage / current. Further, an internal sweep is supported. 
+
+
 ## Documentation
 
-For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+For more information and documentation visit the NOMAD-CAMELS [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
 
 ## Changelog
 

@@ -22,6 +22,7 @@ for instr in instr_list:
             toml = tomllib.load(toml_f)
         if 'project' in toml and 'dependencies' in toml['project']:
             for d in toml['project']['dependencies']:
+                print(instr, d)
                 if d in installed_packages:
                     continue
                 pip.main(['install', d])

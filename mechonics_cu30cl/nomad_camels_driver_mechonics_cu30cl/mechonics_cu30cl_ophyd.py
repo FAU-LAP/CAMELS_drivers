@@ -3,12 +3,12 @@ from ophyd import Device
 from nomad_camels.bluesky_handling.custom_function_signal import \
     Custom_Function_Signal, Custom_Function_SignalRO
 
-import time
-# import sys
-# import os
-# sys.path.append(os.path.dirname(__file__))
-# sys.path.append(os.path.dirname(os.path.dirname(__file__)))
-from nomad_camels_driver_mechonics_cu30cl.servo3ax_wrapper import Servo3AxUSB2Wrapper
+try:
+    from nomad_camels_driver_mechonics_cu30cl.servo3ax_wrapper import Servo3AxUSB2Wrapper
+except FileNotFoundError as e:
+    import os
+    import warnings
+    warnings.warn(f'It seems you have not installed the Mechonics support for CU30CL!\nMake sure it is installed, if it is not working, copy the files "Servo3AxWrap.dll" and "Servo3AxUSB2.dll"/"Servo3AxUSB2_x64.dll" to {os.path.dirname(__file__)}\n\n{e}"')
 
 class Mechonics_CU30CL(Device):
     x_set_position = Cpt(Custom_Function_Signal, name='x_set_position')
@@ -113,7 +113,7 @@ class Mechonics_CU30CL(Device):
         time.sleep(0.1)
         self.update_set_positions()
 
-    def stop(self):
+    def stop_movement(self):
         self.stage._piezo_stop()
 
     def read_position(self, ax):

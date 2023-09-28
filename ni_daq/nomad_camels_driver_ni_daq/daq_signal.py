@@ -121,9 +121,13 @@ class DAQ_Signal_Input(SignalRO):
                                                       max_val=self.maxV)
 
 
-    def destroy(self):
+    # def destroy(self):
+    #     self.task.close()
+    #     super().destroy()
+
+    def close_task(self):
         self.task.close()
-        super().destroy()
+        tasks.remove(self.task)
                         
     def get(self):
         try:
