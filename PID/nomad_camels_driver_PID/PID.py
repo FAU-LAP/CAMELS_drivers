@@ -49,7 +49,7 @@ class subclass(device_class.Device):
         inp_dev = variables_handling.channels[self.settings['read_signal_name']].device
         out_dev = variables_handling.channels[self.settings['set_signal_name']].device
         try:
-            bias_dev = variables_handling.channels[self.settings['bias_signal_name']]
+            bias_dev = variables_handling.channels[self.settings['bias_signal_name']].device
             devs = list({inp_dev, out_dev, bias_dev})
         except:
             devs = list({inp_dev, out_dev})
