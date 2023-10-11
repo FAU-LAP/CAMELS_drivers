@@ -118,7 +118,7 @@ class PID_wait_for_stable(steps.Loop_Step):
         protocol_string += f'{tabs}while not devs["{self.pid}"].pid_stable.get() and not boxes["bar_{self.name}"].skip:\n'
         # protocol_string += f'{tabs}\tprint(devs["{self.pid}"].pid_val.just_readback(), devs["{self.pid}"].pid_cval.just_readback())\n'
         protocol_string += f'{tabs}\tyield from bps.sleep(delta_t)\n'
-        protocol_string += f'{tabs}boxes["bar_{self.name}"].setHidden(True)\n'
+        protocol_string += f'{tabs}boxes["bar_{self.name}"].setter.hide_signal.emit()\n'
         # protocol_string += f'{tabs}\tif np.abs(devs["{self.pid}"].pid_val.just_readback() - devs["{self.pid}"].pid_cval.get()) > devs["{self.pid}"].stability_delta:\n'
         # protocol_string += f'{tabs}\t\tstable_time = datetime.timedelta(0)\n'
         # protocol_string += f'{tabs}\t\tstarttime = datetime.datetime.now()\n'
