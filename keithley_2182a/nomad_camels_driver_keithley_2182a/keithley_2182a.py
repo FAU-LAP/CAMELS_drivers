@@ -21,9 +21,17 @@ from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='keithley_2182a', virtual=False, tags=['nanovoltmeter'],
-                         directory='keithley_2182a', ophyd_device=Keithley_2182A, 
-                         ophyd_class_name='Keithley_2182A', **kwargs)
+        super().__init__(name='keithley_2182a',
+            virtual=False,
+            tags=['nanovoltmeter'],
+            directory='keithley_2182a',
+            ophyd_device=Keithley_2182A,
+            ophyd_class_name='Keithley_2182A',
+            non_channel_functions=[
+                'init_delta_mode',
+                'disable_cacluation'
+            ],
+            **kwargs)
 
 class subclass_config(device_class.Simple_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
