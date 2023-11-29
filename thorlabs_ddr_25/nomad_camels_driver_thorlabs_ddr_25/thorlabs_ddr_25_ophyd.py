@@ -24,7 +24,6 @@ from pylablib.devices import Thorlabs
 
 
 class Thorlabs_DDR_25(Device):
-    # instances = set()
     get_position = Cpt(Custom_Function_SignalRO, name='get_position',
             metadata={'units':'deg'})
     set_relative_position = Cpt(Custom_Function_Signal,
@@ -37,23 +36,24 @@ class Thorlabs_DDR_25(Device):
     is_connected = Cpt(Custom_Function_SignalRO, name='is_connected')
     is_enabled = Cpt(Custom_Function_SignalRO, name='is_enabled')
 
-    def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
-                configuration_attrs=None, parent=None, **kwargs):
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs,
-                configuration_attrs=configuration_attrs, parent=parent, **kwargs)
-
-        # This is a workaround that took care of disconnecting old connected
-        # stages, however it is no longer necesary to do that, nice one can
-        # for instance in Thorlabs_DDR_25.instances:
-        #     if hasattr(instance, 'rotation_stage'):
-        #         instance.rotation_stage.close()
-        # Thorlabs.instances = set()
-        # Thorlabs_DDR_25.instances.add(self)
-
-        # check if instance is created at CAMELS startup; if it is just created
-        # for testing purposes, do not connect to the stage, otherwise it will
-        # not be disconnected afterwards and it will give an error if it is
-        # called again
+    def __init__(
+        self,
+        prefix='',
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        **kwargs):
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            **kwargs)
         if not self.name == 'test':
             self.connect_function()
 
@@ -66,16 +66,14 @@ class Thorlabs_DDR_25(Device):
         self.wait_move.read_function = self.wait_move_function
 
     def connect_function(self, retry=1):
-        print('connecting...')
         rs_con = Thorlabs.list_kinesis_devices()
-        print('still connecting')
         if len(rs_con) > 0:
-            self.rotation_stage = Thorlabs.KinesisMotor(rs_con[0][0], scale="DDR25")
+            self.rotation_stage = Thorlabs.KinesisMotor(rs_con[0][0],
+                scale="DDR25")
             if self.rotation_stage.get_status() == []:
                 print("rotation stage disabled; manually enable it")
         else:
             print("cannot find rotation stage DDR 25; check connection")
-        print('connected!')
 
     def set_speed_function(self, speed):
         if not self.is_connected_function():

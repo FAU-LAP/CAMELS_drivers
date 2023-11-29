@@ -4,8 +4,8 @@
 # 
 # NOMAD-CAMELS driver for Keithley current source 6221 is free software: you
 # can redistribute it and/or modify it under the terms of the GNU Lesser General
-# Public License as published by the Free Software Foundation, either version
-# 2.1 of the License, or any later version.
+# Public License as published by the Free Software Foundation, version 2.1 of
+# the License, or any later version.
 
 # NOMAD-CAMELS driver for Keithley current source 6221 is distributed in the
 # hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
@@ -18,11 +18,14 @@
 
 from ophyd import Component as Cpt
 
-from nomad_camels.bluesky_handling.visa_signal import (VISA_Signal,
-                                                       VISA_Signal_RO,
-                                                       VISA_Device)
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
+from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, \
+    VISA_Signal_RO, VISA_Device
+from nomad_camels.bluesky_handling.custom_function_signal import \
+    Custom_Function_Signal
 
+# ------------------------------------------------------------------------------
+# Allowed Values
+# ------------------------------------------------------------------------------
 ALLOWED_CURRENT_MARGINS = [-105e-3, 105e-3]
 ALLOWED_WAVE_TYPE = ['SIN', 'SQU', 'RAMP', 'ARB0', 'ARB1', 'ARB2', 'ARB3',
     'ARB4']
@@ -43,6 +46,7 @@ is_allowed_wave_duty_cycle = lambda duty_cycle: is_in_allowed_margins(duty_cycle
         ALLOWED_WAVE_DUTY_CYCLE_MARGINS)
 is_allowed_wave_offset = lambda offset: is_in_allowed_margins(offset,
         ALLOWED_WAVE_OFFSET)
+# ------------------------------------------------------------------------------
 
 def convert_to_bool(state):
     if type(state) == type("") and state in ['True', 'False']:
@@ -50,7 +54,6 @@ def convert_to_bool(state):
     return bool(state)
 
 class Keithley_6221(VISA_Device):
-
     get_ID = Cpt(VISA_Signal_RO, name='get_ID', query='*IDN?', metadata={'ID':
         'string'})
     set_constant_current = Cpt(VISA_Signal, name='set_constant_current',
@@ -71,15 +74,30 @@ class Keithley_6221(VISA_Device):
     enable_wave = Cpt(VISA_Signal, name='enable_wave')
     clear = Cpt(VISA_Signal, name='clear', write='SOUR:CLE:IMM')
 
-    def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
-                 configuration_attrs=None, parent=None, resource_name='',
-                 baud_rate=9600, write_termination='\r\n',
-                 read_termination='\r\n', **kwargs):
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs,
-                         configuration_attrs=configuration_attrs, parent=parent,
-                         resource_name=resource_name, baud_rate=baud_rate,
-                         write_termination=write_termination,
-                         read_termination=read_termination, **kwargs)
+    def __init__(self,
+        prefix='',
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        resource_name='',
+        baud_rate=9600,
+        write_termination='\r\n',
+        read_termination='\r\n',
+        **kwargs):
+        super().__init__(prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            resource_name=resource_name,
+            baud_rate=baud_rate,
+            write_termination=write_termination,
+            read_termination=read_termination,
+            **kwargs)
 
         self.set_constant_current.write = self.set_constant_current_function
         self.enable_output.write = self.enable_output_function

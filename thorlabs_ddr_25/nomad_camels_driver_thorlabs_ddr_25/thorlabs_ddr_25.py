@@ -16,7 +16,8 @@
 # with NOMAD-CAMELS driver for Thorlabs rotation stage DDR 25. If not, see
 # <https://www.gnu.org/licenses/>.
 
-from nomad_camels_driver_thorlabs_ddr_25.thorlabs_ddr_25_ophyd import Thorlabs_DDR_25
+from nomad_camels_driver_thorlabs_ddr_25.thorlabs_ddr_25_ophyd import \
+    Thorlabs_DDR_25
 from nomad_camels.main_classes import device_class
 
 class subclass(device_class.Device):
