@@ -9,7 +9,7 @@ class subclass(device_class.Device):
                          tags=['Stage'],
                          ophyd_device=PI_E709,
                          ophyd_class_name='PI_E709',
-                         non_channel_functions='find_reference', **kwargs)
+                         non_channel_functions=['find_reference'], **kwargs)
         self.settings['autozero_on_start'] = True
         self.settings['resource'] = ''
         self.config['servo_on'] = True
