@@ -29,6 +29,8 @@ class Andor_Newton(Device):
     hs_speed = Cpt(Custom_Function_Signal, name='hs_speed', kind='config')
     vs_speed = Cpt(Custom_Function_Signal, name='vs_speed', kind='config')
     multi_tracks = Cpt(Custom_Function_Signal, name='multi_tracks', kind='config')
+    read_settings = Cpt(Custom_Function_SignalRO, name='read_settings', kind='config')
+    shutter_ttl_open = Cpt(Custom_Function_Signal, name='shutter_ttl_open', kind='config')
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, dll_path='',
@@ -46,6 +48,7 @@ class Andor_Newton(Device):
         self.temperature_status.read_function = self.temperature_status_function
         self.set_temperature.put_function = self.set_temperature_function
         self.shutter_mode.put_function = self.shutter_mode_function
+        self.shutter_ttl_open.put_function = self.shutter_ttl_open_function
         self.exposure_time.put_function = self.exposure_time_function
         self.readout_mode.put_function = self.readout_mode_function
         self.preamp_gain.put_function = self.preamp_gain_function
@@ -60,6 +63,9 @@ class Andor_Newton(Device):
         for mode in amp_modes:
             self.all_preamps[mode.preamp_gain] = mode.preamp
             self.all_hs_speeds[mode.hsspeed_MHz] = mode.hsspeed
+        self.read_settings.read_function = lambda: self.camera.get_settings(-10)
+        self.sets = self.camera.get_settings(-10)
+        self.shutter_ttl_setting = 0
 
     def finalize_steps(self):
         self.camera.close()
@@ -84,7 +90,11 @@ class Andor_Newton(Device):
         self.camera.set_fan_mode('full')
 
     def shutter_mode_function(self, value):
-        self.camera.setup_shutter(value)
+        self.camera.setup_shutter(value, ttl_mode=self.shutter_ttl_setting)
+
+    def shutter_ttl_open_function(self, value):
+        self.shutter_ttl_setting = 1 if value == 'high' else 0
+        self.shutter_mode_function(self.shutter_mode.get())
 
     def exposure_time_function(self, value):
         self.camera.set_exposure(value)

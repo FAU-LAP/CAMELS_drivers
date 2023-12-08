@@ -23,9 +23,18 @@ class Ui_andor_newton_config(object):
     def setupUi(self, andor_newton_config):
         if not andor_newton_config.objectName():
             andor_newton_config.setObjectName(u"andor_newton_config")
-        andor_newton_config.resize(377, 283)
+        andor_newton_config.resize(339, 285)
         self.gridLayout = QGridLayout(andor_newton_config)
         self.gridLayout.setObjectName(u"gridLayout")
+        self.tracks_frame = QFrame(andor_newton_config)
+        self.tracks_frame.setObjectName(u"tracks_frame")
+        self.tracks_frame.setFrameShape(QFrame.StyledPanel)
+        self.tracks_frame.setFrameShadow(QFrame.Raised)
+        self.gridLayout_3 = QGridLayout(self.tracks_frame)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+
+        self.gridLayout.addWidget(self.tracks_frame, 0, 2, 3, 1)
+
         self.frame_5 = QFrame(andor_newton_config)
         self.frame_5.setObjectName(u"frame_5")
         self.frame_5.setFrameShape(QFrame.StyledPanel)
@@ -56,47 +65,6 @@ class Ui_andor_newton_config(object):
 
 
         self.gridLayout.addWidget(self.frame_5, 0, 0, 1, 1)
-
-        self.frame = QFrame(andor_newton_config)
-        self.frame.setObjectName(u"frame")
-        self.frame.setFrameShape(QFrame.StyledPanel)
-        self.frame.setFrameShadow(QFrame.Raised)
-        self.gridLayout_2 = QGridLayout(self.frame)
-        self.gridLayout_2.setObjectName(u"gridLayout_2")
-        self.label = QLabel(self.frame)
-        self.label.setObjectName(u"label")
-        self.label.setFont(font)
-
-        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
-
-        self.comboBox_shutter_mode = QComboBox(self.frame)
-        self.comboBox_shutter_mode.addItem("")
-        self.comboBox_shutter_mode.addItem("")
-        self.comboBox_shutter_mode.addItem("")
-        self.comboBox_shutter_mode.setObjectName(u"comboBox_shutter_mode")
-
-        self.gridLayout_2.addWidget(self.comboBox_shutter_mode, 2, 0, 1, 1)
-
-        self.label_5 = QLabel(self.frame)
-        self.label_5.setObjectName(u"label_5")
-
-        self.gridLayout_2.addWidget(self.label_5, 3, 0, 1, 1)
-
-        self.label_4 = QLabel(self.frame)
-        self.label_4.setObjectName(u"label_4")
-
-        self.gridLayout_2.addWidget(self.label_4, 1, 0, 1, 1)
-
-        self.exposure_time = QDoubleSpinBox(self.frame)
-        self.exposure_time.setObjectName(u"exposure_time")
-        self.exposure_time.setButtonSymbols(QAbstractSpinBox.NoButtons)
-        self.exposure_time.setDecimals(3)
-        self.exposure_time.setSingleStep(0.100000000000000)
-
-        self.gridLayout_2.addWidget(self.exposure_time, 4, 0, 1, 1)
-
-
-        self.gridLayout.addWidget(self.frame, 1, 0, 1, 1)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -163,10 +131,6 @@ class Ui_andor_newton_config(object):
 
         self.gridLayout_4.addWidget(self.vs_speed, 10, 0, 1, 1)
 
-        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
-
-        self.gridLayout_4.addItem(self.verticalSpacer_2, 11, 0, 1, 1)
-
         self.label_12 = QLabel(self.frame_3)
         self.label_12.setObjectName(u"label_12")
 
@@ -178,16 +142,64 @@ class Ui_andor_newton_config(object):
         self.gridLayout_4.addWidget(self.label_10, 5, 0, 1, 1)
 
 
-        self.gridLayout.addWidget(self.frame_3, 0, 1, 3, 1)
+        self.gridLayout.addWidget(self.frame_3, 0, 1, 2, 1)
 
-        self.tracks_frame = QFrame(andor_newton_config)
-        self.tracks_frame.setObjectName(u"tracks_frame")
-        self.tracks_frame.setFrameShape(QFrame.StyledPanel)
-        self.tracks_frame.setFrameShadow(QFrame.Raised)
-        self.gridLayout_3 = QGridLayout(self.tracks_frame)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.verticalSpacer_2 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout.addWidget(self.tracks_frame, 0, 2, 3, 1)
+        self.gridLayout.addItem(self.verticalSpacer_2, 2, 1, 1, 1)
+
+        self.frame = QFrame(andor_newton_config)
+        self.frame.setObjectName(u"frame")
+        self.frame.setFrameShape(QFrame.StyledPanel)
+        self.frame.setFrameShadow(QFrame.Raised)
+        self.gridLayout_2 = QGridLayout(self.frame)
+        self.gridLayout_2.setObjectName(u"gridLayout_2")
+        self.comboBox_shutter_mode = QComboBox(self.frame)
+        self.comboBox_shutter_mode.addItem("")
+        self.comboBox_shutter_mode.addItem("")
+        self.comboBox_shutter_mode.addItem("")
+        self.comboBox_shutter_mode.setObjectName(u"comboBox_shutter_mode")
+
+        self.gridLayout_2.addWidget(self.comboBox_shutter_mode, 2, 0, 1, 1)
+
+        self.exposure_time = QDoubleSpinBox(self.frame)
+        self.exposure_time.setObjectName(u"exposure_time")
+        self.exposure_time.setButtonSymbols(QAbstractSpinBox.NoButtons)
+        self.exposure_time.setDecimals(3)
+        self.exposure_time.setSingleStep(0.100000000000000)
+
+        self.gridLayout_2.addWidget(self.exposure_time, 6, 0, 1, 1)
+
+        self.label = QLabel(self.frame)
+        self.label.setObjectName(u"label")
+        self.label.setFont(font)
+
+        self.gridLayout_2.addWidget(self.label, 0, 0, 1, 1)
+
+        self.label_5 = QLabel(self.frame)
+        self.label_5.setObjectName(u"label_5")
+
+        self.gridLayout_2.addWidget(self.label_5, 5, 0, 1, 1)
+
+        self.label_4 = QLabel(self.frame)
+        self.label_4.setObjectName(u"label_4")
+
+        self.gridLayout_2.addWidget(self.label_4, 1, 0, 1, 1)
+
+        self.label_2 = QLabel(self.frame)
+        self.label_2.setObjectName(u"label_2")
+
+        self.gridLayout_2.addWidget(self.label_2, 3, 0, 1, 1)
+
+        self.comboBox_shutter_ttl = QComboBox(self.frame)
+        self.comboBox_shutter_ttl.addItem("")
+        self.comboBox_shutter_ttl.addItem("")
+        self.comboBox_shutter_ttl.setObjectName(u"comboBox_shutter_ttl")
+
+        self.gridLayout_2.addWidget(self.comboBox_shutter_ttl, 4, 0, 1, 1)
+
+
+        self.gridLayout.addWidget(self.frame, 1, 0, 1, 1)
 
         QWidget.setTabOrder(self.set_temperature, self.exposure_time)
         QWidget.setTabOrder(self.exposure_time, self.preamp_gain)
@@ -205,13 +217,6 @@ class Ui_andor_newton_config(object):
     def retranslateUi(self, andor_newton_config):
         andor_newton_config.setWindowTitle(QCoreApplication.translate("andor_newton_config", u"Form", None))
         self.label_15.setText(QCoreApplication.translate("andor_newton_config", u"Temperature (\u00b0C)", None))
-        self.label.setText(QCoreApplication.translate("andor_newton_config", u"Exposure", None))
-        self.comboBox_shutter_mode.setItemText(0, QCoreApplication.translate("andor_newton_config", u"open", None))
-        self.comboBox_shutter_mode.setItemText(1, QCoreApplication.translate("andor_newton_config", u"closed", None))
-        self.comboBox_shutter_mode.setItemText(2, QCoreApplication.translate("andor_newton_config", u"auto", None))
-
-        self.label_5.setText(QCoreApplication.translate("andor_newton_config", u"Exposure Time (s)", None))
-        self.label_4.setText(QCoreApplication.translate("andor_newton_config", u"Shutter Mode", None))
         self.label_8.setText(QCoreApplication.translate("andor_newton_config", u"Readout Mode", None))
         self.comboBox_readout_mode.setItemText(0, QCoreApplication.translate("andor_newton_config", u"FVB - full vertical binning", None))
         self.comboBox_readout_mode.setItemText(1, QCoreApplication.translate("andor_newton_config", u"multi track", None))
@@ -223,5 +228,16 @@ class Ui_andor_newton_config(object):
         self.label_11.setText(QCoreApplication.translate("andor_newton_config", u"HS Speed (MHz)", None))
         self.label_12.setText(QCoreApplication.translate("andor_newton_config", u"VS Speed (\u00b5s/shift)", None))
         self.label_10.setText(QCoreApplication.translate("andor_newton_config", u"Horizontal Binning", None))
+        self.comboBox_shutter_mode.setItemText(0, QCoreApplication.translate("andor_newton_config", u"open", None))
+        self.comboBox_shutter_mode.setItemText(1, QCoreApplication.translate("andor_newton_config", u"closed", None))
+        self.comboBox_shutter_mode.setItemText(2, QCoreApplication.translate("andor_newton_config", u"auto", None))
+
+        self.label.setText(QCoreApplication.translate("andor_newton_config", u"Exposure", None))
+        self.label_5.setText(QCoreApplication.translate("andor_newton_config", u"Exposure Time (s)", None))
+        self.label_4.setText(QCoreApplication.translate("andor_newton_config", u"Shutter Mode", None))
+        self.label_2.setText(QCoreApplication.translate("andor_newton_config", u"Shutter TTL open", None))
+        self.comboBox_shutter_ttl.setItemText(0, QCoreApplication.translate("andor_newton_config", u"low", None))
+        self.comboBox_shutter_ttl.setItemText(1, QCoreApplication.translate("andor_newton_config", u"high", None))
+
     # retranslateUi
 

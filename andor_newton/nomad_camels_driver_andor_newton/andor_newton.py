@@ -23,6 +23,7 @@ class subclass(device_class.Device):
         self.config['hs_speed'] = 0.05
         self.config['vs_speed'] = 25.7
         self.config['multi_tracks'] = {}
+        self.config['shutter_ttl_open'] = 'low'
 
 
 class subclass_config(device_class.Device_Config):
@@ -94,6 +95,16 @@ class subclass_config_sub(device_class.Device_Config_Sub, Ui_andor_newton_config
                                           tableData=tableData, title='Tracks')
         self.tracks_frame.layout().addWidget(self.track_table)
         self.load_config()
+        self.set_temperature.lineEdit().returnPressed.connect(lambda x=None, y='set_temperature': self.config_changed.emit(x, y))
+        self.comboBox_shutter_mode.currentTextChanged.connect(lambda x=None, y='shutter_mode': self.config_changed.emit(x, y))
+        self.comboBox_shutter_ttl.currentTextChanged.connect(lambda x=None, y='shutter_ttl_open': self.config_changed.emit(x, y))
+        self.exposure_time.lineEdit().returnPressed.connect(lambda x=None, y='exposure_time': self.config_changed.emit(x, y))
+        self.comboBox_readout_mode.currentTextChanged.connect(lambda x=None, y='readout_mode': self.config_changed.emit(x, y))
+        self.preamp_gain.lineEdit().returnPressed.connect(lambda x=None, y='preamp_gain': self.config_changed.emit(x, y))
+        self.horizontal_binning.lineEdit().returnPressed.connect(lambda x=None, y='horizontal_binning': self.config_changed.emit(x, y))
+        self.hs_speed.lineEdit().returnPressed.connect(lambda x=None, y='hs_speed': self.config_changed.emit(x, y))
+        self.vs_speed.lineEdit().returnPressed.connect(lambda x=None, y='vs_speed': self.config_changed.emit(x, y))
+        # self.track_table.table.clicked.connect(lambda x=None, y='multi_tracks': self.config_changed.emit(x,y))
 
     def load_config(self):
         tableData = {}
@@ -113,6 +124,8 @@ class subclass_config_sub(device_class.Device_Config_Sub, Ui_andor_newton_config
             self.lineEdit_current_temperature.setHidden(True)
         if 'shutter_mode' in self.config_dict:
             self.comboBox_shutter_mode.setCurrentText(self.config_dict['shutter_mode'])
+        if 'shutter_ttl_open' in self.config_dict:
+            self.comboBox_shutter_ttl.setCurrentText(self.config_dict['shutter_ttl_open'])
         if 'exposure_time' in self.config_dict:
             self.exposure_time.setValue(self.config_dict['exposure_time'])
         if 'readout_mode' in self.config_dict:
@@ -129,6 +142,7 @@ class subclass_config_sub(device_class.Device_Config_Sub, Ui_andor_newton_config
     def get_config(self):
         self.config_dict['set_temperature'] = self.set_temperature.value()
         self.config_dict['shutter_mode'] = self.comboBox_shutter_mode.currentText()
+        self.config_dict['shutter_ttl_open'] = self.comboBox_shutter_ttl.currentText()
         self.config_dict['exposure_time'] = self.exposure_time.value()
         self.config_dict['readout_mode'] = self.comboBox_readout_mode.currentText()
         self.config_dict['preamp_gain'] = self.preamp_gain.value()
