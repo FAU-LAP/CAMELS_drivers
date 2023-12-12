@@ -28,6 +28,8 @@ class subclass_config_sub(device_class.Device_Config_Sub, Ui_andor_shamrock500_c
         devs = list(variables_handling.devices.keys())
         if '!non_string!_camera' in self.config_dict and self.config_dict['!non_string!_camera'] in devs:
             self.comboBox_camera.setCurrentText(self.config_dict['!non_string!_camera'])
+        if 'horizontal_cam_flip' in self.config_dict:
+            self.checkBox_horizontal_flip.setChecked(self.config_dict['horizontal_cam_flip'])
         if 'wavelength' in self.config_dict:
             wl = self.config_dict['wavelength']
             self.lineEdit_wl_end.setText(f'{max(wl):.2f}')
@@ -47,4 +49,5 @@ class subclass_config_sub(device_class.Device_Config_Sub, Ui_andor_shamrock500_c
         self.config_dict['!non_string!_camera'] = self.comboBox_camera.currentText()
         self.config_dict['input_slit_size'] = self.input_slit_size.value()
         self.config_dict['output_slit_size'] = self.output_slit_size.value()
+        self.config_dict['horizontal_cam_flip'] = self.checkBox_horizontal_flip.isChecked()
         return super().get_config()

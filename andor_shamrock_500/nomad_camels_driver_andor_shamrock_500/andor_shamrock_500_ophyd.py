@@ -20,6 +20,7 @@ class Andor_Shamrock_500(Device):
     camera = Cpt(Custom_Function_Signal, name='camera', kind='config')
     input_slit_size = Cpt(Custom_Function_Signal, name='input_slit_size', kind='config')
     output_slit_size = Cpt(Custom_Function_Signal, name='output_slit_size', kind='config')
+    horizontal_cam_flip = Cpt(Custom_Function_Signal, name='horizontal_cam_flip', kind='config')
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, spectrometer='',
@@ -42,6 +43,8 @@ class Andor_Shamrock_500(Device):
         self.output_slit_size.put_function = self.output_slit_size_function
         self.spectrum.read_function = self.read_spectrum
         self.wavelength.read_function = self.get_wavelengths
+        self.horizontal_cam_flip.put_function = self.horizontal_cam_flip_function
+        self.flip_horizontal = False
 
     def finalize_steps(self):
         self.spectrometer.close()
@@ -100,7 +103,14 @@ class Andor_Shamrock_500(Device):
 
     def read_spectrum(self):
         cam = self.get_camera_device()
-        return cam.read_camera.get()
+        spec = cam.read_camera.get()
+        if not self.flip_horizontal:
+            return spec
+        # if dimension of spec is 2, flip the first dimension, if it is 1, just flip the array
+        if spec.ndim == 2:
+            return spec[:, ::-1]
+        else:
+            return spec[::-1]
 
     def get_camera_device(self):
         cam = self.camera.get()
@@ -108,3 +118,6 @@ class Andor_Shamrock_500(Device):
             from nomad_camels.utility import device_handling
             cam = device_handling.running_devices[cam]
         return cam
+
+    def horizontal_cam_flip_function(self, value):
+        self.flip_horizontal = value

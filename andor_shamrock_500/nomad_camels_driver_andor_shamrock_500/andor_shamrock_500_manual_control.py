@@ -7,7 +7,7 @@ from .andor_shamrock_500_config_sub import subclass_config_sub
 from nomad_camels.main_classes.plot_widget import PlotWidget_NoBluesky
 from nomad_camels.ui_widgets.warn_popup import WarnPopup
 
-from PySide6.QtWidgets import QCheckBox, QPushButton, QLabel, QComboBox, QGridLayout, QWidget
+from PySide6.QtWidgets import QCheckBox, QPushButton, QLabel, QComboBox, QGridLayout, QWidget, QFileDialog
 from PySide6.QtCore import Signal, QThread, Qt
 
 from nomad_camels.utility import variables_handling
@@ -53,7 +53,7 @@ class Andor_Manual_Control(Manual_Control):
                                                   'intensity (counts)',
                                                   title='Spectrum')
         self.image_plot = None
-        self.current_data = {'intensity': [], 'wavelength': []}
+        self.current_data = {}
 
         self.acquire_button.clicked.connect(self.measure_spectrum)
         self.continuous_meas = False
@@ -65,7 +65,9 @@ class Andor_Manual_Control(Manual_Control):
         self.settings_widge.output_port.currentTextChanged.connect(self.set_output_port)
         self.settings_widge.input_slit_size.lineEdit().returnPressed.connect(self.set_input_slit_size)
         self.settings_widge.output_slit_size.lineEdit().returnPressed.connect(self.set_output_slit_size)
+        self.settings_widge.checkBox_horizontal_flip.clicked.connect(self.set_horizontal_flip)
         self.camera_widge.config_changed.connect(self.change_camera_config)
+        self.save_button.clicked.connect(self.save_spectrum)
 
         self.spectrometer_thread = Spectrometer_Work_Thread(self, self.ophyd_device)
         self.spectrometer_thread.job_done.connect(self.stop_job)
@@ -73,6 +75,20 @@ class Andor_Manual_Control(Manual_Control):
         self.spectrometer_thread.new_cam_config.connect(self.update_cam_config)
         self.spectrometer_thread.new_spec_config.connect(self.update_config)
         self.spectrometer_thread.start()
+    
+    def save_spectrum(self):
+        if not self.current_data:
+            return
+        file = QFileDialog.getSaveFileName(self, 'Save Spectrum', '*.txt')[0]
+        if not file:
+            return
+        import numpy as np
+        if self.current_data['intensity'].ndim > 1:
+            arr = np.column_stack([self.current_data['wavelength'], self.current_data['intensity'].transpose()])
+        else:
+            arr = np.stack([self.current_data['wavelength'], self.current_data['intensity']]).transpose()
+        np.savetxt(file, arr, delimiter='\t', header='wavelength (nm)\t(intensity)')
+
 
     def update_config(self, config_dict):
         self.settings_widge.config_dict = config_dict
@@ -119,6 +135,9 @@ class Andor_Manual_Control(Manual_Control):
         val = self.settings_widge.output_slit_size.value()
         self.spectrometer_thread.do_function('set_output_slit_size', val)
         self.start_job()
+    
+    def set_horizontal_flip(self):
+        self.ophyd_device.horizontal_cam_flip.put(self.settings_widge.checkBox_horizontal_flip.isChecked())
 
     def measure_spectrum(self):
         self.spectrometer_thread.do_function('measure_spectrum', None)
@@ -133,6 +152,7 @@ class Andor_Manual_Control(Manual_Control):
                     import matplotlib.pyplot as plt
                     self.image_plot = plt.subplots()
                 x, y = np.meshgrid(wl, range(len(intensity)))
+                self.image_plot[1].clear()
                 self.image_plot[1].pcolormesh(x, y, intensity)
                 self.image_plot[0].show()
             else:
@@ -243,37 +263,37 @@ class Spectrometer_Work_Thread(QThread):
         try:
             self.spectrometer.set_grating_number.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def set_wavelength(self, value):
         try:
             self.spectrometer.center_wavelength.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def set_input_port(self, value):
         try:
             self.spectrometer.input_port.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def set_output_port(self, value):
         try:
             self.spectrometer.output_port.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def set_input_slit_size(self, value):
         try:
             self.spectrometer.input_slit_size.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def set_output_slit_size(self, value):
         try:
             self.spectrometer.output_slit_size.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def measure_spectrum(self, value):
         try:
@@ -281,7 +301,7 @@ class Spectrometer_Work_Thread(QThread):
             wl = self.spectrometer.wavelength.get()
             self.spectrum_data_signal.emit(wl, intensity)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
     def continuous_function(self):
         cam = self.spectrometer.get_camera_device().camera

@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'andor_shamrock_500_config.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.5.2
+## Created by: Qt User Interface Compiler version 6.5.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -15,9 +15,9 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QFont, QFontDatabase, QGradient, QIcon,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QComboBox, QFrame, QGridLayout,
-    QLabel, QLineEdit, QSizePolicy, QSpacerItem,
-    QSpinBox, QWidget)
+from PySide6.QtWidgets import (QApplication, QCheckBox, QComboBox, QFrame,
+    QGridLayout, QLabel, QLineEdit, QSizePolicy,
+    QSpacerItem, QSpinBox, QWidget)
 
 class Ui_andor_shamrock500_config(object):
     def setupUi(self, andor_shamrock500_config):
@@ -103,14 +103,19 @@ class Ui_andor_shamrock500_config(object):
 
         self.gridLayout_5.addWidget(self.label_5, 0, 0, 1, 1)
 
+        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+
+        self.gridLayout_5.addItem(self.verticalSpacer_4, 3, 0, 1, 1)
+
         self.comboBox_camera = QComboBox(self.frame_4)
         self.comboBox_camera.setObjectName(u"comboBox_camera")
 
         self.gridLayout_5.addWidget(self.comboBox_camera, 1, 0, 1, 1)
 
-        self.verticalSpacer_4 = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
+        self.checkBox_horizontal_flip = QCheckBox(self.frame_4)
+        self.checkBox_horizontal_flip.setObjectName(u"checkBox_horizontal_flip")
 
-        self.gridLayout_5.addItem(self.verticalSpacer_4, 2, 0, 1, 1)
+        self.gridLayout_5.addWidget(self.checkBox_horizontal_flip, 2, 0, 1, 1)
 
 
         self.gridLayout.addWidget(self.frame_4, 0, 1, 1, 1)
@@ -218,6 +223,7 @@ class Ui_andor_shamrock500_config(object):
         self.label_2.setText(QCoreApplication.translate("andor_shamrock500_config", u"grating number", None))
         self.label.setText(QCoreApplication.translate("andor_shamrock500_config", u"Grating Settings", None))
         self.label_5.setText(QCoreApplication.translate("andor_shamrock500_config", u"Camera", None))
+        self.checkBox_horizontal_flip.setText(QCoreApplication.translate("andor_shamrock500_config", u"horizontal flip", None))
         self.label_4.setText(QCoreApplication.translate("andor_shamrock500_config", u"Input Slit Size (\u00b5m)", None))
         self.label_7.setText(QCoreApplication.translate("andor_shamrock500_config", u"Input Port", None))
         self.input_port.setItemText(0, QCoreApplication.translate("andor_shamrock500_config", u"side", None))
