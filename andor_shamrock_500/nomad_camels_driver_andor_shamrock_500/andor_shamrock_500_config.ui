@@ -128,10 +128,7 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
-       <widget class="QComboBox" name="comboBox_camera"/>
-      </item>
-      <item row="2" column="0">
+      <item row="3" column="0">
        <spacer name="verticalSpacer_4">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -143,6 +140,16 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="comboBox_camera"/>
+      </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="checkBox_horizontal_flip">
+        <property name="text">
+         <string>horizontal flip</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
