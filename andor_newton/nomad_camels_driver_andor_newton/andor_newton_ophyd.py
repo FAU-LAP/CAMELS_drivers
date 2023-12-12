@@ -29,7 +29,7 @@ class Andor_Newton(Device):
     hs_speed = Cpt(Custom_Function_Signal, name='hs_speed', kind='config')
     vs_speed = Cpt(Custom_Function_Signal, name='vs_speed', kind='config')
     multi_tracks = Cpt(Custom_Function_Signal, name='multi_tracks', kind='config')
-    read_settings = Cpt(Custom_Function_SignalRO, name='read_settings', kind='config')
+    # read_settings = Cpt(Custom_Function_SignalRO, name='read_settings', kind='config')
     shutter_ttl_open = Cpt(Custom_Function_Signal, name='shutter_ttl_open', kind='config')
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
@@ -63,7 +63,7 @@ class Andor_Newton(Device):
         for mode in amp_modes:
             self.all_preamps[mode.preamp_gain] = mode.preamp
             self.all_hs_speeds[mode.hsspeed_MHz] = mode.hsspeed
-        self.read_settings.read_function = lambda: self.camera.get_settings(-10)
+        # self.read_settings.read_function = lambda: self.camera.get_settings(-10)
         self.sets = self.camera.get_settings(-10)
         self.shutter_ttl_setting = 0
 

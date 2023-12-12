@@ -138,6 +138,7 @@ class Andor_Manual_Control(Manual_Control):
             else:
                 self.spectrum_plot.plot.add_data(wl, {'intensity': intensity},
                                                  add=not self.checkBox_clear_plot.isChecked())
+                self.spectrum_plot.show()
         except Exception as e:
             WarnPopup(self, str(e), 'error')
 
@@ -301,7 +302,7 @@ class Spectrometer_Work_Thread(QThread):
             set_signal = getattr(cam, conf)
             set_signal.put(value)
         except Exception as e:
-            WarnPopup(self, str(e), 'error')
+            WarnPopup(None, str(e), 'error')
 
 
 class Andor_Manual_Control_Config(Manual_Control_Config):
