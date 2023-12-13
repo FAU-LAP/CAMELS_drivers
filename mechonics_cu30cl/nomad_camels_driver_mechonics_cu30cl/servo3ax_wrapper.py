@@ -540,22 +540,24 @@ if __name__ == '__main__':
     # print(wrap.get_position())
     # set_vals = [1000, 1000, 0]
     # wrap.set_position(set_vals, wait=False)
+    print(wrap._get_EEPROM_info())
+    wrap.findReference(force=True, axes=[1, 2])
     print(wrap._get_positioner_properties())
     print(wrap._getTimeConstant())
-    wrap.findReference(force=False, axes=[1, 2])
+    print(wrap._read_pick_encoder())
     print(wrap.get_position())
-    wrap.move_to_position_async([100, 0, 0], [10, 10, 0])
-    wrap.move_to_position_async([100, 0, 0], [10, 10, 0])
-    wrap.move_to_position_async([100, 0, 0], [10, 10, 0])
-    for i in range(3):
+    wrap.move_to_position_async([2000, 0, 0], [100, 100, 0])
+    # wrap.move_to_position_async([100, 0, 0], [10, 10, 0])
+    # wrap.move_to_position_async([100, 0, 0], [10, 10, 0])
+    for i in range(7):
         time.sleep(1)
         print(i, wrap.get_position())
         print(i, wrap.get_position())
         print(i, wrap.get_position())
-    wrap.move_to_position_async([200, 100, 0], [10, 10, 0])
-    wrap.move_to_position_async([200, 100, 0], [10, 10, 0])
-    wrap.move_to_position_async([200, 100, 0], [10, 10, 0])
-    for i in range(3):
+    wrap.move_to_position_async([000, 2000, 0], [100, 100, 0])
+    # wrap.move_to_position_async([200, 100, 0], [10, 10, 0])
+    # wrap.move_to_position_async([200, 100, 0], [10, 10, 0])
+    for i in range(7):
         time.sleep(1)
         print(i, wrap.get_position())
         print(i, wrap.get_position())
