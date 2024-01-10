@@ -29,6 +29,7 @@ class subclass(device_class.Device):
         self.settings['auto_pid'] = True
         self.settings['show_plot'] = True
         self.config['dt'] = 0.5
+        self.main_thread_only = True
 
 
         self.controls = {'PID_manual_control': [PID_manual_control,

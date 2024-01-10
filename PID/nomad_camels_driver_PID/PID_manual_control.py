@@ -20,6 +20,8 @@ class PID_manual_control(Manual_Control):
         self.setLayout(QGridLayout())
         self.start_device(control_data['pid_name'])
 
+    def device_ready(self):
+        super().device_ready()
         self.settings_widge = subclass_config_sub(settings_dict=self.device.settings, config_dict=self.device.config, parent=self)
         self.settings_widge.input_label.setHidden(True)
         self.settings_widge.comboBox_input.setHidden(True)
