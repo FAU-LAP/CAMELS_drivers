@@ -69,7 +69,7 @@ class Andor_Manual_Control(Manual_Control):
         self.save_button.clicked.connect(self.save_spectrum)
 
         self.spectrometer_thread = None
-        self.start_device(self.device)
+        self.start_device(control_data['spectrometer'])
 
 
     def device_ready(self):
