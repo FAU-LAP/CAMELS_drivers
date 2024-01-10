@@ -22,8 +22,7 @@ class Andor_Manual_Control(Manual_Control):
             name = 'Andor Spectrometer - Manual Control'
         super().__init__(parent=parent, title=name)
         self.setLayout(QGridLayout())
-
-        self.start_device(control_data['spectrometer'])
+        self.device = variables_handling.devices[control_data['spectrometer']]
 
         self.settings_widge = subclass_config_sub(parent=self, config_dict=self.device.config)
         self.camera = variables_handling.devices[control_data['camera']]
@@ -69,6 +68,12 @@ class Andor_Manual_Control(Manual_Control):
         self.camera_widge.config_changed.connect(self.change_camera_config)
         self.save_button.clicked.connect(self.save_spectrum)
 
+        self.spectrometer_thread = None
+        self.start_device(self.device)
+
+
+    def device_ready(self):
+        super().device_ready()
         self.spectrometer_thread = Spectrometer_Work_Thread(self, self.ophyd_device)
         self.spectrometer_thread.job_done.connect(self.stop_job)
         self.spectrometer_thread.spectrum_data_signal.connect(self.show_spectrum)
