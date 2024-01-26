@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nomad_camels_driver_PID"
-version = "0.1.6"
+name = "nomad_camels_driver_andor_newton"
+version = "0.1.0"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
-description = "This package provides everything to run a PID Controller with."
+description = "This package provides everything to run an Andor Newton CCD."
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [
@@ -17,8 +17,8 @@ classifiers = [
 
 ]
 dependencies = [
-    "simple-pid",
-    "nomad-camels>=0.2.4"
+    "nomad-camels>=1.0.0",
+    "pylablib>=1.4.2",
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"

@@ -219,17 +219,17 @@ class PID_Controller(Device):
             self.pid_vals = pid_val_table[setpoints == max(setpoints)].to_dict(orient='list')
         elif setpoint <= min(setpoints):
             self.pid_vals = pid_val_table[setpoints == min(setpoints)].to_dict(orient='list')
-        elif self.interpolate_auto:
+        elif not self.interpolate_auto:
             next_lo = max(setpoints[setpoints <= setpoint])
-            next_hi = min(setpoints[setpoints >= setpoint])
+            self.pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient='list')
+        else:
+            next_lo = max(setpoints[setpoints <= setpoint])
+            next_hi = min(setpoints[setpoints > setpoint])
             lo_vals = pid_val_table[setpoints == next_lo].to_dict(orient='list')
             hi_vals = pid_val_table[setpoints == next_hi].to_dict(orient='list')
             self.pid_vals = {}
             for key, lo_val in lo_vals.items():
                 self.pid_vals[key] = [lo_val[0] + (hi_vals[key][0] - lo_val[0]) * (setpoint - next_lo)/(next_hi - next_lo)]
-        else:
-            next_lo = max(setpoints[setpoints <= setpoint])
-            self.pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient='list')
         if old_vals != self.pid_vals or force:
             for key in self.pid_vals:
                 if key in ['setpoint', 'stability-time', 'stability-delta'] or (key == 'bias' and self.bias_func is None):
@@ -274,6 +274,8 @@ class PID_Thread(QThread):
         self.starttime = 0
         self.current_value = 0
         self.still_running = True
+        self.last_I = 0
+        self.last_output = 0
 
     def update_pid(self, Kp=None, Ki=None, Kd=None, setpoint=None,
                    sample_time=None, output_limits=None, auto_mode=True,
@@ -297,6 +299,12 @@ class PID_Thread(QThread):
             new_output = self.pid(self.current_value)
         else:
             new_output = 0
+        if new_output in self.pid.output_limits:
+            self.pid._integral = self.last_I
+        if np.isnan(new_output):
+            new_output = self.last_output
+        self.last_output = new_output
+        self.last_I = self.pid._integral
         self.last = time.monotonic()
         if new_output is not None:
             self.device.set_function(new_output)

@@ -29,6 +29,7 @@ class subclass(device_class.Device):
         self.settings['auto_pid'] = True
         self.settings['show_plot'] = True
         self.config['dt'] = 0.5
+        self.main_thread_only = True
 
 
         self.controls = {'PID_manual_control': [PID_manual_control,
@@ -48,7 +49,11 @@ class subclass(device_class.Device):
     def get_necessary_devices(self):
         inp_dev = variables_handling.channels[self.settings['read_signal_name']].device
         out_dev = variables_handling.channels[self.settings['set_signal_name']].device
-        devs = list({inp_dev, out_dev})
+        try:
+            bias_dev = variables_handling.channels[self.settings['bias_signal_name']].device
+            devs = list({inp_dev, out_dev, bias_dev})
+        except:
+            devs = list({inp_dev, out_dev})
         return devs
 
     def get_config(self):
@@ -109,15 +114,24 @@ class PID_wait_for_stable(steps.Loop_Step):
         protocol_string += f'{tabs}delta_t = devs["{self.pid}"].dt.get()\n'
         # protocol_string += f'{tabs}starttime = datetime.datetime.now()\n'
         # protocol_string += f'{tabs}dt = datetime.timedelta(seconds=devs["{self.pid}"].stability_time)\n'
-        protocol_string += f'{tabs}while not devs["{self.pid}"].pid_stable.get():\n'
+        protocol_string += f'{tabs}boxes["bar_{self.name}"].skip = False\n'
+        protocol_string += f'{tabs}boxes["bar_{self.name}"].helper.executor.emit()\n'
+        protocol_string += f'{tabs}while not devs["{self.pid}"].pid_stable.get() and not boxes["bar_{self.name}"].skip:\n'
         # protocol_string += f'{tabs}\tprint(devs["{self.pid}"].pid_val.just_readback(), devs["{self.pid}"].pid_cval.just_readback())\n'
         protocol_string += f'{tabs}\tyield from bps.sleep(delta_t)\n'
+        protocol_string += f'{tabs}boxes["bar_{self.name}"].setter.hide_signal.emit()\n'
         # protocol_string += f'{tabs}\tif np.abs(devs["{self.pid}"].pid_val.just_readback() - devs["{self.pid}"].pid_cval.get()) > devs["{self.pid}"].stability_delta:\n'
         # protocol_string += f'{tabs}\t\tstable_time = datetime.timedelta(0)\n'
         # protocol_string += f'{tabs}\t\tstarttime = datetime.datetime.now()\n'
         # protocol_string += f'{tabs}\telse:\n'
         # protocol_string += f'{tabs}\t\tstable_time += datetime.datetime.now() - starttime\n'
         return protocol_string
+
+    def get_add_main_string(self):
+        add_main_string = super().get_add_main_string()
+        add_main_string += f'\tboxes["bar_{self.name}"] = helper_functions.Waiting_Bar(title="{self.name} waiting...", skipable=True)\n'
+        return add_main_string
+
 
 
 class PID_wait_for_stable_config(steps.Loop_Step_Config):

@@ -2,6 +2,9 @@ from ophyd import Component as Cpt
 from ophyd import Device
 from nomad_camels.bluesky_handling.custom_function_signal import \
     Custom_Function_Signal, Custom_Function_SignalRO
+import sys
+import os
+sys.path.append(os.path.dirname(__file__))
 try:
     from .TLPM import TLPM
 except ModuleNotFoundError as e:
