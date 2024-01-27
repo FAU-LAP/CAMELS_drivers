@@ -1,4 +1,5 @@
 # Copyright 2023 Simon Sochiera
+# Copyright 2024 Rouven Craemer, Simon Sochiera
 #
 # This file is part of NOMAD-CAMELS driver for the Zurich Instruments lock-in
 # amplifier MFLI 
@@ -40,6 +41,27 @@ EXTERNAL_REFERENCES = {
         'external:Aux In 1': '8',
         'external:Aux In 2': '9',
         'external:Constant': '174',
+        }
+        
+SIGNAL_INPUTS = {
+        'Sig In 1': '0',
+        'Cur In 1': '1',
+        'Trigger 1': '2',
+        'Trigger 2': '3',
+        'Aux Out 1': '4',
+        'Aux Out 2': '5',
+        'Aux Out 3': '6',
+        'Aux Out 4': '7',
+        'Aux In 1': '8',
+        'Aux In 2': '9',
+        'Constant': '174',
+        }
+        
+OUTPUT_RANGES = {
+        '10 mV': .01,
+        '100 mV': .1,
+        '1 V': 1,
+        '10 V': 10,
         }
 
 def construct_correct_path(dev_name, path):
@@ -104,6 +126,22 @@ class Zurich_Instruments_MFLI(Device):
         kind='config')
     ac_input = Cpt(Custom_Function_Signal, name='ac_input', kind='config')
     diff_input = Cpt(Custom_Function_Signal, name='diff_input', kind='config')
+    select_input = Cpt(Custom_Function_Signal, name='select_input', kind='config')
+    # === Output Amplitude ===
+    enable_output_amp = Cpt(Custom_Function_Signal, name='enable_output_amp',
+        kind='config')
+    # === Output ===
+    select_output_range = Cpt(Custom_Function_Signal,
+        name='select_output_range', kind='config')
+    autorange_output = Cpt(Custom_Function_Signal, name='autorange_output',
+        kind='config')
+    add_output = Cpt(Custom_Function_Signal, name='add_output', kind='config')
+    diff_output = Cpt(Custom_Function_Signal, name='diff_output',
+        kind='config')
+    enable_output = Cpt(Custom_Function_Signal, name='enable_output',
+        kind='config')
+    imp_50_output = Cpt(Custom_Function_Signal, name='imp_50_output',
+        kind='config')
     # === Filter ===
     filter_order = Cpt(Custom_Function_Signal, name='filter_order',
         kind='config')
@@ -125,6 +163,12 @@ class Zurich_Instruments_MFLI(Device):
     # === Lock-In Input ===
     set_input_range = Cpt(Custom_Function_Signal, name='set_input_range')
     set_input_scaling = Cpt(Custom_Function_Signal, name='set_input_scaling')
+    # === Reference Frequency ===
+    set_reference_frequency = Cpt(Custom_Function_Signal, name='set_reference_frequency')
+    # === Output Amplitude ===
+    set_output_amp = Cpt(Custom_Function_Signal, name='set_output_amp')
+    # === Output ===
+    set_output_offset = Cpt(Custom_Function_Signal, name='set_output_offset')
     # --------------------------------------------------------------------------
     # Reading Channels
     # --------------------------------------------------------------------------
@@ -167,6 +211,16 @@ class Zurich_Instruments_MFLI(Device):
         self.imp_50_input.put_function = self.imp_50_input_function
         self.ac_input.put_function = self.ac_input_function
         self.diff_input.put_function = self.diff_input_function
+        self.select_input.put_function = self.select_input_function
+        # === Output Amplitude ===
+        self.enable_output_amp.put_function = self.enable_output_amp_function
+        # === Output ===
+        self.select_output_range.put_function = self.select_output_range_function
+        self.autorange_output.put_function = self.autorange_output_function
+        self.add_output.put_function = self.add_output_function
+        self.diff_output.put_function = self.diff_output_function
+        self.enable_output.put_function = self.enable_output_function
+        self.imp_50_output.put_function = self.imp_50_output_function
         # === Filter ===
         self.filter_order.put_function = self.filter_order_function
         self.filter_time_constant.put_function =\
@@ -186,6 +240,12 @@ class Zurich_Instruments_MFLI(Device):
         # === Lock-In Input ===
         self.set_input_range.put_function = self.set_input_range_function
         self.set_input_scaling.put_function = self.set_input_scaling_function
+        # === Reference Frequency
+        self.set_reference_frequency.put_function = self.set_reference_frequency_function
+        # === Output Amplitude ===
+        self.set_output_amp.put_function = self.set_output_amp_function
+        # === Output ===
+        self.set_output_offset.put_function = self.set_output_offset_function
         # ----------------------------------------------------------------------
         # Reading Channels
         # ----------------------------------------------------------------------
@@ -282,6 +342,37 @@ class Zurich_Instruments_MFLI(Device):
     def diff_input_function(self, state):
         state = int(state)
         self.set_int_function(f'sigins/0/diff:{state}')
+    
+    def select_input_function(self, inp):
+        self.set_int_function('demods/0/adcselect:'+\
+            SIGNAL_INPUTS[inp])
+    # === Output Amplitude
+    def enable_output_amp_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/enables/1:{state}')
+    # === Output ===
+    def select_output_range_function(self, rang):
+        self.set_double_function(f'sigouts/0/range:{OUTPUT_RANGES[rang]}')
+    
+    def autorange_output_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/autorange:{state}')
+        
+    def add_output_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/add:{state}')
+        
+    def diff_output_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/diff:{state}')
+        
+    def enable_output_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/on:{state}')
+        
+    def imp_50_output_function(self, state):
+        state = int(state)
+        self.set_int_function(f'sigouts/0/imp50:{state}')
     # === Filter ===
     def filter_order_function(self, order):
         self.set_int_function(f'demods/0/order:{order}')
@@ -325,6 +416,15 @@ class Zurich_Instruments_MFLI(Device):
 
     def set_input_scaling_function(self, scaling):
         self.set_double_function(f'sigins/0/scaling:{scaling}')
+    # === Reference Frequency
+    def set_reference_frequency_function(self, freq):
+        self.set_double_function(f'oscs/0/freq:{freq}')
+    # === Output Amplitude ===
+    def set_output_amp_function(self, amp):
+        self.set_double_function(f'sigouts/0/amplitudes/1:{amp}')
+    # === Output ===
+    def set_output_offset_function(self, offset):
+        self.set_double_function(f'sigouts/0/offset:{offset}')
     # --------------------------------------------------------------------------
     # Reading Channels
     # --------------------------------------------------------------------------
@@ -390,6 +490,7 @@ class Zurich_Instruments_MFLI(Device):
     # === Lock-In Input ===
     def autorange_input(self):
         self.set_int_function('sigins/0/autorange:1')
+    # === Output ===
     # --------------------------------------------------------------------------
     # Finalize Steps
     # --------------------------------------------------------------------------

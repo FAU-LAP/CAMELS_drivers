@@ -1,4 +1,5 @@
 # Copyright 2023 Simon Sochiera
+# Copyright 2024 Rouven Craemer, Simon Sochiera
 #
 # This file is part of NOMAD-CAMELS driver for the Zurich Instruments lock-in
 # amplifier MFLI 
@@ -18,7 +19,8 @@
 # with NOMAD-CAMELS driver for the Zurich Instruments lock-in amplifier MFLI. If
 # not, see <https://www.gnu.org/licenses/>.
 from nomad_camels_driver_zurich_instruments_mfli.zurich_instruments_mfli_ophyd \
-    import Zurich_Instruments_MFLI, EXTERNAL_REFERENCES
+    import Zurich_Instruments_MFLI, EXTERNAL_REFERENCES, SIGNAL_INPUTS,\
+    OUTPUT_RANGES
 from nomad_camels.main_classes import device_class
 
 
@@ -41,10 +43,18 @@ class subclass(device_class.Device):
         self.config['imp_50_input'] = False
         self.config['ac_input'] = False
         self.config['diff_input'] = False
+        self.config['select_input'] = 'Sig In 1'
+        self.config['enable_output_amp'] = True
+        self.config['select_output_range'] = '1 V'
+        self.config['autorange_output'] = True
+        self.config['add_output'] = False
+        self.config['diff_output'] = False
+        self.config['enable_output'] = True
+        self.config['imp_50_output'] = False
         self.config['select_reference'] = 'internal'
-        self.config['select_nth_harmonic'] = True
+        self.config['select_nth_harmonic'] = 1
         self.config['set_demodulator_phaseshift'] = False
-        self.config['select_1_over_nth_harmonic'] = True
+        self.config['select_1_over_nth_harmonic'] = 1
         self.config['filter_order'] = '3'
         self.config['filter_time_constant'] = '0.0008154'
         self.config['sinc'] = False
@@ -57,6 +67,8 @@ class subclass_config(device_class.Simple_Config):
                 # 'imp_50_input': ['0', '1'],
                 # 'ac_input': ['0', '1'],
                 # 'diff_input': ['0', '1'],
+                'select_input': list(SIGNAL_INPUTS.keys()),
+                'select_output_range': list(OUTPUT_RANGES.keys()),
                 'select_reference': ['internal'] + list(EXTERNAL_REFERENCES.keys()),
                 'filter_order': [str(i) for i in range(1,9)],
                 # 'sinc': ['0', '1'],
