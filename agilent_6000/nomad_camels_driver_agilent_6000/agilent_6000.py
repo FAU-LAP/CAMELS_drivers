@@ -1,6 +1,7 @@
 from .agilent_6000_ophyd import Agilent_6000
 
 from nomad_camels.main_classes import device_class
+from .agilent_6000_manual_control import Agilent_6000_Manual_Control, Agilent_6000_Manual_Control_Config
 
 from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
@@ -15,10 +16,12 @@ class subclass(device_class.Device):
         self.config['grayscale'] = False
         self.config['image_type'] = 'png'
 
+        self.controls = {'Agilent_6000_Manual_Control': [Agilent_6000_Manual_Control, Agilent_6000_Manual_Control_Config]}
+
 class subclass_config(device_class.Simple_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
                  config_dict=None, additional_info=None):
-        comboboxes = {'image_type': ['png', 'jpg', 'bmp', 'tif'],
+        comboboxes = {'image_type': ['png', 'bmp8bit', 'bmp', 'tiff'],
                       }
         super().__init__(parent, 'Agilent 6000', data, settings_dict,
                          config_dict, additional_info, comboBoxes=comboboxes)
