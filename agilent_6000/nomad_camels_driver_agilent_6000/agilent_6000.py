@@ -21,7 +21,7 @@ class subclass(device_class.Device):
 class subclass_config(device_class.Simple_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
                  config_dict=None, additional_info=None):
-        comboboxes = {'image_type': ['png', 'bmp8bit', 'bmp', 'tiff'],
+        comboboxes = {'image_type': ['png', 'bmp'],
                       }
         super().__init__(parent, 'Agilent 6000', data, settings_dict,
                          config_dict, additional_info, comboBoxes=comboboxes)

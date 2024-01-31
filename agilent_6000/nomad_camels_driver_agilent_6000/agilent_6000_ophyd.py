@@ -107,17 +107,12 @@ class Agilent_6000(VISA_Device):
         image_type = self.image_type.get()
         if image_type == 'bmp':
             write_string += 'BMP, '
-        elif image_type == 'bmp8bit':
-            write_string += 'BMP8bit, '
         elif image_type == 'png':
             write_string += 'PNG, '
-        if image_type == 'tiff':
-            write_string += 'TIFF, GRAT, MON;'
+        if self.grayscale.get():
+            write_string += f'SCR, GRAY;'
         else:
-            if self.grayscale.get():
-                write_string += f'SCR, GRAY;'
-            else:
-                write_string += f'SCR, COL;'
+            write_string += f'SCR, COL;'
         self.visa_instrument.write(write_string)
         data = self.visa_instrument.read_raw(size=50000000)
         while True:
@@ -129,14 +124,8 @@ class Agilent_6000(VISA_Device):
             header_end = data.find(b'\x89PNG')
             if header_end != -1:
                 data = data[header_end:]
-        elif image_type in ['bmp', 'bmp8bit']:
+        elif image_type == 'bmp':
             header_end = data.find(b'BM')
-            if header_end != -1:
-                data = data[header_end:]
-        elif image_type == 'tiff':
-            header_end = data.find(b'II*\x00')
-            if header_end == -1:
-                header_end = data.find(b'MM\x00*')
             if header_end != -1:
                 data = data[header_end:]
         img_data = io.BytesIO(data)

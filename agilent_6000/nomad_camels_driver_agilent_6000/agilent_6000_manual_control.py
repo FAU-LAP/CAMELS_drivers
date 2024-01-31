@@ -26,7 +26,7 @@ class Agilent_6000_Manual_Control(Manual_Control):
         self.setLayout(layout)
         self.device = variables_handling.devices[control_data['device']]
 
-        comboboxes = {'image_type': ['png', 'bmp8bit', 'bmp', 'tiff']}
+        comboboxes = {'image_type': ['png', 'bmp']}
         self.settings_widge = Simple_Config_Sub(config_dict=self.device.config,
                                                 comboBoxes=comboboxes)
         
@@ -38,7 +38,10 @@ class Agilent_6000_Manual_Control(Manual_Control):
         layout.addWidget(self.get_data_button, 1, 1)
 
         self.image = None
+        self.shown_image = None
         self.data = None
+        self.analog_plot = None
+        self.digital_plot = None
         self.osci_thread = None
         self.adjustSize()
         self.start_device(control_data['device'])
@@ -64,6 +67,12 @@ class Agilent_6000_Manual_Control(Manual_Control):
     
     def closeEvent(self, a0):
         self.osci_thread.still_running = False
+        if self.shown_image is not None:
+            plt.close(self.shown_image)
+        if self.analog_plot is not None:
+            plt.close(self.analog_plot)
+        if self.digital_plot is not None:
+            plt.close(self.digital_plot)
         return super().closeEvent(a0)
 
     def start_job(self):
@@ -88,12 +97,74 @@ class Agilent_6000_Manual_Control(Manual_Control):
     
     def show_image(self, image):
         self.image = image
-        plt.imshow(image)
-        plt.show()
+        if self.shown_image is None:
+            self.shown_image = plt.Figure()
+            self.shown_image.add_subplot(111)
+        self.shown_image.axes[0].imshow(image)
+        self.shown_image.canvas.draw_idle()
+        self.shown_image.show()
     
     def show_data(self, data):
         self.data = data
-        # TODO
+        plot_analog = False
+        plot_digital = False
+        for i in range(4):
+            if f'channel {i+1}' in data:
+                plot_analog = True
+                break
+        if 'math' in data:
+            plot_analog = True
+        for i in range(2):
+            if f'digital {i+1}' in data:
+                plot_digital = True
+                int_data = np.array([int(''.join(map(str, i.astype(int))), 2) for i in data[f'digital {i+1}']])
+                data[f'digital {i+1}'] = int_data
+        if plot_analog:
+            self.show_analog_data(data)
+        if plot_digital:
+            self.show_digital_data(data)
+
+    def show_analog_data(self, data):
+        if self.analog_plot is None:
+            self.analog_plot = plt.Figure()
+            self.analog_plot.axes = self.analog_plot.add_subplot(111)
+        self.analog_plot.axes.clear()
+        for i in range(4):
+            if f'channel {i+1}' in data:
+                self.analog_plot.axes.plot(data[f'time {i+1}'], data[f'channel {i+1}'], label=f'channel {i+1}')
+        if 'math' in data:
+            self.analog_plot.axes.plot(data['time math'], data['math'], label='math')
+        self.analog_plot.axes.legend()
+        self.analog_plot.axes.figure.canvas.draw_idle()
+        self.analog_plot.show()
+
+    def show_digital_data(self, data):
+        if self.digital_plot is None:
+            self.digital_plot = plt.Figure()
+            self.digital_plot.axes = self.digital_plot.add_subplot(111)
+        self.digital_plot.axes.clear()
+        for i in range(2):
+            if f'digital {i+1}' in data:
+                self.digital_plot.axes.plot(data[f'time digital {i+1}'], data[f'digital {i+1}'], label=f'digital {i+1}')
+        self.digital_plot.axes.legend()
+        self.digital_plot.axes.figure.canvas.draw_idle()
+        self.digital_plot.show()
+    
+    def save_image(self):
+        if self.image is None:
+            return
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Save image', '', 'Images (*.png *.bmp)')
+        if file_name:
+            plt.imsave(file_name, self.image)
+
+    def save_data(self):
+        if self.data is None:
+            return
+        file_name, _ = QFileDialog.getSaveFileName(self, 'Save data', '', 'CSV (*.csv)')
+        if file_name:
+            df = pd.DataFrame(self.data)
+            df.to_csv(file_name, index=False)
+
 
     
 
