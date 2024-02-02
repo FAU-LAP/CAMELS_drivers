@@ -50,3 +50,27 @@ class Agilent_33220A(Device):
         if value == 'highZ':
             value = 'INF'
         self.visa_instrument.write(f'OUTP:LOAD {value}')
+
+    def configure_arbitrary_waveform(self, data, name='ARB1'):
+        # scale data according to instrument
+        import numpy as np
+        n1 = len(bytes(len(data) * 2))
+        n2 = len(data) * 2
+        data = np.array(data)
+        maxval = max(data)
+        minval = min(data)
+        if maxval != minval:
+            scale = (maxval - minval) / 2
+            offset = minval + scale
+            data = (data - offset) / scale
+        # typecast to int16
+        data *= 2047
+        data = data.astype(int)
+        # convert numbers to binary data
+        data = data.tobytes()
+        # write data to instrument
+        self.visa_instrument.write(f'FORM:BORD NORM;:DATA:DAC VOLATILE, #{n1}{n2}{data};:DATA:COPY {name}, VOLATILE;')
+
+    def set_arbitrary_waveform(self, name='ARB1', gain=1.0, offset=0.0, frequency=1000.0):
+        self.visa_instrument.write(f'FUNC:USER {name};:FUNC:SHAP USER;:VOLT {gain:g};:VOLT:OFFS {offset:g};:FREQ {frequency:g};')
+        

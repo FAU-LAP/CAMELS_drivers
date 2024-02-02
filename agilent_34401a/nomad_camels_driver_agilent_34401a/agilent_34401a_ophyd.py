@@ -31,6 +31,10 @@ class Agilent_34401(VISA_Device):
                name='nPLC', kind='config',
                write='VOLT:DC:NPLC {value};CURR:DC:NPLC {value};RES:NPLC {value};FRES:NPLC {value}',
                metadata={'description':''})
+    aperture_time = Cpt(VISA_Signal,
+                        name='aperture_time', kind='config',
+                        write=':VOLT:APER:ENAB ON;:VOLT:APER {value};:CURR:APER:ENAB ON;:CURR:APER {value};:RES:APER:ENAB ON;:RES:APER {value};:FRES:APER:ENAB ON;:FRES:APER {value}',
+                        metadata={'description':''})
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, resource_name='',

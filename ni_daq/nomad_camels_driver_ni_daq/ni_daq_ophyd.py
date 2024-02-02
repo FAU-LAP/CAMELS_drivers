@@ -5,6 +5,8 @@ from ophyd import Device
 
 import time as ttime
 
+from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_SignalRO, Custom_Function_Signal
+
 
 class Custom_DAQ_Device(Device):
     in1 = Cpt(DAQ_Signal_Input, name='in1')
@@ -23,6 +25,9 @@ class Custom_DAQ_Device(Device):
     out6 = Cpt(DAQ_Signal_Output, name='out6')
     out7 = Cpt(DAQ_Signal_Output, name='out7')
     out8 = Cpt(DAQ_Signal_Output, name='out8')
+
+    samples_per_channel = Cpt(Custom_Function_Signal, name='samples_per_channel', kind='config')
+    sample_rate = Cpt(Custom_Function_Signal, name='sample_rate', kind='config', metadata={'units': 'Hz'})
 
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None,
@@ -54,6 +59,17 @@ class Custom_DAQ_Device(Device):
         for nam in self.component_setups:
             self.comps[nam].close_task()
 
+    def set_samples_per_channel(self, value):
+        for comp in self.comps.values():
+            if not isinstance(comp, DAQ_Signal_Input) and not isinstance(comp, DAQ_Signal_Output):
+                continue
+            comp.task.timing.samp_timing.samp_quant_samp_per_chan = value
+    
+    def set_sample_rate(self, value):
+        for comp in self.comps.values():
+            if not isinstance(comp, DAQ_Signal_Input) and not isinstance(comp, DAQ_Signal_Output):
+                continue
+            comp.task.timing.samp_timing.samp_clk_rate = value
 
 
     def wait_for_connection(self, all_signals=False, timeout=2.0):

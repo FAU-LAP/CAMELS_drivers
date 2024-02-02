@@ -131,7 +131,11 @@ class DAQ_Signal_Input(SignalRO):
                         
     def get(self):
         try:
-            self._readback = self.task.read()
+            n_samples = self.task.timing.samp_quant_samp_per_chan
+            if n_samples > 1:
+                self._readback = self.task.read(n_samples)
+            else:
+                self._readback = self.task.read()
         except:
             self._readback = np.nan
         return super().get()
