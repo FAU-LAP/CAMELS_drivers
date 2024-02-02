@@ -3,7 +3,6 @@ from .agilent_6000_ophyd import Agilent_6000
 from nomad_camels.main_classes import device_class
 from .agilent_6000_manual_control import Agilent_6000_Manual_Control, Agilent_6000_Manual_Control_Config
 
-from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 
 class subclass(device_class.Device):
@@ -11,7 +10,9 @@ class subclass(device_class.Device):
         super().__init__(name='agilent_6000', virtual=False,
                          tags=['oscilloscope', 'voltage', 'current'],
                          ophyd_device=Agilent_6000,
-                         ophyd_class_name='Agilent_6000', **kwargs)
+                         ophyd_class_name='Agilent_6000',
+                         non_channel_functions=['disable_front_panel', 'enable_front_panel'],
+                         **kwargs)
         self.config['invert_colors'] = False
         self.config['grayscale'] = False
         self.config['image_type'] = 'png'

@@ -32,10 +32,18 @@ class Agilent_6000_Manual_Control(Manual_Control):
         
         self.screenshot_button = QPushButton('Screenshot')
         self.get_data_button = QPushButton('Get Data')
+        self.save_image_button = QPushButton('Save Image')
+        self.save_data_button = QPushButton('Save Data')
+        self.save_image_button.setEnabled(False)
+        self.save_data_button.setEnabled(False)
+        self.save_image_button.clicked.connect(self.save_image)
+        self.save_data_button.clicked.connect(self.save_data)
 
         layout.addWidget(self.settings_widge, 0, 0, 1, 2)
         layout.addWidget(self.screenshot_button, 1, 0)
         layout.addWidget(self.get_data_button, 1, 1)
+        layout.addWidget(self.save_image_button, 2, 0)
+        layout.addWidget(self.save_data_button, 2, 1)
 
         self.image = None
         self.shown_image = None
@@ -97,15 +105,18 @@ class Agilent_6000_Manual_Control(Manual_Control):
     
     def show_image(self, image):
         self.image = image
+        self.save_image_button.setEnabled(True)
         if self.shown_image is None:
-            self.shown_image = plt.Figure()
+            self.shown_image = plt.figure()
             self.shown_image.add_subplot(111)
+        self.shown_image.axes[0].clear()
         self.shown_image.axes[0].imshow(image)
         self.shown_image.canvas.draw_idle()
         self.shown_image.show()
     
     def show_data(self, data):
         self.data = data
+        self.save_data_button.setEnabled(True)
         plot_analog = False
         plot_digital = False
         for i in range(4):
@@ -126,28 +137,28 @@ class Agilent_6000_Manual_Control(Manual_Control):
 
     def show_analog_data(self, data):
         if self.analog_plot is None:
-            self.analog_plot = plt.Figure()
-            self.analog_plot.axes = self.analog_plot.add_subplot(111)
-        self.analog_plot.axes.clear()
+            self.analog_plot = plt.figure()
+            self.analog_plot.add_subplot(111)
+        self.analog_plot.axes[0].clear()
         for i in range(4):
             if f'channel {i+1}' in data:
-                self.analog_plot.axes.plot(data[f'time {i+1}'], data[f'channel {i+1}'], label=f'channel {i+1}')
+                self.analog_plot.axes[0].plot(data[f'time {i+1}'], data[f'channel {i+1}'], label=f'channel {i+1}')
         if 'math' in data:
-            self.analog_plot.axes.plot(data['time math'], data['math'], label='math')
-        self.analog_plot.axes.legend()
-        self.analog_plot.axes.figure.canvas.draw_idle()
+            self.analog_plot.axes[0].plot(data['time math'], data['math'], label='math')
+        self.analog_plot.axes[0].legend()
+        self.analog_plot.canvas.draw_idle()
         self.analog_plot.show()
 
     def show_digital_data(self, data):
         if self.digital_plot is None:
-            self.digital_plot = plt.Figure()
-            self.digital_plot.axes = self.digital_plot.add_subplot(111)
-        self.digital_plot.axes.clear()
+            self.digital_plot = plt.figure()
+            self.digital_plot.add_subplot(111)
+        self.digital_plot.axes[0].clear()
         for i in range(2):
             if f'digital {i+1}' in data:
-                self.digital_plot.axes.plot(data[f'time digital {i+1}'], data[f'digital {i+1}'], label=f'digital {i+1}')
-        self.digital_plot.axes.legend()
-        self.digital_plot.axes.figure.canvas.draw_idle()
+                self.digital_plot.axes[0].plot(data[f'time digital {i+1}'], data[f'digital {i+1}'], label=f'digital {i+1}')
+        self.digital_plot.axes[0].legend()
+        self.digital_plot.canvas.draw_idle()
         self.digital_plot.show()
     
     def save_image(self):

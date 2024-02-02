@@ -23,6 +23,42 @@ class Agilent_6000(VISA_Device):
     invert_colors = Cpt(Custom_Function_Signal, value=False, name='invert_colors', kind='config')
     grayscale = Cpt(Custom_Function_Signal, value=False, name='grayscale', kind='config')
     image_type = Cpt(Custom_Function_Signal, value='png', name='image_type', kind='config')
+    acquisition_type = Cpt(Custom_Function_Signal, value='normal', name='acquisition_type', kind='config')
+    n_averages = Cpt(Custom_Function_Signal, value=8, name='n_averages', kind='config')
+
+    timebase = Cpt(Custom_Function_Signal, value=20e-9, name='timebase', kind='config')
+    timebase_offset = Cpt(Custom_Function_Signal, value=0, name='timebase_offset', kind='config')
+    min_record_length = Cpt(Custom_Function_Signal, name='min_record_length', kind='config')
+    trigger_mode = Cpt(Custom_Function_Signal, name='trigger_mode', kind='config') # auto or normal
+
+    channel_range_1 = Cpt(Custom_Function_Signal, value=1, name='channel_range_1', kind='config')
+    channel_range_2 = Cpt(Custom_Function_Signal, value=1, name='channel_range_2', kind='config')
+    channel_range_3 = Cpt(Custom_Function_Signal, value=1, name='channel_range_3', kind='config')
+    channel_range_4 = Cpt(Custom_Function_Signal, value=1, name='channel_range_4', kind='config')
+    ac_coupling_1 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_1', kind='config')
+    ac_coupling_2 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_2', kind='config')
+    ac_coupling_3 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_3', kind='config')
+    ac_coupling_4 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_4', kind='config')
+    vertical_range_1 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_1', kind='config')
+    vertical_range_2 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_2', kind='config')
+    vertical_range_3 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_3', kind='config')
+    vertical_range_4 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_4', kind='config')
+    vertical_offset_1 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_1', kind='config')
+    vertical_offset_2 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_2', kind='config')
+    vertical_offset_3 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_3', kind='config')
+    vertical_offset_4 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_4', kind='config')
+    probe_attenuation_1 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_1', kind='config')
+    probe_attenuation_2 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_2', kind='config')
+    probe_attenuation_3 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_3', kind='config')
+    probe_attenuation_4 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_4', kind='config')
+
+    waveform_meas_source = Cpt(Custom_Function_Signal, name='waveform_meas_source', kind='config')
+    waveform_meas_source_2 = Cpt(Custom_Function_Signal, name='waveform_meas_source_2', kind='config')
+    waveform_meas_function = Cpt(Custom_Function_Signal, name='waveform_meas_function', kind='config')
+
+    waveform_meas = Cpt(Custom_Function_SignalRO, name='waveform_meas')
+
+
 
     error = Cpt(VISA_Signal_RO, name='error', query=':SYST:ERR?', kind='normal')
 
@@ -43,6 +79,8 @@ class Agilent_6000(VISA_Device):
     time_digital_1 = Cpt(Custom_Function_SignalRO, name='time_digital_1')
     time_digital_2 = Cpt(Custom_Function_SignalRO, name='time_digital_2')
 
+    acquisition_success = Cpt(Custom_Function_SignalRO, name='acquisition_success')
+
     def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
                  configuration_attrs=None, parent=None, resource_name='',
                  read_termination='\r\n', write_termination='\r\n',
@@ -52,9 +90,6 @@ class Agilent_6000(VISA_Device):
                          resource_name=resource_name, baud_rate=baud_rate,
                          write_termination=write_termination,
                          read_termination=read_termination, **kwargs)
-        if name != 'test':
-            self.default_setup()
-            # self.visa_instrument.timeout = 10
         self.image.read_function = self.make_screenshot
         self.channel1.read_function = lambda: self.fetch_analog('CHAN1')
         self.channel2.read_function = lambda: self.fetch_analog('CHAN2')
@@ -73,6 +108,71 @@ class Agilent_6000(VISA_Device):
         self.times_math = None
         self.times_analog = [None, None, None, None]
         self.times_digital = [None, None]
+
+        self.channel_range_1.put_function = lambda value: self.set_vertical_range(1, value)
+        self.channel_range_2.put_function = lambda value: self.set_vertical_range(2, value)
+        self.channel_range_3.put_function = lambda value: self.set_vertical_range(3, value)
+        self.channel_range_4.put_function = lambda value: self.set_vertical_range(4, value)
+        self.ac_coupling_1.put_function = lambda value: self.set_coupling(1, value)
+        self.ac_coupling_2.put_function = lambda value: self.set_coupling(2, value)
+        self.ac_coupling_3.put_function = lambda value: self.set_coupling(3, value)
+        self.ac_coupling_4.put_function = lambda value: self.set_coupling(4, value)
+        self.vertical_range_1.put_function = lambda value: self.set_vertical_range(1, value)
+        self.vertical_range_2.put_function = lambda value: self.set_vertical_range(2, value)
+        self.vertical_range_3.put_function = lambda value: self.set_vertical_range(3, value)
+        self.vertical_range_4.put_function = lambda value: self.set_vertical_range(4, value)
+        self.vertical_offset_1.put_function = lambda value: self.set_vertical_offset(1, value)
+        self.vertical_offset_2.put_function = lambda value: self.set_vertical_offset(2, value)
+        self.vertical_offset_3.put_function = lambda value: self.set_vertical_offset(3, value)
+        self.vertical_offset_4.put_function = lambda value: self.set_vertical_offset(4, value)
+
+        self.acquisition_success.read_function = self.check_acquisition_success
+        self.trigger_mode.put_function = self.set_trigger_mode
+
+        self.acquisition_type.put_function = self.put_acquisition_type
+        self.n_averages.put_function = self.update_average_number
+    
+    def update_average_number(self, value):
+        self.put_acquisition_type(self.acquisition_type.get(), value)
+    
+    def put_acquisition_type(self, value, n_avg=None):
+        write_string = ':ACQ:TYPE '
+        if value == 'normal':
+            write_string += 'NORM; MODE RTIM;'
+        elif value == 'average':
+            # add number of averages as int
+            n_avg = n_avg or self.n_averages.get()
+            write_string += f'AVER;COUN {int(n_avg)};MODE ETIM;'
+        elif value == 'peak_detect':
+            write_string += 'PEAK; MODE RTIM;'
+        elif value == 'high_resolution':
+            write_string += 'HRES; MODE RTIM;'
+        self.visa_instrument.write(write_string)
+
+    def check_acquisition_success(self):
+        self.visa_instrument.write(':ACQ:COMP?')
+        try:
+            state = self.visa_instrument.read_raw()
+            if state != b'100\n':
+                return False
+            return True
+        except Exception as e:
+            print(e)
+            return False
+    
+    def set_trigger_mode(self, value):
+        self.visa_instrument.write(f':TRIG:SWE {value};')
+    
+    def measure_waveform(self, source=None, source2=None, function=None):
+        source = source or self.waveform_meas_source.get()
+        source2 = source2 or self.waveform_meas_source_2.get()
+        function = function or self.waveform_meas_function.get()
+        if source2 is None:
+            write_string = f':MEAS:SOUR {source};{function}?;'
+        else:
+            write_string = f':MEAS:SOUR {source},{source2};{function}?;'
+        data = self.visa_instrument.query(write_string)
+        return float(data)
 
     def get_digital_times(self, n):
         times = self.times_digital[n]
@@ -139,19 +239,19 @@ class Agilent_6000(VISA_Device):
         values = re.match(r"([+-]\d+),([+-]\d+),([+-]\d+),([+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+)", data.strip())
         self.visa_instrument.write(':WAV:DATA?')
         y_data = self.visa_instrument.read_raw()
-        try:
-            y_data = y_data.decode('ascii')
-        except:
-            pass
+        n_vals = int(values.group(3))
         x_increment = float(values.group(5))
         x_origin = float(values.group(6))
         y_increment = float(values.group(8))
         y_origin = float(values.group(9))
         y_reference = int(values.group(10))
-        try:
-            y_data = np.array([ord(c) for c in y_data], dtype=float)
-        except:
-            y_data = np.array(list(y_data), dtype=float)
+        n_bytes = int(y_data[2:10].decode())
+        y_data = y_data[11:]
+        ints = []
+        multiplier = int(n_bytes / n_vals)
+        for i in range(n_vals):
+            ints.append(int.from_bytes(y_data[multiplier*i:multiplier*i+multiplier], byteorder='little'))
+        y_data = np.array(ints, dtype=float)
         y_data -= y_reference
         y_data *= y_increment
         y_data += y_origin
@@ -170,10 +270,15 @@ class Agilent_6000(VISA_Device):
         values = re.match(r"([+-]\d+),([+-]\d+),([+-]\d+),([+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+\.\d+E[+-]\d+),([+-]\d+)", data.strip())
         self.visa_instrument.write(':WAV:DATA?')
         y_data = self.visa_instrument.read_raw()
+        n_vals = int(values.group(3))
         x_increment = float(values.group(5))
         x_origin = float(values.group(6))
-        y_data = list(y_data)
-        y_data = [int_to_bools(n) for n in y_data]
+        ints = []
+        n_bytes = int(y_data[2:10].decode())
+        multiplier = int(n_bytes / n_vals)
+        for i in range(n_vals):
+            ints.append(int.from_bytes(y_data[multiplier*i:multiplier*i+multiplier], byteorder='little'))
+        y_data = [int_to_bools(n) for n in ints]
         y_data = np.array(pad_bool_arrays(y_data))
         x_data = np.array([x_origin + x_increment * i for i in range(len(y_data))])
         for i in range(0, 2):
@@ -181,6 +286,90 @@ class Agilent_6000(VISA_Device):
                 self.times_digital[i] = x_data
                 break
         return y_data
+    
+    def set_coupling(self, channel, value):
+        if value:
+            self.visa_instrument.write(f':CHAN{channel}:COUP AC;')
+        else:
+            self.visa_instrument.write(f':CHAN{channel}:COUP DC;')
+    
+    def set_vertical_range(self, channel, value):
+        self.visa_instrument.write(f':CHAN{channel}:RANG .;{value:g} V;')
+
+    def set_vertical_offset(self, channel, value):
+        self.visa_instrument.write(f':CHAN{channel}:OFFS .;{value:g} V;')
+
+    def set_probe_attenuation(self, channel, value):
+        self.visa_instrument.write(f':CHAN{channel}:PROBE .;{value:g};')
+    
+    def set_timebase(self, value):
+        self.update_timebase(timebase=value)
+
+    def set_timebase_offset(self, value):
+        self.update_timebase(timebase_offset=value)
+
+    def set_min_record_length(self, value):
+        self.update_timebase(min_record_length=value)
+    
+    def update_timebase(self, timebase=None, timebase_offset=None,
+                        min_record_length=None):
+        timebase = timebase or self.timebase.get()
+        timebase_offset = timebase_offset or self.timebase_offset.get()
+        min_record_length = min_record_length or self.min_record_length.get()
+        if min_record_length == 'max':
+            min_record_length = 'MAX'
+        else:
+            min_record_length = int(min_record_length)
+        write_string = f':TIM:RANG {timebase:g};:POS {timebase_offset:g};:WAV:POIN {min_record_length};'
+        self.visa_instrument.write(write_string)
+    
+    def disable_front_panel(self):
+        self.visa_instrument.write(':SYSTem:LOCK 1;')
+
+    def enable_front_panel(self):
+        self.visa_instrument.write(':SYSTem:LOCK 0;')
+
+    def initiate_acquisition(self):
+        self.visa_instrument.write(':DIG;')
+    
+    def run_continuous(self):
+        self.visa_instrument.write(':RUN;')
+
+    def stop_acquisition(self):
+        self.visa_instrument.write(':STOP;')
+
+    def read_channel_range_1(self):
+        val = self.visa_instrument.query(':CHAN1:RANG?')
+        self.channel_range_1._readback = float(val)
+    
+    def read_channel_range_2(self):
+        val = self.visa_instrument.query(':CHAN2:RANG?')
+        self.channel_range_2._readback = float(val)
+    
+    def read_channel_range_3(self):
+        val = self.visa_instrument.query(':CHAN3:RANG?')
+        self.channel_range_3._readback = float(val)
+    
+    def read_channel_range_4(self):
+        val = self.visa_instrument.query(':CHAN4:RANG?')
+        self.channel_range_4._readback = float(val)
+    
+    def read_channel_offset_1(self):
+        val = self.visa_instrument.query(':CHAN1:OFFS?')
+        self.channel_offset_1._readbac = float(val)
+    
+    def read_channel_offset_2(self):
+        val = self.visa_instrument.query(':CHAN2:OFFS?')
+        self.channel_offset_2._readbac = float(val)
+    
+    def read_channel_offset_3(self):
+        val = self.visa_instrument.query(':CHAN3:OFFS?')
+        self.channel_offset_3._readbac = float(val)
+    
+    def read_channel_offset_4(self):
+        val = self.visa_instrument.query(':CHAN4:OFFS?')
+        self.channel_offset_4._readbac = float(val)
+
 
 def int_to_bools(n, lsb_first=True):
     binary = bin(n)[2:]
@@ -201,12 +390,12 @@ if __name__ == '__main__':
     # import matplotlib.pyplot as plt
     # plt.imshow(img)
     # plt.show()
-    osci.channel1.get()
-    osci.channel2.get()
-    osci.channel3.get()
-    osci.channel4.get()
-    osci.math_data.get()
-    osci.digital1.get()
-    osci.digital2.get()
-    osci.image.get()
+    # osci.channel1.get()
+    # osci.channel2.get()
+    # osci.channel3.get()
+    # osci.channel4.get()
+    # osci.math_data.get()
+    print(osci.digital1.get())
+    # osci.digital2.get()
+    # osci.image.get()
 
