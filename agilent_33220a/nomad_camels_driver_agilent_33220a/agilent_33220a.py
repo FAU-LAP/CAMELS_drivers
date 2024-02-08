@@ -18,7 +18,8 @@ class subclass_config(device_class.Simple_Config):
     def __init__(self, parent=None, data='', settings_dict=None,
                     config_dict=None, additional_info=None):
             comboboxes = {'amplitude_unit': ['VPP', 'VRMS', 'DBM'],
-                        'waveform': ['sinusoid', 'square', 'ramp', 'pulse', 'noise', 'dc', 'user'],
+                        'waveform': ['sinusoid', 'square', 'ramp', 'pulse', 'noise', 'dc', 'triangle',
+                                     'sinc', 'negative ramp', 'exponential rise', 'exponential fall', 'cardiac'],
                         'output_impedance': ['50', 'highZ'],}
             super().__init__(parent, 'Agilent 33220A', data, settings_dict,
                             config_dict, additional_info, comboBoxes=comboboxes)

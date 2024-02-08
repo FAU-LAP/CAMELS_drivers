@@ -8,25 +8,25 @@ from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function
 
 class Agilent_34401(VISA_Device):
     measure_voltage_DC = Cpt(Custom_Function_SignalRO,
-                             name='measure_voltage_DC', query="MEAS:VOLT:DC?",
+                             name='measure_voltage_DC',
                              metadata={'units': 'V', 'description': 'Measures DC voltage.'})
     measure_current_DC = Cpt(Custom_Function_SignalRO,
                              name='measure_current_DC',
                              metadata={'units': 'A', 'description': 'Measures DC current.'})
     measure_voltage_AC = Cpt(Custom_Function_SignalRO,
-                             name='measure_voltage_AC', query="MEAS:VOLT:AC?",
+                             name='measure_voltage_AC',
                              metadata={'units': 'V', 'description':'Measures AC voltage.'})
     measure_current_AC = Cpt(Custom_Function_SignalRO,
-                             name='measure_current_AC', query="MEAS:CURR:AC?",
+                             name='measure_current_AC',
                              metadata={'units': 'A', 'description':'Measures AC current.'})
     measure_resistance = Cpt(Custom_Function_SignalRO,
-                             name='measure_resistance', query="MEAS:RES?",
+                             name='measure_resistance',
                              metadata={'units': 'Ohm', 'description':'Measures DC resistance.'})
     measure_resistance_4wire = Cpt(Custom_Function_SignalRO,
-                                   name='measure_resistance_4wire', query="MEAS:FRES?",
+                                   name='measure_resistance_4wire',
                                    metadata={'units': 'Ohm', 'description':'Measures four wire DC resistance.'})
-    error = Cpt(VISA_Signal_RO,
-                name='error', query=':SYST:ERR?',
+    error = Cpt(Custom_Function_SignalRO,
+                name='error',
                 metadata={'description':'Error message.'})
 
     device_ID = Cpt(VISA_Signal_RO,
@@ -52,6 +52,7 @@ class Agilent_34401(VISA_Device):
         self.measure_resistance_4wire.read_function = lambda: self.do_measurement('FRES')
         self.measure_current_AC.read_function = lambda: self.do_measurement('CURR:AC')
         self.measure_voltage_AC.read_function = lambda: self.do_measurement('VOLT:AC')
+        self.error.read_function = self.read_errors
         
         self.last_meas_type = None
         self.nPLC.put_function = self.set_nPLC
@@ -68,8 +69,16 @@ class Agilent_34401(VISA_Device):
             self.visa_instrument.write(f':{measurement_type}:NPLC {self.nPLC.get()}')
             self.visa_instrument.write(':TRIG:SOUR IMM;:TRIG:DEL:AUTO ON;')
             self.visa_instrument.write(':TRIG:COUN 1;:SAMP:COUN 1;:SAMP:TIM 0.1;:SAMP:SOUR IMM;')
+            self.last_meas_type = measurement_type
         dat = self.visa_instrument.query('READ?')
         return float(dat.rstrip())
+
+    def read_errors(self):
+        invalid = self.check_valid()
+        errs = self.visa_instrument.query(':SYST:ERR?').rstrip()
+        if invalid:
+            return f'{invalid}\n{errs}'
+        return errs
 
     def check_valid(self):
         resp = int(self.visa_instrument.query(':STAT:QUES?'))
@@ -99,8 +108,7 @@ class Agilent_34401(VISA_Device):
             errors += 'upper limit failed\n'
         if resp[14]:
             errors += 'memory overflow\n'
-        if errors:
-            raise Exception(f'Errors detected: {errors}')
+        return errors
 
 def int_to_bools(n, lsb_first=True, n_bits=16):
     binary = bin(n)[2:]

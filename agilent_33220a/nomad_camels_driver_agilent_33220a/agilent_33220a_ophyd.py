@@ -41,7 +41,20 @@ class Agilent_33220A(Device):
         self.visa_instrument.output = value
 
     def set_waveform(self, value):
-        self.visa_instrument.shape = value.upper()
+        values= ["SINUSOID", "SIN", "SQUARE", "SQU", "RAMP",
+                "PULSE", "PULS", "NOISE", "NOIS", "DC"]
+        user_vals = {'sinc': 'SINC',
+                     'negative ramp': 'NEG_RAMP',
+                     'exponential rise': 'EXP_RISE',
+                     'exponential fall': 'EXP_FALL',
+                     'cardiac': 'CARDIAC'}
+        if value.upper() in values:
+            self.visa_instrument.shape = value.upper()
+        elif value in user_vals:
+            self.visa_instrument.write(f'FUNC:USER {user_vals[value]};:FUNC:SHAP USER;')
+        elif value == 'triangle':
+            self.visa_instrument.write('FUNC:SHAP TRI;')
+            
     
     def set_amplitude_unit(self, value):
         self.visa_instrument.amplitude_unit = value.upper()
