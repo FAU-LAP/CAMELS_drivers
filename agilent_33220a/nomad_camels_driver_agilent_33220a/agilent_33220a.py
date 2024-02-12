@@ -1,4 +1,5 @@
 from .agilent_33220a_ophyd import Agilent_33220A
+from .virtual_lab_manual import Virtual_Lab, Virtual_Lab_Config
 
 from nomad_camels.main_classes import device_class
 
@@ -12,6 +13,8 @@ class subclass(device_class.Device):
         self.config['amplitude_unit'] = 'VPP'
         self.config['waveform'] = 'sinusoid'
         self.config['output_impedance'] = '50'
+
+        self.controls = {'Virtual_Lab': [Virtual_Lab, Virtual_Lab_Config]}
 
 
 class subclass_config(device_class.Simple_Config):
