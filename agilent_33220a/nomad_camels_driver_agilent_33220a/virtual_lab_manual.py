@@ -31,6 +31,7 @@ class Virtual_Lab(Manual_Control):
         self.run_button = QPushButton('run')
         self.layout().addWidget(self.run_button, 1, 0)
         self.sub_widget.config_changed.connect(self.change_set)
+        self.run_button.clicked.connect(self.change_run)
 
         self.run_thread = None
         self.running = False
@@ -94,9 +95,8 @@ class Run_Thread(QThread):
                 self.update_settings()
     
     def update_settings(self):
-        if 'running' not in self.current_settings or not self.current_settings['running']:
-            self.device.output.put(0)
-        else:
+        self.device.output.put(0)
+        if 'running' in self.current_settings and self.current_settings['running']:
             params = []
             if 'coffee machine' in self.current_settings and self.current_settings['coffee machine']:
                 params.append({'frequency': 50, 'amplitude': 2, 'phase': 0})

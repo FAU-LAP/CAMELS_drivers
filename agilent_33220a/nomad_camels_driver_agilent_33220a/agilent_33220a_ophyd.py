@@ -110,14 +110,18 @@ def generate_waveform(tone_params, noise_level=0.0, offset=0.0, sampling_rate=10
     # Create a time array
     t = np.arange(num_samples) / sampling_rate
 
-    # Generate the waveform by summing sine tones
-    waveform = np.sum([params['amplitude'] * np.sin(2 * np.pi * params['frequency'] * t + np.deg2rad(params['phase']))
-                       for params in tone_params], axis=0)
-
     # Add Gaussian noise
     if seed > 0:
         np.random.seed(seed)
-    waveform += np.random.normal(scale=noise_level, size=num_samples)
+    noise = np.random.normal(scale=noise_level, size=num_samples)
+
+    # Generate the waveform by summing sine tones
+    if tone_params:
+        waveform = np.sum([params['amplitude'] * np.sin(2 * np.pi * params['frequency'] * t + np.deg2rad(params['phase']))
+                        for params in tone_params], axis=0)
+        waveform += noise
+    else:
+        waveform = noise
 
     # Add DC offset
     waveform += offset

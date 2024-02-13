@@ -8,6 +8,50 @@ import io
 from nomad_camels.bluesky_handling.visa_signal import VISA_Device,  VISA_Signal_RO
 from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_SignalRO, Custom_Function_Signal
 
+meas_sources = {'channel 1': 'CHAN1',
+                'channel 2': 'CHAN2',
+                'channel 3': 'CHAN3',
+                'channel 4': 'CHAN4',
+                'math': 'MATH',
+                'digital 0': 'DIG0',
+                'digital 1': 'DIG1',
+                'digital 2': 'DIG2',
+                'digital 3': 'DIG3',
+                'digital 4': 'DIG4',
+                'digital 5': 'DIG5',
+                'digital 6': 'DIG6',
+                'digital 7': 'DIG7',
+                'digital 8': 'DIG8',
+                'digital 9': 'DIG9',
+                'digital 10': 'DIG10',
+                'digital 11': 'DIG11',
+                'digital 12': 'DIG12',
+                'digital 13': 'DIG13',
+                'digital 14': 'DIG14',
+                'digital 15': 'DIG15'}
+
+waveform_functions = {'amplitude': 'VAMP',
+                      'voltage average': 'VAV',
+                      'voltage base': 'VBAS',
+                      'counter': 'COUN',
+                      'delay': 'DEL',
+                      'duty cycle': 'DUTY',
+                      'fall time': 'FALL',
+                      'frequency': 'FREQ',
+                      'voltage max': 'VMAX',
+                      'voltage min': 'VMIN',
+                      'overshoot': 'OVER',
+                      'voltage peak to peak': 'VPP',
+                      'period': 'PER',
+                      'phase': 'PHAS',
+                      'pre-shoot': 'PRES',
+                      'rise time': 'RIS',
+                      'voltage rms': 'VRMS',
+                      'top': 'VTOP',
+                      'width positive': 'PWID',
+                      'width negative': 'NWID',
+                      'x at maximum y': 'XMAX',
+                      'x at minimum y': 'XMIN'}
 
 def filter_resources(search_str:str):
     rm = pyvisa.ResourceManager()
@@ -26,27 +70,24 @@ class Agilent_6000(VISA_Device):
     acquisition_type = Cpt(Custom_Function_Signal, value='normal', name='acquisition_type', kind='config')
     n_averages = Cpt(Custom_Function_Signal, value=8, name='n_averages', kind='config')
 
-    timebase = Cpt(Custom_Function_Signal, value=20e-9, name='timebase', kind='config')
+    timebase = Cpt(Custom_Function_Signal, value=20e-9, name='timebase')
     timebase_offset = Cpt(Custom_Function_Signal, value=0, name='timebase_offset', kind='config')
     min_record_length = Cpt(Custom_Function_Signal, name='min_record_length', kind='config')
     trigger_mode = Cpt(Custom_Function_Signal, name='trigger_mode', kind='config') # auto or normal
 
-    channel_range_1 = Cpt(Custom_Function_Signal, value=1, name='channel_range_1', kind='config')
-    channel_range_2 = Cpt(Custom_Function_Signal, value=1, name='channel_range_2', kind='config')
-    channel_range_3 = Cpt(Custom_Function_Signal, value=1, name='channel_range_3', kind='config')
-    channel_range_4 = Cpt(Custom_Function_Signal, value=1, name='channel_range_4', kind='config')
+    channel_range_1 = Cpt(Custom_Function_Signal, value=1, name='channel_range_1')
+    channel_range_2 = Cpt(Custom_Function_Signal, value=1, name='channel_range_2')
+    channel_range_3 = Cpt(Custom_Function_Signal, value=1, name='channel_range_3')
+    channel_range_4 = Cpt(Custom_Function_Signal, value=1, name='channel_range_4')
+    vertical_offset_1 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_1')
+    vertical_offset_2 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_2')
+    vertical_offset_3 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_3')
+    vertical_offset_4 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_4')
+
     ac_coupling_1 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_1', kind='config')
     ac_coupling_2 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_2', kind='config')
     ac_coupling_3 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_3', kind='config')
     ac_coupling_4 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_4', kind='config')
-    vertical_range_1 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_1', kind='config')
-    vertical_range_2 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_2', kind='config')
-    vertical_range_3 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_3', kind='config')
-    vertical_range_4 = Cpt(Custom_Function_Signal, value=10, name='vertical_range_4', kind='config')
-    vertical_offset_1 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_1', kind='config')
-    vertical_offset_2 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_2', kind='config')
-    vertical_offset_3 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_3', kind='config')
-    vertical_offset_4 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_4', kind='config')
     probe_attenuation_1 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_1', kind='config')
     probe_attenuation_2 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_2', kind='config')
     probe_attenuation_3 = Cpt(Custom_Function_Signal, value=10, name='probe_attenuation_3', kind='config')
@@ -109,28 +150,38 @@ class Agilent_6000(VISA_Device):
         self.times_analog = [None, None, None, None]
         self.times_digital = [None, None]
 
+        self.timebase.put_function = self.set_timebase
+        self.timebase.read_function = self.get_timebase
+        self.timebase_offset.put_function = self.set_timebase_offset
+
         self.channel_range_1.put_function = lambda value: self.set_vertical_range(1, value)
         self.channel_range_2.put_function = lambda value: self.set_vertical_range(2, value)
         self.channel_range_3.put_function = lambda value: self.set_vertical_range(3, value)
         self.channel_range_4.put_function = lambda value: self.set_vertical_range(4, value)
+        self.channel_range_1.read_function = lambda: self.read_channel_range(1)
+        self.channel_range_2.read_function = lambda: self.read_channel_range(2)
+        self.channel_range_3.read_function = lambda: self.read_channel_range(3)
+        self.channel_range_4.read_function = lambda: self.read_channel_range(4)
         self.ac_coupling_1.put_function = lambda value: self.set_coupling(1, value)
         self.ac_coupling_2.put_function = lambda value: self.set_coupling(2, value)
         self.ac_coupling_3.put_function = lambda value: self.set_coupling(3, value)
         self.ac_coupling_4.put_function = lambda value: self.set_coupling(4, value)
-        self.vertical_range_1.put_function = lambda value: self.set_vertical_range(1, value)
-        self.vertical_range_2.put_function = lambda value: self.set_vertical_range(2, value)
-        self.vertical_range_3.put_function = lambda value: self.set_vertical_range(3, value)
-        self.vertical_range_4.put_function = lambda value: self.set_vertical_range(4, value)
         self.vertical_offset_1.put_function = lambda value: self.set_vertical_offset(1, value)
         self.vertical_offset_2.put_function = lambda value: self.set_vertical_offset(2, value)
         self.vertical_offset_3.put_function = lambda value: self.set_vertical_offset(3, value)
         self.vertical_offset_4.put_function = lambda value: self.set_vertical_offset(4, value)
+        self.vertical_offset_1.read_function = lambda: self.read_channel_offset(1)
+        self.vertical_offset_2.read_function = lambda: self.read_channel_offset(2)
+        self.vertical_offset_3.read_function = lambda: self.read_channel_offset(3)
+        self.vertical_offset_4.read_function = lambda: self.read_channel_offset(4)
 
         self.acquisition_success.read_function = self.check_acquisition_success
         self.trigger_mode.put_function = self.set_trigger_mode
 
         self.acquisition_type.put_function = self.put_acquisition_type
         self.n_averages.put_function = self.update_average_number
+
+        self.waveform_meas.read_function = self.measure_waveform
     
     def update_average_number(self, value):
         self.put_acquisition_type(self.acquisition_type.get(), value)
@@ -150,6 +201,7 @@ class Agilent_6000(VISA_Device):
         self.visa_instrument.write(write_string)
 
     def check_acquisition_success(self):
+        self.visa_instrument.write(':DIG;')
         self.visa_instrument.write(':ACQ:COMP?')
         try:
             state = self.visa_instrument.read_raw()
@@ -167,7 +219,13 @@ class Agilent_6000(VISA_Device):
         source = source or self.waveform_meas_source.get()
         source2 = source2 or self.waveform_meas_source_2.get()
         function = function or self.waveform_meas_function.get()
-        if source2 is None:
+        if source in meas_sources:
+            source = meas_sources[source]
+        if source2 in meas_sources:
+            source2 = meas_sources[source2]
+        if function in waveform_functions:
+            function = waveform_functions[function]
+        if source2 is None or source2.upper() == 'NONE':
             write_string = f':MEAS:SOUR {source};{function}?;'
         else:
             write_string = f':MEAS:SOUR {source},{source2};{function}?;'
@@ -294,16 +352,19 @@ class Agilent_6000(VISA_Device):
             self.visa_instrument.write(f':CHAN{channel}:COUP DC;')
     
     def set_vertical_range(self, channel, value):
-        self.visa_instrument.write(f':CHAN{channel}:RANG .;{value:g} V;')
+        self.visa_instrument.write(f':CHAN{channel}:RANG {value:g} V;')
 
     def set_vertical_offset(self, channel, value):
-        self.visa_instrument.write(f':CHAN{channel}:OFFS .;{value:g} V;')
+        self.visa_instrument.write(f':CHAN{channel}:OFFS {value:g} V;')
 
     def set_probe_attenuation(self, channel, value):
-        self.visa_instrument.write(f':CHAN{channel}:PROBE .;{value:g};')
+        self.visa_instrument.write(f':CHAN{channel}:PROBE {value:g};')
     
     def set_timebase(self, value):
         self.update_timebase(timebase=value)
+    
+    def get_timebase(self):
+        return float(self.visa_instrument.query(':TIM:RANG?'))
 
     def set_timebase_offset(self, value):
         self.update_timebase(timebase_offset=value)
@@ -338,37 +399,13 @@ class Agilent_6000(VISA_Device):
     def stop_acquisition(self):
         self.visa_instrument.write(':STOP;')
 
-    def read_channel_range_1(self):
-        val = self.visa_instrument.query(':CHAN1:RANG?')
-        self.channel_range_1._readback = float(val)
+    def read_channel_range(self, channel):
+        val = self.visa_instrument.query(f'CHAN{channel}:RANGE?')
+        return float(val)
     
-    def read_channel_range_2(self):
-        val = self.visa_instrument.query(':CHAN2:RANG?')
-        self.channel_range_2._readback = float(val)
-    
-    def read_channel_range_3(self):
-        val = self.visa_instrument.query(':CHAN3:RANG?')
-        self.channel_range_3._readback = float(val)
-    
-    def read_channel_range_4(self):
-        val = self.visa_instrument.query(':CHAN4:RANG?')
-        self.channel_range_4._readback = float(val)
-    
-    def read_channel_offset_1(self):
-        val = self.visa_instrument.query(':CHAN1:OFFS?')
-        self.channel_offset_1._readbac = float(val)
-    
-    def read_channel_offset_2(self):
-        val = self.visa_instrument.query(':CHAN2:OFFS?')
-        self.channel_offset_2._readbac = float(val)
-    
-    def read_channel_offset_3(self):
-        val = self.visa_instrument.query(':CHAN3:OFFS?')
-        self.channel_offset_3._readbac = float(val)
-    
-    def read_channel_offset_4(self):
-        val = self.visa_instrument.query(':CHAN4:OFFS?')
-        self.channel_offset_4._readbac = float(val)
+    def read_channel_offset(self, channel):
+        val = self.visa_instrument.query(f'CHAN{channel}:OFFS?')
+        return float(val)
 
 
 def int_to_bools(n, lsb_first=True):
@@ -386,6 +423,7 @@ if __name__ == '__main__':
     rs = filter_resources('USB?::0x0957::0x172?*INSTR')[0]
     print(rs)
     osci = Agilent_6000(name='osci', resource_name=rs)
+    print(osci.channel_range_1.get())
     # img = osci.image.get()
     # import matplotlib.pyplot as plt
     # plt.imshow(img)
@@ -395,7 +433,7 @@ if __name__ == '__main__':
     # osci.channel3.get()
     # osci.channel4.get()
     # osci.math_data.get()
-    print(osci.digital1.get())
+    # print(osci.digital1.get())
     # osci.digital2.get()
     # osci.image.get()
 
