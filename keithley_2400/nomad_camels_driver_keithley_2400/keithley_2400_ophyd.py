@@ -3,8 +3,14 @@ from ophyd import Component as Cpt
 from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, VISA_Signal_RO, VISA_Device
 
 class Keithley_2400(VISA_Device):
-	measure_voltage = Cpt(VISA_Signal_RO, name="measure_voltage", parse=r'^([+-].*),[+-].*,[+-].*,[+-].*,[+-].*$', parse_return_type="float", metadata={"units": "V", "description": "Measures voltage using FETC?"})
-	measure_current = Cpt(VISA_Signal_RO, name="measure_current", parse=r'^[+-].*,([+-].*),[+-].*,[+-].*,[+-].*$', parse_return_type="float", metadata={"units": "A", "description": "Measures current using FETC?"})
+	measure_voltage = Cpt(VISA_Signal_RO, name="measure_voltage", parse=r'^([+-].*),[+-].*,[+-].*,[+-].*,[+-].*$', parse_return_type="float", metadata={"units": "V", "description": "Measures voltage using READ?"})
+	measure_current = Cpt(VISA_Signal_RO, name="measure_current", parse=r'^[+-].*,([+-].*),[+-].*,[+-].*,[+-].*$', parse_return_type="float", metadata={"units": "A", "description": "Measures current using READ?"})
+	measure_resistance = Cpt(VISA_Signal_RO, 
+						  name="measure_resistance", 
+						  parse=r'^[+-].*,[+-].*,([+-].*),[+-].*,[+-].*$', 
+						  parse_return_type="float", 
+						  metadata={"units": "Ohm", "description": "Measures resistance using READ?"}
+						  )
 	set_voltage = Cpt(VISA_Signal, name="set_voltage", parse_return_type=None, metadata={"units": "V", "description": "Sets voltage to desired value"})
 	set_current = Cpt(VISA_Signal, name="set_current", parse_return_type=None, metadata={"units": "A", "description": "Sets current to desired value"})
 	current_compliance = Cpt(VISA_Signal, name="current_compliance", write=":CURR:PROT {value}", parse_return_type=None, kind="config", metadata={"units": "V", "description": "Maximum allowed current"})
@@ -18,6 +24,7 @@ class Keithley_2400(VISA_Device):
 		super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs, configuration_attrs=configuration_attrs, parent=parent, resource_name=resource_name, baud_rate=baud_rate, read_termination=read_termination, write_termination=write_termination, **kwargs)
 		self.measure_voltage.query = self.measure_voltage_query_function
 		self.measure_current.query = self.measure_current_query_function
+		self.measure_resistance.query = self.measure_resistance_query_function
 		self.set_voltage.write = self.set_voltage_write_function
 		self.set_current.write = self.set_current_write_function
 		self.current_range.write = self.current_range_write_function
@@ -40,6 +47,14 @@ class Keithley_2400(VISA_Device):
 		if self.measure_function != 'current':
 			self.visa_instrument.write(':CONF:CURR')
 			self.measure_function = 'current'
+		else:
+			pass
+		return ':READ?'
+
+	def measure_resistance_query_function(self):
+		if self.measure_function != 'resistance':
+			self.visa_instrument.write(':CONF:RES')
+			self.measure_function = 'resistance'
 		else:
 			pass
 		return ':READ?'
