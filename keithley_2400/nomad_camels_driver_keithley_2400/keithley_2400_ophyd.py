@@ -49,8 +49,8 @@ class Keithley_2400(VISA_Device):
 			if self.set_voltage_range_sense:
 				pass
 			else:
-				value = self.voltage_range_sense.get()
-				self.visa_instrument.write(f':VOLT:RANG {value}')
+				value_voltage_range_sense = self.voltage_range_sense.get()
+				self.visa_instrument.write(f':VOLT:RANG {value_voltage_range_sense}')
 				self.set_voltage_range_sense = True
 
 		# check if the measure function type is voltage and if not set it
@@ -67,8 +67,8 @@ class Keithley_2400(VISA_Device):
 			if self.set_current_range_sense:
 				pass
 			else:
-				value = self.current_range_sense.get()
-				self.visa_instrument.write(f':CURR:RANG {value}')
+				value_current_range_sense = self.current_range_sense.get()
+				self.visa_instrument.write(f':CURR:RANG {value_current_range_sense}')
 				self.set_current_range_sense = True
 		
 		# check if the measure function type is current and if not set it
@@ -85,8 +85,8 @@ class Keithley_2400(VISA_Device):
 			if self.set_voltage_range_sense:
 				pass
 			else:
-				value = self.voltage_range_sense.get()
-				self.visa_instrument.write(f':VOLT:RANG {value}')
+				value_voltage_range_sense = self.voltage_range_sense.get()
+				self.visa_instrument.write(f':VOLT:RANG {value_voltage_range_sense}')
 				self.set_voltage_range_sense = True
 
 		# check if the current sensing range was set and if not set it
@@ -94,8 +94,8 @@ class Keithley_2400(VISA_Device):
 			if self.set_current_range_sense:
 				pass
 			else:
-				value = self.current_range_sense.get()
-				self.visa_instrument.write(f':CURR:RANG {value}')
+				value_current_range_sense = self.current_range_sense.get()
+				self.visa_instrument.write(f':CURR:RANG {value_current_range_sense}')
 				self.set_current_range_sense = True
 		
 		if self.measure_function != 'resistance':
@@ -110,17 +110,17 @@ class Keithley_2400(VISA_Device):
 		if self.set_current_compliance:
 			pass
 		else:
-			value = self.current_compliance.get()
-			self.visa_instrument.write(f'CURR:PROT {value}')
+			value_current_compliance = self.current_compliance.get()
+			self.visa_instrument.write(f'CURR:PROT {value_current_compliance}')
 			self.set_current_compliance = True
 
 		# check if voltage range is set and if not set it
 		if self.set_voltage_range_source:
 			pass
 		else:
-			value = self.voltage_range_source.get()
+			value_voltage_range_source = self.voltage_range_source.get()
 			# set sensing range:
-			self.visa_instrument.write(f':SOUR:VOLT:RANG {value}')
+			self.visa_instrument.write(f':SOUR:VOLT:RANG {value_voltage_range_source}')
 			# set current sourcing range:
 			
 			self.set_voltage_range_source = True
@@ -149,16 +149,16 @@ class Keithley_2400(VISA_Device):
 		if self.set_voltage_compliance:
 			pass
 		else:
-			value = self.voltage_compliance.get()
-			self.visa_instrument.write(f'SENS:VOLT:PROT {value}')
+			value_voltage_compliance = self.voltage_compliance.get()
+			self.visa_instrument.write(f'SENS:VOLT:PROT {value_voltage_compliance}')
 			self.set_voltage_compliance = True
 		
 		# check if current range is set and if not set it
 		if self.set_current_range_source:
 			pass
 		else:
-			value = self.current_range_source.get()
-			self.visa_instrument.write(f'SOUR:CURR:RANG {value}')
+			value_current_range_source = self.current_range_source.get()
+			self.visa_instrument.write(f'SOUR:CURR:RANG {value_current_range_source}')
 			self.set_current_range_source = True
 		
 		# check if the source function type is current and if not set it
