@@ -1,5 +1,5 @@
 from ophyd import Component as Cpt
-
+import re
 from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, VISA_Signal_RO, VISA_Device
 
 class Keithley_2400(VISA_Device):
@@ -110,7 +110,7 @@ class Keithley_2400(VISA_Device):
 			pass
 		else:
 			value = self.current_compliance.get()
-			self.visa_instrument.write(f'"SENS:CURR:PROT {value}"')
+			self.visa_instrument.write(f'CURR:PROT {value}')
 			self.set_current_compliance = True
 
 		# check if voltage range is set and if not set it
@@ -119,13 +119,17 @@ class Keithley_2400(VISA_Device):
 		else:
 			value = self.voltage_range_source.get()
 			# set sensing range:
-			self.visa_instrument.write(f'SOUR:VOLT:RANG {value}')
+			self.visa_instrument.write(f':SOUR:VOLT:RANG {value}')
 			# set current sourcing range:
 			
 			self.set_voltage_range_source = True
 		
 		# check if the source function type is voltage and if not set it
 		if self.source_function != 'voltage':
+			# can not set voltage if measuring resistance
+			if re.search(r'"RES"', self.visa_instrument.query(':CONF?')):
+				self.visa_instrument.write(':CONF:CURR')
+				self.measure_function = 'current'
 			self.visa_instrument.write(':SOUR:FUNC VOLT')
 			self.source_function = 'voltage'
 		else:
@@ -158,6 +162,10 @@ class Keithley_2400(VISA_Device):
 		
 		# check if the source function type is current and if not set it
 		if self.source_function != 'current':
+			# can not set voltage if measuring resistance
+			if re.search(r'"RES"', self.visa_instrument.query(':CONF?')):
+				self.visa_instrument.write(':CONF:VOLT')
+				self.measure_function = 'voltage'
 			self.visa_instrument.write(':SOUR:FUNC CURR')
 			self.source_function = 'current'
 		else:
