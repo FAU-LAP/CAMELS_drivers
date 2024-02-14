@@ -1,6 +1,7 @@
 from ophyd import Component as Cpt
 import re
 from nomad_camels.bluesky_handling.visa_signal import VISA_Signal, VISA_Signal_RO, VISA_Device
+from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
 
 class Keithley_2400(VISA_Device):
 	measure_voltage = Cpt(VISA_Signal_RO, name="measure_voltage", parse=r'^([+-].*),[+-].*,[+-].*,[+-].*,[+-].*$', parse_return_type="float", metadata={"units": "V", "description": "Measures voltage using READ?"})
@@ -13,12 +14,12 @@ class Keithley_2400(VISA_Device):
 						  )
 	set_voltage = Cpt(VISA_Signal, name="set_voltage", parse_return_type=None, metadata={"units": "V", "description": "Sets voltage to desired value"})
 	set_current = Cpt(VISA_Signal, name="set_current", parse_return_type=None, metadata={"units": "A", "description": "Sets current to desired value"})
-	current_compliance = Cpt(VISA_Signal, write = '*CLS', name="current_compliance", kind="config", metadata={"units": "A", "description": "Maximum allowed current. 1.05A max"}) # Value is used but the actual channel does not set anything
-	voltage_compliance = Cpt(VISA_Signal, write = '*CLS', name="voltage_compliance", kind="config", metadata={"units": "V", "description": "Maximum allowed voltage. 210V max"}) # Value is used but the actual channel does not set anything
-	current_range_source = Cpt(VISA_Signal, write = '*CLS', name="current_range_source", kind="config", metadata={"units": "A", "description": "Sets current sourcing range. 1.05A max"}) # Value is used but the actual channel does not set anything
-	voltage_range_source = Cpt(VISA_Signal, write = '*CLS', name="voltage_range_source", kind="config", metadata={"units": "V", "description": "Sets voltage sourcing range. 210V max"}) # Value is used but the actual channel does not set anything
-	current_range_sense = Cpt(VISA_Signal, write = '*CLS', name="current_range_sense", kind="config", metadata={"units": "A", "description": "Sets current sensing range. 1.05A max"}) # Value is used but the actual channel does not set anything
-	voltage_range_sense = Cpt(VISA_Signal, write = '*CLS', name="voltage_range_sense", kind="config", metadata={"units": "V", "description": "Sets voltage sensing range. 210V max"}) # Value is used but the actual channel does not set anything
+	current_compliance = Cpt(Custom_Function_Signal, name="current_compliance", kind="config", metadata={"units": "A", "description": "Maximum allowed current. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_compliance = Cpt(Custom_Function_Signal, name="voltage_compliance", kind="config", metadata={"units": "V", "description": "Maximum allowed voltage. 210V max"}) # Value is used but the actual channel does not set anything
+	current_range_source = Cpt(Custom_Function_Signal, name="current_range_source", kind="config", metadata={"units": "A", "description": "Sets current sourcing range. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_range_source = Cpt(Custom_Function_Signal, name="voltage_range_source", kind="config", metadata={"units": "V", "description": "Sets voltage sourcing range. 210V max"}) # Value is used but the actual channel does not set anything
+	current_range_sense = Cpt(Custom_Function_Signal, name="current_range_sense", kind="config", metadata={"units": "A", "description": "Sets current sensing range. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_range_sense = Cpt(Custom_Function_Signal, name="voltage_range_sense", kind="config", metadata={"units": "V", "description": "Sets voltage sensing range. 210V max"}) # Value is used but the actual channel does not set anything
 	device_id = Cpt(VISA_Signal_RO, name="device_id", query="*IDN?", parse_return_type="str", kind="config", metadata={"units": "", "description": ""})
 
 	def __init__(self, prefix="", *, name, kind=None, read_attrs=None, configuration_attrs=None, parent=None, resource_name="", write_termination="\r\n", read_termination="\r\n", baud_rate=9600, **kwargs):
