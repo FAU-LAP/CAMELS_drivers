@@ -13,11 +13,12 @@ class Keithley_2400(VISA_Device):
 						  )
 	set_voltage = Cpt(VISA_Signal, name="set_voltage", parse_return_type=None, metadata={"units": "V", "description": "Sets voltage to desired value"})
 	set_current = Cpt(VISA_Signal, name="set_current", parse_return_type=None, metadata={"units": "A", "description": "Sets current to desired value"})
-	current_compliance = Cpt(VISA_Signal, name="current_compliance", write=":CURR:PROT {value}", parse_return_type=None, kind="config", metadata={"units": "V", "description": "Maximum allowed current"})
-	voltage_compliance = Cpt(VISA_Signal, name="voltage_compliance", write=":VOLT:PROT {value}", parse_return_type=None, kind="config", metadata={"units": "A", "description": "Maximum allowed voltage"})
-	current_range = Cpt(VISA_Signal, name="current_range", parse_return_type=None, kind="config", metadata={"units": "V", "description": "Sets measurement range"})
-	voltage_range = Cpt(VISA_Signal, name="voltage_range", parse_return_type=None, kind="config", metadata={"units": "A", "description": "Sets measurements range"})
-
+	current_compliance = Cpt(VISA_Signal, write = '*CLS', name="current_compliance", kind="config", metadata={"units": "A", "description": "Maximum allowed current. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_compliance = Cpt(VISA_Signal, write = '*CLS', name="voltage_compliance", kind="config", metadata={"units": "V", "description": "Maximum allowed voltage. 210V max"}) # Value is used but the actual channel does not set anything
+	current_range_source = Cpt(VISA_Signal, write = '*CLS', name="current_range_source", kind="config", metadata={"units": "A", "description": "Sets current sourcing range. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_range_source = Cpt(VISA_Signal, write = '*CLS', name="voltage_range_source", kind="config", metadata={"units": "V", "description": "Sets voltage sourcing range. 210V max"}) # Value is used but the actual channel does not set anything
+	current_range_sense = Cpt(VISA_Signal, write = '*CLS', name="current_range_sense", kind="config", metadata={"units": "A", "description": "Sets current sensing range. 1.05A max"}) # Value is used but the actual channel does not set anything
+	voltage_range_sense = Cpt(VISA_Signal, write = '*CLS', name="voltage_range_sense", kind="config", metadata={"units": "V", "description": "Sets voltage sensing range. 210V max"}) # Value is used but the actual channel does not set anything
 	device_id = Cpt(VISA_Signal_RO, name="device_id", query="*IDN?", parse_return_type="str", kind="config", metadata={"units": "", "description": ""})
 
 	def __init__(self, prefix="", *, name, kind=None, read_attrs=None, configuration_attrs=None, parent=None, resource_name="", write_termination="\r\n", read_termination="\r\n", baud_rate=9600, **kwargs):
@@ -27,15 +28,31 @@ class Keithley_2400(VISA_Device):
 		self.measure_resistance.query = self.measure_resistance_query_function
 		self.set_voltage.write = self.set_voltage_write_function
 		self.set_current.write = self.set_current_write_function
-		self.current_range.write = self.current_range_write_function
-		self.voltage_range.write = self.voltage_range_write_function
+		# self.current_range_sense.write = self.current_range_sense_write_function
+		# self.voltage_range_sense.write = self.voltage_range_sense_write_function
 		if name == 'test':
 			return
 		self.source_function = None
 		self.measure_function = None
 		self.output_on = False
+		self.set_voltage_compliance = None # None if nothing was set and True if it was set
+		self.set_current_compliance = None # None if nothing was set and True if it was set
+		self.set_voltage_range_sense = None # None if nothing was set and True if it was set
+		self.set_current_range_sense = None # None if nothing was set and True if it was set
+		self.set_voltage_range_source = None # None if nothing was set and True if it was set
+		self.set_current_range_source = None # None if nothing was set and True if it was set
 
 	def measure_voltage_query_function(self):
+		# check if the voltage sensing range was set and if not set it
+		if self.source_function != 'voltage':
+			if self.set_voltage_range_sense:
+				pass
+			else:
+				value = self.voltage_range_sense.get()
+				self.visa_instrument.write(f':VOLT:RANG {value}')
+				self.set_voltage_range_sense = True
+
+		# check if the measure function type is voltage and if not set it
 		if self.measure_function != 'voltage':
 			self.visa_instrument.write(':CONF:VOLT')
 			self.measure_function = 'voltage'
@@ -44,6 +61,16 @@ class Keithley_2400(VISA_Device):
 		return ':READ?'
 
 	def measure_current_query_function(self):
+		# check if the current sensing range was set and if not set it
+		if self.source_function != 'current':
+			if self.set_current_range_sense:
+				pass
+			else:
+				value = self.current_range_sense.get()
+				self.visa_instrument.write(f':CURR:RANG {value}')
+				self.set_current_range_sense = True
+		
+		# check if the measure function type is current and if not set it
 		if self.measure_function != 'current':
 			self.visa_instrument.write(':CONF:CURR')
 			self.measure_function = 'current'
@@ -52,6 +79,24 @@ class Keithley_2400(VISA_Device):
 		return ':READ?'
 
 	def measure_resistance_query_function(self):
+		# check if the voltage sensing range was set and if not set it
+		if self.source_function != 'voltage':
+			if self.set_voltage_range_sense:
+				pass
+			else:
+				value = self.voltage_range_sense.get()
+				self.visa_instrument.write(f':VOLT:RANG {value}')
+				self.set_voltage_range_sense = True
+
+		# check if the current sensing range was set and if not set it
+		if self.source_function != 'current':
+			if self.set_current_range_sense:
+				pass
+			else:
+				value = self.current_range_sense.get()
+				self.visa_instrument.write(f':CURR:RANG {value}')
+				self.set_current_range_sense = True
+		
 		if self.measure_function != 'resistance':
 			self.visa_instrument.write(':CONF:RES')
 			self.measure_function = 'resistance'
@@ -60,34 +105,76 @@ class Keithley_2400(VISA_Device):
 		return ':READ?'
 
 	def set_voltage_write_function(self, value):
+		# check if current compliance is already set and if not set it
+		if self.set_current_compliance:
+			pass
+		else:
+			value = self.current_compliance.get()
+			self.visa_instrument.write(f'"SENS:CURR:PROT {value}"')
+			self.set_current_compliance = True
+
+		# check if voltage range is set and if not set it
+		if self.set_voltage_range_source:
+			pass
+		else:
+			value = self.voltage_range_source.get()
+			# set sensing range:
+			self.visa_instrument.write(f'SOUR:VOLT:RANG {value}')
+			# set current sourcing range:
+			
+			self.set_voltage_range_source = True
+		
+		# check if the source function type is voltage and if not set it
 		if self.source_function != 'voltage':
 			self.visa_instrument.write(':SOUR:FUNC VOLT')
 			self.source_function = 'voltage'
 		else:
 			pass
+		
+		# check if the output is on and if not turn it on
 		if self.output_on:
 			pass
 		else:
 			self.visa_instrument.write(':OUTP 1')
 		return f':SOUR:VOLT {value}'
 
+
 	def set_current_write_function(self, value):
+		# check if voltage compliance is already set and if not set it
+		if self.set_voltage_compliance:
+			pass
+		else:
+			value = self.voltage_compliance.get()
+			self.visa_instrument.write(f'SENS:VOLT:PROT {value}')
+			self.set_voltage_compliance = True
+		
+		# check if current range is set and if not set it
+		if self.set_current_range_source:
+			pass
+		else:
+			value = self.current_range_source.get()
+			self.visa_instrument.write(f'SOUR:CURR:RANG {value}')
+			self.set_current_range_source = True
+		
+		# check if the source function type is current and if not set it
 		if self.source_function != 'current':
 			self.visa_instrument.write(':SOUR:FUNC CURR')
 			self.source_function = 'current'
 		else:
 			pass
+		
+		# check if the output is on and if not turn it on
 		if self.output_on:
 			pass
 		else:
 			self.visa_instrument.write(':OUTP 1')
 		return f':SOUR:CURR {value}'
 
-	def current_range_write_function(self, value):
-		return f':CURR:RANG {value}'
+	# def current_range_sense_write_function(self, value):
+	# 	return f':CURR:RANG {value}'
 
-	def voltage_range_write_function(self, value):
-		return f':VOLT:RANG {value}'
+	# def voltage_range_sense_write_function(self, value):
+	# 	return f':VOLT:RANG {value}'
 
 
 	def finalize_steps(self):
