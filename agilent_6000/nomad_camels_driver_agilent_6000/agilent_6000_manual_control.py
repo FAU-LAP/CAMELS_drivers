@@ -254,7 +254,7 @@ class Oscilloscope_Thread(QThread):
         try:
             if self.configuration != self.last_config:
                 self.device.configure(self.configuration)
-                self.last_config = self.configuration
+                self.last_config = dict(self.configuration)
         except Exception as e:
             self.exception_signal.emit(e)
         finally:
