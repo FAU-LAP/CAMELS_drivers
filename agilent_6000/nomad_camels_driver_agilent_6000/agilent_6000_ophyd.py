@@ -70,19 +70,28 @@ class Agilent_6000(VISA_Device):
     acquisition_type = Cpt(Custom_Function_Signal, value='normal', name='acquisition_type', kind='config')
     n_averages = Cpt(Custom_Function_Signal, value=8, name='n_averages', kind='config')
 
-    timebase = Cpt(Custom_Function_Signal, value=20e-9, name='timebase')
+    timebase_get = Cpt(Custom_Function_SignalRO, value=20e-9, name='timebase_get')
+    timebase_set = Cpt(Custom_Function_Signal, value=20e-9, name='timebase_set')
     timebase_offset = Cpt(Custom_Function_Signal, value=0, name='timebase_offset', kind='config')
     min_record_length = Cpt(Custom_Function_Signal, name='min_record_length', kind='config')
     trigger_mode = Cpt(Custom_Function_Signal, name='trigger_mode', kind='config') # auto or normal
 
-    channel_range_1 = Cpt(Custom_Function_Signal, value=1, name='channel_range_1')
-    channel_range_2 = Cpt(Custom_Function_Signal, value=1, name='channel_range_2')
-    channel_range_3 = Cpt(Custom_Function_Signal, value=1, name='channel_range_3')
-    channel_range_4 = Cpt(Custom_Function_Signal, value=1, name='channel_range_4')
-    vertical_offset_1 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_1')
-    vertical_offset_2 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_2')
-    vertical_offset_3 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_3')
-    vertical_offset_4 = Cpt(Custom_Function_Signal, value=0, name='vertical_offset_4')
+    get_channel_range_1 = Cpt(Custom_Function_SignalRO, value=1, name='get_channel_range_1')
+    get_channel_range_2 = Cpt(Custom_Function_SignalRO, value=1, name='get_channel_range_2')
+    get_channel_range_3 = Cpt(Custom_Function_SignalRO, value=1, name='get_channel_range_3')
+    get_channel_range_4 = Cpt(Custom_Function_SignalRO, value=1, name='get_channel_range_4')
+    set_channel_range_1 = Cpt(Custom_Function_Signal, value=1, name='set_channel_range_1')
+    set_channel_range_2 = Cpt(Custom_Function_Signal, value=1, name='set_channel_range_2')
+    set_channel_range_3 = Cpt(Custom_Function_Signal, value=1, name='set_channel_range_3')
+    set_channel_range_4 = Cpt(Custom_Function_Signal, value=1, name='set_channel_range_4')
+    get_vertical_offset_1 = Cpt(Custom_Function_SignalRO, value=0, name='get_vertical_offset_1')
+    get_vertical_offset_2 = Cpt(Custom_Function_SignalRO, value=0, name='get_vertical_offset_2')
+    get_vertical_offset_3 = Cpt(Custom_Function_SignalRO, value=0, name='get_vertical_offset_3')
+    get_vertical_offset_4 = Cpt(Custom_Function_SignalRO, value=0, name='get_vertical_offset_4')
+    set_vertical_offset_1 = Cpt(Custom_Function_Signal, value=0, name='set_vertical_offset_1')
+    set_vertical_offset_2 = Cpt(Custom_Function_Signal, value=0, name='set_vertical_offset_2')
+    set_vertical_offset_3 = Cpt(Custom_Function_Signal, value=0, name='set_vertical_offset_3')
+    set_vertical_offset_4 = Cpt(Custom_Function_Signal, value=0, name='set_vertical_offset_4')
 
     ac_coupling_1 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_1', kind='config')
     ac_coupling_2 = Cpt(Custom_Function_Signal, value=False, name='ac_coupling_2', kind='config')
@@ -132,56 +141,102 @@ class Agilent_6000(VISA_Device):
                          write_termination=write_termination,
                          read_termination=read_termination, **kwargs)
         self.image.read_function = self.make_screenshot
+        self.image.error_retry_function = self.error_clear_function
         self.channel1.read_function = lambda: self.fetch_analog('CHAN1')
+        self.channel1.error_retry_function = self.error_clear_function
         self.channel2.read_function = lambda: self.fetch_analog('CHAN2')
+        self.channel2.error_retry_function = self.error_clear_function
         self.channel3.read_function = lambda: self.fetch_analog('CHAN3')
+        self.channel3.error_retry_function = self.error_clear_function
         self.channel4.read_function = lambda: self.fetch_analog('CHAN4')
+        self.channel4.error_retry_function = self.error_clear_function
         self.math_data.read_function = lambda: self.fetch_analog('MATH')
+        self.math_data.error_retry_function = self.error_clear_function
         self.digital1.read_function = lambda: self.fetch_digital('POD1')
+        self.digital1.error_retry_function = self.error_clear_function
         self.digital2.read_function = lambda: self.fetch_digital('POD2')
+        self.digital2.error_retry_function = self.error_clear_function
         self.time_1.read_function = lambda: self.get_analog_times(0)
+        self.time_1.error_retry_function = self.error_clear_function
         self.time_2.read_function = lambda: self.get_analog_times(1)
+        self.time_2.error_retry_function = self.error_clear_function
         self.time_3.read_function = lambda: self.get_analog_times(2)
+        self.time_3.error_retry_function = self.error_clear_function
         self.time_4.read_function = lambda: self.get_analog_times(3)
+        self.time_4.error_retry_function = self.error_clear_function
         self.time_math.read_function = self.get_math_times
+        self.time_math.error_retry_function = self.error_clear_function
         self.time_digital_1.read_function = lambda: self.get_digital_times(0)
+        self.time_digital_1.error_retry_function = self.error_clear_function
         self.time_digital_2.read_function = lambda: self.get_digital_times(1)
+        self.time_digital_2.error_retry_function = self.error_clear_function
+
         self.times_math = None
         self.times_analog = [None, None, None, None]
         self.times_digital = [None, None]
 
-        self.timebase.put_function = self.set_timebase
-        self.timebase.read_function = self.get_timebase
+        self.timebase_set.put_function = self.set_timebase
+        self.timebase_set.error_retry_function = self.error_clear_function
+        self.timebase_get.read_function = self.get_timebase
+        self.timebase_get.error_retry_function = self.error_clear_function
         self.timebase_offset.put_function = self.set_timebase_offset
+        self.timebase_offset.error_retry_function = self.error_clear_function
 
-        self.channel_range_1.put_function = lambda value: self.set_vertical_range(1, value)
-        self.channel_range_2.put_function = lambda value: self.set_vertical_range(2, value)
-        self.channel_range_3.put_function = lambda value: self.set_vertical_range(3, value)
-        self.channel_range_4.put_function = lambda value: self.set_vertical_range(4, value)
-        self.channel_range_1.read_function = lambda: self.read_channel_range(1)
-        self.channel_range_2.read_function = lambda: self.read_channel_range(2)
-        self.channel_range_3.read_function = lambda: self.read_channel_range(3)
-        self.channel_range_4.read_function = lambda: self.read_channel_range(4)
+        self.set_channel_range_1.put_function = lambda value: self.set_vertical_range(1, value)
+        self.set_channel_range_1.error_retry_function = self.error_clear_function
+        self.set_channel_range_2.put_function = lambda value: self.set_vertical_range(2, value)
+        self.set_channel_range_2.error_retry_function = self.error_clear_function
+        self.set_channel_range_3.put_function = lambda value: self.set_vertical_range(3, value)
+        self.set_channel_range_3.error_retry_function = self.error_clear_function
+        self.set_channel_range_4.put_function = lambda value: self.set_vertical_range(4, value)
+        self.set_channel_range_4.error_retry_function = self.error_clear_function
+        self.get_channel_range_1.read_function = lambda: self.read_channel_range(1)
+        self.get_channel_range_1.error_retry_function = self.error_clear_function
+        self.get_channel_range_2.read_function = lambda: self.read_channel_range(2)
+        self.get_channel_range_2.error_retry_function = self.error_clear_function
+        self.get_channel_range_3.read_function = lambda: self.read_channel_range(3)
+        self.get_channel_range_3.error_retry_function = self.error_clear_function
+        self.get_channel_range_4.read_function = lambda: self.read_channel_range(4)
+        self.get_channel_range_4.error_retry_function = self.error_clear_function
         self.ac_coupling_1.put_function = lambda value: self.set_coupling(1, value)
+        self.ac_coupling_1.error_retry_function = self.error_clear_function
         self.ac_coupling_2.put_function = lambda value: self.set_coupling(2, value)
+        self.ac_coupling_2.error_retry_function = self.error_clear_function
         self.ac_coupling_3.put_function = lambda value: self.set_coupling(3, value)
+        self.ac_coupling_3.error_retry_function = self.error_clear_function
         self.ac_coupling_4.put_function = lambda value: self.set_coupling(4, value)
-        self.vertical_offset_1.put_function = lambda value: self.set_vertical_offset(1, value)
-        self.vertical_offset_2.put_function = lambda value: self.set_vertical_offset(2, value)
-        self.vertical_offset_3.put_function = lambda value: self.set_vertical_offset(3, value)
-        self.vertical_offset_4.put_function = lambda value: self.set_vertical_offset(4, value)
-        self.vertical_offset_1.read_function = lambda: self.read_channel_offset(1)
-        self.vertical_offset_2.read_function = lambda: self.read_channel_offset(2)
-        self.vertical_offset_3.read_function = lambda: self.read_channel_offset(3)
-        self.vertical_offset_4.read_function = lambda: self.read_channel_offset(4)
+        self.ac_coupling_4.error_retry_function = self.error_clear_function
+        self.set_vertical_offset_1.put_function = lambda value: self.set_vertical_offset(1, value)
+        self.set_vertical_offset_1.error_retry_function = self.error_clear_function
+        self.set_vertical_offset_2.put_function = lambda value: self.set_vertical_offset(2, value)
+        self.set_vertical_offset_2.error_retry_function = self.error_clear_function
+        self.set_vertical_offset_3.put_function = lambda value: self.set_vertical_offset(3, value)
+        self.set_vertical_offset_3.error_retry_function = self.error_clear_function
+        self.set_vertical_offset_4.put_function = lambda value: self.set_vertical_offset(4, value)
+        self.set_vertical_offset_4.error_retry_function = self.error_clear_function
+        self.get_vertical_offset_1.read_function = lambda: self.read_channel_offset(1)
+        self.get_vertical_offset_1.error_retry_function = self.error_clear_function
+        self.get_vertical_offset_2.read_function = lambda: self.read_channel_offset(2)
+        self.get_vertical_offset_2.error_retry_function = self.error_clear_function
+        self.get_vertical_offset_3.read_function = lambda: self.read_channel_offset(3)
+        self.get_vertical_offset_3.error_retry_function = self.error_clear_function
+        self.get_vertical_offset_4.read_function = lambda: self.read_channel_offset(4)
+        self.get_vertical_offset_4.error_retry_function = self.error_clear_function
 
         self.acquisition_success.read_function = self.check_acquisition_success
         self.trigger_mode.put_function = self.set_trigger_mode
+        self.trigger_mode.error_retry_function = self.error_clear_function
 
         self.acquisition_type.put_function = self.put_acquisition_type
+        self.acquisition_type.error_retry_function = self.error_clear_function
         self.n_averages.put_function = self.update_average_number
+        self.n_averages.error_retry_function = self.error_clear_function
 
         self.waveform_meas.read_function = self.measure_waveform
+    
+    def error_clear_function(self, e:Exception):
+        if isinstance(e, pyvisa.errors.VisaIOError):
+            self.visa_instrument.clear()
     
     def update_average_number(self, value):
         self.put_acquisition_type(self.acquisition_type.get(), value)
@@ -374,7 +429,7 @@ class Agilent_6000(VISA_Device):
     
     def update_timebase(self, timebase=None, timebase_offset=None,
                         min_record_length=None):
-        timebase = timebase or self.timebase.get()
+        timebase = timebase or self.timebase_get.get()
         timebase_offset = timebase_offset or self.timebase_offset.get()
         min_record_length = min_record_length or self.min_record_length.get()
         if min_record_length == 'max':
@@ -406,6 +461,12 @@ class Agilent_6000(VISA_Device):
     def read_channel_offset(self, channel):
         val = self.visa_instrument.query(f'CHAN{channel}:OFFS?')
         return float(val)
+
+    def start_continuous_acquisition(self):
+        self.visa_instrument.write(':RUN;')
+    
+    def stop_continuous_acquisition(self):
+        self.visa_instrument.write(':STOP;')
 
 
 def int_to_bools(n, lsb_first=True):

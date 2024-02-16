@@ -11,7 +11,7 @@ class subclass(device_class.Device):
                          tags=['oscilloscope', 'voltage', 'current'],
                          ophyd_device=Agilent_6000,
                          ophyd_class_name='Agilent_6000',
-                         non_channel_functions=['disable_front_panel', 'enable_front_panel'],
+                         non_channel_functions=['disable_front_panel', 'enable_front_panel', 'start_continuous_acquisition', 'stop_continuous_acquisition'],
                          **kwargs)
         self.config['invert_colors'] = False
         self.config['grayscale'] = False
