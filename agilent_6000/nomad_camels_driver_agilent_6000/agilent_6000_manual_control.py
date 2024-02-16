@@ -27,7 +27,11 @@ class Agilent_6000_Manual_Control(Manual_Control):
         self.device = variables_handling.devices[control_data['device']]
 
         comboboxes = {'image_type': ['png', 'bmp']}
-        self.settings_widge = Simple_Config_Sub(config_dict=self.device.config,
+        config_dict = dict(self.device.config)
+        for k in self.device.config:
+            if k not in ['invert_colors', 'grayscale', 'image_type']:
+                config_dict.pop(k)
+        self.settings_widge = Simple_Config_Sub(config_dict=config_dict,
                                                 comboBoxes=comboboxes)
         
         self.screenshot_button = QPushButton('Screenshot')
@@ -249,7 +253,8 @@ class Oscilloscope_Thread(QThread):
     def do_config(self):
         try:
             if self.configuration != self.last_config:
-                self.last_config = self.device.configure(self.configuration)
+                self.device.configure(self.configuration)
+                self.last_config = self.configuration
         except Exception as e:
             self.exception_signal.emit(e)
         finally:
