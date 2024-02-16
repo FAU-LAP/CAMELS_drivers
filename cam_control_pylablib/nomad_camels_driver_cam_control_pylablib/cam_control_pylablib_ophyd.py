@@ -64,7 +64,16 @@ class Cam_Control_Pylablib(Device):
             r'{    "id": 0,    "purpose": "request",    "parameters": {        "name": "stream/buffer/setup"   }}' + "\n",
             "utf-8"))
         self.sock.recv(self.byte_length)
+        # Get the ROI and the size of the ROI so that we know how large the read frame from buffer should be
+        self.sock.sendall(bytes(
+                r'{    "id": 0,    "purpose": "request",    "parameters": { "name": "cam/param/get", "args": {"name": "roi"}  }}',
+                "utf-8"))
         time.sleep(0.1)
+        self.roi_string = (self.sock.recv(self.byte_length)).decode('utf-8')
+        self.roi_matches = re.findall(r'\[\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)\s*\]', self.roi_string)
+        self.roi = np.array([int(num) for match in self.roi_matches for num in match])
+        self.roi_length = float((self.roi[1]-self.roi[0])*(self.roi[3]-self.roi[2]))
+        
 
     def exposure_time_function(self, exposure_time=100):
         if self.overwrite_exposure_time:
@@ -86,14 +95,15 @@ class Cam_Control_Pylablib(Device):
         self.sock.sendall(bytes(
             r'{    "id": 2,    "purpose": "request",    "parameters": {        "name": "stream/buffer/read" , "args": {"n": 1}  }}',
             'utf-8'))
-        time.sleep(0.1)
         full_read = self.sock.recv(self.byte_length)
+        while len(full_read) < self.roi_length*2:
+            full_read += self.sock.recv(self.byte_length)
+
         match = re.match(rb'^.*"nbytes": \d*}}', full_read)
         data = full_read[match.span()[1]:]
         read = full_read[:match.span()[1]]
         size_match = re.match(r'^.*\"shape\": \[1, (\d*), (\d*)], \"dtype\": \"<u2\", \"nbytes\": (\d*)}}.*$',
                               str(read, 'utf-8'))
-        # print('Succeeded to read from buffer')
         return np.frombuffer(data, dtype='<u2').reshape(int(size_match.group(1)), int(size_match.group(2)))
 
     def get_background_frame_function(self, ):
