@@ -69,7 +69,9 @@ class Ui_B2912_channel(object):
         self.lineEdit_voltage_compliance.setObjectName("lineEdit_voltage_compliance")
         self.gridLayout.addWidget(self.lineEdit_voltage_compliance, 4, 3, 1, 1)
         self.checkBox_resistance_auto_range = QtWidgets.QCheckBox(B2912_channel)
-        self.checkBox_resistance_auto_range.setObjectName("checkBox_resistance_auto_range")
+        self.checkBox_resistance_auto_range.setObjectName(
+            "checkBox_resistance_auto_range"
+        )
         self.gridLayout.addWidget(self.checkBox_resistance_auto_range, 13, 0, 1, 2)
         self.comboBox_voltage_range = QtWidgets.QComboBox(B2912_channel)
         self.comboBox_voltage_range.setObjectName("comboBox_voltage_range")
@@ -90,7 +92,9 @@ class Ui_B2912_channel(object):
         self.checkBox_voltage_auto_range.setObjectName("checkBox_voltage_auto_range")
         self.gridLayout.addWidget(self.checkBox_voltage_auto_range, 10, 0, 1, 2)
         self.comboBox_resistance_upper_lim = QtWidgets.QComboBox(B2912_channel)
-        self.comboBox_resistance_upper_lim.setObjectName("comboBox_resistance_upper_lim")
+        self.comboBox_resistance_upper_lim.setObjectName(
+            "comboBox_resistance_upper_lim"
+        )
         self.gridLayout.addWidget(self.comboBox_resistance_upper_lim, 14, 3, 1, 1)
         self.line = QtWidgets.QFrame(B2912_channel)
         self.line.setFrameShape(QtWidgets.QFrame.HLine)
@@ -101,7 +105,9 @@ class Ui_B2912_channel(object):
         self.label_15.setObjectName("label_15")
         self.gridLayout.addWidget(self.label_15, 14, 2, 1, 1)
         self.checkBox_resistance_compensation = QtWidgets.QCheckBox(B2912_channel)
-        self.checkBox_resistance_compensation.setObjectName("checkBox_resistance_compensation")
+        self.checkBox_resistance_compensation.setObjectName(
+            "checkBox_resistance_compensation"
+        )
         self.gridLayout.addWidget(self.checkBox_resistance_compensation, 13, 2, 1, 2)
         self.comboBox_current_range = QtWidgets.QComboBox(B2912_channel)
         self.comboBox_current_range.setObjectName("comboBox_current_range")
@@ -139,43 +145,87 @@ class Ui_B2912_channel(object):
         B2912_channel.setTabOrder(self.comboBox_source, self.comboBox_low_terminal)
         B2912_channel.setTabOrder(self.comboBox_low_terminal, self.checkBox_source_auto)
         B2912_channel.setTabOrder(self.checkBox_source_auto, self.comboBox_source_range)
-        B2912_channel.setTabOrder(self.comboBox_source_range, self.comboBox_range_lower_lim)
-        B2912_channel.setTabOrder(self.comboBox_range_lower_lim, self.checkBox_output_protection)
-        B2912_channel.setTabOrder(self.checkBox_output_protection, self.lineEdit_current_compliance)
-        B2912_channel.setTabOrder(self.lineEdit_current_compliance, self.lineEdit_voltage_compliance)
-        B2912_channel.setTabOrder(self.lineEdit_voltage_compliance, self.checkBox_four_wire_meas)
+        B2912_channel.setTabOrder(
+            self.comboBox_source_range, self.comboBox_range_lower_lim
+        )
+        B2912_channel.setTabOrder(
+            self.comboBox_range_lower_lim, self.checkBox_output_protection
+        )
+        B2912_channel.setTabOrder(
+            self.checkBox_output_protection, self.lineEdit_current_compliance
+        )
+        B2912_channel.setTabOrder(
+            self.lineEdit_current_compliance, self.lineEdit_voltage_compliance
+        )
+        B2912_channel.setTabOrder(
+            self.lineEdit_voltage_compliance, self.checkBox_four_wire_meas
+        )
         B2912_channel.setTabOrder(self.checkBox_four_wire_meas, self.lineEdit_NPLC)
         B2912_channel.setTabOrder(self.lineEdit_NPLC, self.checkBox_current_auto_range)
-        B2912_channel.setTabOrder(self.checkBox_current_auto_range, self.comboBox_current_range)
-        B2912_channel.setTabOrder(self.comboBox_current_range, self.checkBox_voltage_auto_range)
-        B2912_channel.setTabOrder(self.checkBox_voltage_auto_range, self.comboBox_voltage_range)
-        B2912_channel.setTabOrder(self.comboBox_voltage_range, self.checkBox_resistance_auto_range)
-        B2912_channel.setTabOrder(self.checkBox_resistance_auto_range, self.checkBox_resistance_compensation)
-        B2912_channel.setTabOrder(self.checkBox_resistance_compensation, self.comboBox_resistance_range)
-        B2912_channel.setTabOrder(self.comboBox_resistance_range, self.comboBox_resistance_upper_lim)
+        B2912_channel.setTabOrder(
+            self.checkBox_current_auto_range, self.comboBox_current_range
+        )
+        B2912_channel.setTabOrder(
+            self.comboBox_current_range, self.checkBox_voltage_auto_range
+        )
+        B2912_channel.setTabOrder(
+            self.checkBox_voltage_auto_range, self.comboBox_voltage_range
+        )
+        B2912_channel.setTabOrder(
+            self.comboBox_voltage_range, self.checkBox_resistance_auto_range
+        )
+        B2912_channel.setTabOrder(
+            self.checkBox_resistance_auto_range, self.checkBox_resistance_compensation
+        )
+        B2912_channel.setTabOrder(
+            self.checkBox_resistance_compensation, self.comboBox_resistance_range
+        )
+        B2912_channel.setTabOrder(
+            self.comboBox_resistance_range, self.comboBox_resistance_upper_lim
+        )
 
     def retranslateUi(self, B2912_channel):
         _translate = QtCore.QCoreApplication.translate
         B2912_channel.setWindowTitle(_translate("B2912_channel", "Form"))
-        self.checkBox_source_auto.setText(_translate("B2912_channel", "Source Auto Range"))
+        self.checkBox_source_auto.setText(
+            _translate("B2912_channel", "Source Auto Range")
+        )
         self.label.setText(_translate("B2912_channel", "Source:"))
         self.label_5.setText(_translate("B2912_channel", "Current compliance:"))
-        self.checkBox_output_protection.setText(_translate("B2912_channel", "Output Protection"))
+        self.checkBox_output_protection.setText(
+            _translate("B2912_channel", "Output Protection")
+        )
         self.label_2.setText(_translate("B2912_channel", "Low Terminal:"))
         self.label_4.setText(_translate("B2912_channel", "Range Lower Limit:"))
         self.label_3.setText(_translate("B2912_channel", "Source Range:"))
         self.label_11.setText(_translate("B2912_channel", "Voltage Range:"))
         self.label_8.setText(_translate("B2912_channel", "Current Range:"))
-        self.checkBox_current_auto_range.setText(_translate("B2912_channel", "Current Meas Auto Range"))
+        self.checkBox_current_auto_range.setText(
+            _translate("B2912_channel", "Current Meas Auto Range")
+        )
         self.label_6.setText(_translate("B2912_channel", "Voltage compliance:"))
-        self.checkBox_resistance_auto_range.setText(_translate("B2912_channel", "Resistance Auto Range"))
+        self.checkBox_resistance_auto_range.setText(
+            _translate("B2912_channel", "Resistance Auto Range")
+        )
         self.label_14.setText(_translate("B2912_channel", "Resistance Range:"))
         self.label_7.setText(_translate("B2912_channel", "NPLC:"))
-        self.checkBox_four_wire_meas.setText(_translate("B2912_channel", "4-wire measurement"))
-        self.checkBox_voltage_auto_range.setText(_translate("B2912_channel", "Voltage Meas Auto Range"))
-        self.label_15.setText(_translate("B2912_channel", "Resistance auto upper lim.:"))
-        self.checkBox_resistance_compensation.setText(_translate("B2912_channel", "Resistance Compensation"))
-        self.label_10.setText(_translate("B2912_channel", "Current meas auto lower lim.:"))
+        self.checkBox_four_wire_meas.setText(
+            _translate("B2912_channel", "4-wire measurement")
+        )
+        self.checkBox_voltage_auto_range.setText(
+            _translate("B2912_channel", "Voltage Meas Auto Range")
+        )
+        self.label_15.setText(
+            _translate("B2912_channel", "Resistance auto upper lim.:")
+        )
+        self.checkBox_resistance_compensation.setText(
+            _translate("B2912_channel", "Resistance Compensation")
+        )
+        self.label_10.setText(
+            _translate("B2912_channel", "Current meas auto lower lim.:")
+        )
         self.label_9.setText(_translate("B2912_channel", "Current Auto Range Mode:"))
         self.label_13.setText(_translate("B2912_channel", "Voltage Auto Range Mode:"))
-        self.label_12.setText(_translate("B2912_channel", "Voltage meas auto lower lim.:"))
+        self.label_12.setText(
+            _translate("B2912_channel", "Voltage meas auto lower lim.:")
+        )

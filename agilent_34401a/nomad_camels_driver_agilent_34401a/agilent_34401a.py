@@ -7,19 +7,37 @@ from PySide6.QtWidgets import QGridLayout, QLabel, QLineEdit
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='agilent_34401a', virtual=False,
-                         tags=['DMM', 'voltage', 'current'],
-                         ophyd_device=Agilent_34401,
-                         ophyd_class_name='Agilent_34401', **kwargs)
-        self.config['nPLC'] = '1'
+        super().__init__(
+            name="agilent_34401a",
+            virtual=False,
+            tags=["DMM", "voltage", "current"],
+            ophyd_device=Agilent_34401,
+            ophyd_class_name="Agilent_34401",
+            **kwargs
+        )
+        self.config["nPLC"] = "1"
+
 
 class subclass_config(device_class.Simple_Config):
-    def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, additional_info=None):
-        comboboxes = {'nPLC': ['0.006', '0.02', '0.06', '0.2', '1', '2', '10', '100']}
-        super().__init__(parent, 'Agilent 34401', data, settings_dict,
-                         config_dict, additional_info, comboBoxes=comboboxes)
-        self.comboBox_connection_type.addItem('Local VISA')
+    def __init__(
+        self,
+        parent=None,
+        data="",
+        settings_dict=None,
+        config_dict=None,
+        additional_info=None,
+    ):
+        comboboxes = {"nPLC": ["0.006", "0.02", "0.06", "0.2", "1", "2", "10", "100"]}
+        super().__init__(
+            parent,
+            "Agilent 34401",
+            data,
+            settings_dict,
+            config_dict,
+            additional_info,
+            comboBoxes=comboboxes,
+        )
+        self.comboBox_connection_type.addItem("Local VISA")
         # self.sub_widget = subclass_config_sub(config_dict=self.config_dict, parent=self)
         # self.layout().addWidget(self.sub_widget, 20, 0, 1, 5)
         self.load_settings()

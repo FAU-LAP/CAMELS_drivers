@@ -10,30 +10,38 @@ from PySide6.QtWidgets import QComboBox
 
 from nomad_camels.utility import variables_handling
 
-default_pid_val_table = {'setpoint': [0],
-                         'kp': [1],
-                         'ki': [1],
-                         'kd': [1],
-                         'max_value': [2],
-                         'min_value': [-2],
-                         'bias': [0],
-                         'stability-delta': [0.5],
-                         'stability-time': [10]}
+default_pid_val_table = {
+    "setpoint": [0],
+    "kp": [1],
+    "ki": [1],
+    "kd": [1],
+    "max_value": [2],
+    "min_value": [-2],
+    "bias": [0],
+    "stability-delta": [0.5],
+    "stability-time": [10],
+}
+
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='PID', virtual=True, tags=['PID', 'control'],
-                         ophyd_device=PID_Controller,
-                         ophyd_class_name='PID_Controller', **kwargs)
-        self.settings['pid_val_table'] = default_pid_val_table
-        self.settings['auto_pid'] = True
-        self.settings['show_plot'] = True
-        self.config['dt'] = 0.5
+        super().__init__(
+            name="PID",
+            virtual=True,
+            tags=["PID", "control"],
+            ophyd_device=PID_Controller,
+            ophyd_class_name="PID_Controller",
+            **kwargs,
+        )
+        self.settings["pid_val_table"] = default_pid_val_table
+        self.settings["auto_pid"] = True
+        self.settings["show_plot"] = True
+        self.config["dt"] = 0.5
         self.main_thread_only = True
 
-
-        self.controls = {'PID_manual_control': [PID_manual_control,
-                                                PID_Manual_Control_Config]}
+        self.controls = {
+            "PID_manual_control": [PID_manual_control, PID_Manual_Control_Config]
+        }
 
     # def get_additional_string(self):
     #     inp_pv = self.config['pid_inp'].split(' ')[0]
@@ -44,24 +52,28 @@ class subclass(device_class.Device):
     #     return add_string
 
     def get_special_steps(self):
-        return {'PID wait for stable': [PID_wait_for_stable, PID_wait_for_stable_config]}
+        return {
+            "PID wait for stable": [PID_wait_for_stable, PID_wait_for_stable_config]
+        }
 
     def get_necessary_devices(self):
-        inp_dev = variables_handling.channels[self.settings['read_signal_name']].device
-        out_dev = variables_handling.channels[self.settings['set_signal_name']].device
+        inp_dev = variables_handling.channels[self.settings["read_signal_name"]].device
+        out_dev = variables_handling.channels[self.settings["set_signal_name"]].device
         try:
-            bias_dev = variables_handling.channels[self.settings['bias_signal_name']].device
+            bias_dev = variables_handling.channels[
+                self.settings["bias_signal_name"]
+            ].device
             devs = list({inp_dev, out_dev, bias_dev})
         except:
             devs = list({inp_dev, out_dev})
         return devs
 
     def get_config(self):
-        if 'pid_val_table' not in self.settings:
+        if "pid_val_table" not in self.settings:
             return super().get_config()
-        for c in ['kp', 'ki', 'kd', 'min_value', 'max_value']:
-            if c in self.settings['pid_val_table']:
-                val = self.settings['pid_val_table'][c]
+        for c in ["kp", "ki", "kd", "min_value", "max_value"]:
+            if c in self.settings["pid_val_table"]:
+                val = self.settings["pid_val_table"][c]
                 try:
                     self.config[c] = val[0]
                 except:
@@ -69,18 +81,26 @@ class subclass(device_class.Device):
         return super().get_config()
 
 
-
 class subclass_config(device_class.Device_Config):
-    def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, additional_info=None):
-        super().__init__(parent, 'PID_Controller', data, settings_dict,
-                         config_dict, additional_info)
+    def __init__(
+        self,
+        parent=None,
+        data="",
+        settings_dict=None,
+        config_dict=None,
+        additional_info=None,
+    ):
+        super().__init__(
+            parent, "PID_Controller", data, settings_dict, config_dict, additional_info
+        )
         # self.comboBox_connection_type.addItem()
         # self.layout().removeWidget(self.comboBox_connection_type)
         # self.comboBox_connection_type.deleteLater()
         # self.layout().removeWidget(self.label_connection)
         # self.label_connection.deleteLater()
-        self.sub_widget = subclass_config_sub(settings_dict=settings_dict, parent=self, config_dict=config_dict)
+        self.sub_widget = subclass_config_sub(
+            settings_dict=settings_dict, parent=self, config_dict=config_dict
+        )
         self.layout().addWidget(self.sub_widget, 5, 0, 1, 5)
         self.load_settings()
 
@@ -91,15 +111,13 @@ class subclass_config(device_class.Device_Config):
         return self.sub_widget.get_config()
 
 
-
-
 class PID_wait_for_stable(steps.Loop_Step):
-    def __init__(self, name='', parent_step=None, step_info=None, **kwargs):
+    def __init__(self, name="", parent_step=None, step_info=None, **kwargs):
         super().__init__(name, parent_step, step_info, **kwargs)
-        self.step_type = 'PID wait for stable'
+        self.step_type = "PID wait for stable"
         if step_info is None:
             step_info = {}
-        self.pid = step_info['pid'] if 'pid' in step_info else ''
+        self.pid = step_info["pid"] if "pid" in step_info else ""
         self.update_used_devices()
 
     def update_used_devices(self):
@@ -108,7 +126,7 @@ class PID_wait_for_stable(steps.Loop_Step):
         return []
 
     def get_protocol_string(self, n_tabs=1):
-        tabs = '\t' * n_tabs
+        tabs = "\t" * n_tabs
         protocol_string = super().get_protocol_string(n_tabs)
         # protocol_string += f'{tabs}stable_time = datetime.timedelta(0)\n'
         protocol_string += f'{tabs}delta_t = devs["{self.pid}"].dt.get()\n'
@@ -118,7 +136,7 @@ class PID_wait_for_stable(steps.Loop_Step):
         protocol_string += f'{tabs}boxes["bar_{self.name}"].helper.executor.emit()\n'
         protocol_string += f'{tabs}while not devs["{self.pid}"].pid_stable.get() and not boxes["bar_{self.name}"].skip:\n'
         # protocol_string += f'{tabs}\tprint(devs["{self.pid}"].pid_val.just_readback(), devs["{self.pid}"].pid_cval.just_readback())\n'
-        protocol_string += f'{tabs}\tyield from bps.sleep(delta_t)\n'
+        protocol_string += f"{tabs}\tyield from bps.sleep(delta_t)\n"
         protocol_string += f'{tabs}boxes["bar_{self.name}"].setter.hide_signal.emit()\n'
         # protocol_string += f'{tabs}\tif np.abs(devs["{self.pid}"].pid_val.just_readback() - devs["{self.pid}"].pid_cval.get()) > devs["{self.pid}"].stability_delta:\n'
         # protocol_string += f'{tabs}\t\tstable_time = datetime.timedelta(0)\n'
@@ -133,9 +151,8 @@ class PID_wait_for_stable(steps.Loop_Step):
         return add_main_string
 
 
-
 class PID_wait_for_stable_config(steps.Loop_Step_Config):
-    def __init__(self, loop_step:PID_wait_for_stable, parent=None):
+    def __init__(self, loop_step: PID_wait_for_stable, parent=None):
         super().__init__(parent, loop_step)
         self.pid_box = QComboBox()
         self.layout().addWidget(self.pid_box, 1, 0)

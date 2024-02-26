@@ -2,7 +2,7 @@
 #
 # This file is part of NOMAD-CAMELS driver for the Rhode and Schwarz microwave
 # amplifier SMP 02
-# 
+#
 # NOMAD-CAMELS driver for the Rhode and Schwarz microwave amplifier SMP 02 is
 # free software: you can redistribute it and/or modify it under the terms of the
 # GNU Lesser General Public License as published by the Free Software
@@ -24,30 +24,39 @@ from nomad_camels.main_classes import device_class
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name='Rhode_and_Schwarz_SMP_02',
+            name="Rhode_and_Schwarz_SMP_02",
             virtual=False,
-            tags=['microwave_generator'],
+            tags=["microwave_generator"],
             ophyd_device=Rhode_and_Schwarz_SMP_02,
-            ophyd_class_name='Rhode_and_Schwarz_SMP_02',
-            non_channel_functions = [
-                'output_on',
-                'output_off',
-                'ac_coupling',
-                'dc_coupling',
-                'impedance_100kOhm'
+            ophyd_class_name="Rhode_and_Schwarz_SMP_02",
+            non_channel_functions=[
+                "output_on",
+                "output_off",
+                "ac_coupling",
+                "dc_coupling",
+                "impedance_100kOhm",
             ],
-            **kwargs)
+            **kwargs
+        )
+
 
 class subclass_config(device_class.Simple_Config):
-    def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, additional_info=None):
+    def __init__(
+        self,
+        parent=None,
+        data="",
+        settings_dict=None,
+        config_dict=None,
+        additional_info=None,
+    ):
         super().__init__(
             parent,
-            'Rhode_and_Schwarz_SMP_02',
+            "Rhode_and_Schwarz_SMP_02",
             data,
             settings_dict,
             config_dict,
-            additional_info) 
+            additional_info,
+        )
 
-        self.comboBox_connection_type.addItem('Local VISA')
+        self.comboBox_connection_type.addItem("Local VISA")
         self.load_settings()

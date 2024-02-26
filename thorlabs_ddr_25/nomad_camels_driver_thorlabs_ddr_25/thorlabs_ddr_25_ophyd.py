@@ -1,7 +1,7 @@
 # Copyright 2023 Simon Sochiera
 #
 # This file is part of NOMAD-CAMELS driver for Thorlabs rotation stage DDR 25.
-# 
+#
 # NOMAD-CAMELS driver for Thorlabs rotation stage DDR 25 is free software: you
 # can redistribute it and/or modify it under the terms of the GNU Lesser General
 # Public License as published by the Free Software Foundation, either version
@@ -18,34 +18,44 @@
 
 from ophyd import Component as Cpt
 from ophyd import Device
-from nomad_camels.bluesky_handling.custom_function_signal import \
-    Custom_Function_Signal, Custom_Function_SignalRO
+from nomad_camels.bluesky_handling.custom_function_signal import (
+    Custom_Function_Signal,
+    Custom_Function_SignalRO,
+)
 from pylablib.devices import Thorlabs
 
 
 class Thorlabs_DDR_25(Device):
-    get_position = Cpt(Custom_Function_SignalRO, name='get_position',
-            metadata={'units':'deg'})
-    set_relative_position = Cpt(Custom_Function_Signal,
-            name='set_relative_position', metadata={'units':'deg'})
-    set_absolute_position = Cpt(Custom_Function_Signal,
-            name='set_absolute_position', metadata={'units':'deg'})
-    set_speed = Cpt(Custom_Function_Signal,
-            name='set_speed', kind='config', metadata={'units':'deg / s'})
-    wait_move = Cpt(Custom_Function_SignalRO, name='wait_move')
-    is_connected = Cpt(Custom_Function_SignalRO, name='is_connected')
-    is_enabled = Cpt(Custom_Function_SignalRO, name='is_enabled')
+    get_position = Cpt(
+        Custom_Function_SignalRO, name="get_position", metadata={"units": "deg"}
+    )
+    set_relative_position = Cpt(
+        Custom_Function_Signal, name="set_relative_position", metadata={"units": "deg"}
+    )
+    set_absolute_position = Cpt(
+        Custom_Function_Signal, name="set_absolute_position", metadata={"units": "deg"}
+    )
+    set_speed = Cpt(
+        Custom_Function_Signal,
+        name="set_speed",
+        kind="config",
+        metadata={"units": "deg / s"},
+    )
+    wait_move = Cpt(Custom_Function_SignalRO, name="wait_move")
+    is_connected = Cpt(Custom_Function_SignalRO, name="is_connected")
+    is_enabled = Cpt(Custom_Function_SignalRO, name="is_enabled")
 
     def __init__(
         self,
-        prefix='',
+        prefix="",
         *,
         name,
         kind=None,
         read_attrs=None,
         configuration_attrs=None,
         parent=None,
-        **kwargs):
+        **kwargs
+    ):
         super().__init__(
             prefix=prefix,
             name=name,
@@ -53,8 +63,9 @@ class Thorlabs_DDR_25(Device):
             read_attrs=read_attrs,
             configuration_attrs=configuration_attrs,
             parent=parent,
-            **kwargs)
-        if not self.name == 'test':
+            **kwargs
+        )
+        if not self.name == "test":
             self.connect_function()
 
         self.get_position.read_function = self.get_position_function
@@ -68,8 +79,7 @@ class Thorlabs_DDR_25(Device):
     def connect_function(self, retry=1):
         rs_con = Thorlabs.list_kinesis_devices()
         if len(rs_con) > 0:
-            self.rotation_stage = Thorlabs.KinesisMotor(rs_con[0][0],
-                scale="DDR25")
+            self.rotation_stage = Thorlabs.KinesisMotor(rs_con[0][0], scale="DDR25")
             if self.rotation_stage.get_status() == []:
                 print("rotation stage disabled; manually enable it")
         else:
@@ -114,11 +124,14 @@ class Thorlabs_DDR_25(Device):
         return 0
 
     def is_connected_function(self):
-        return hasattr(self, 'rotation_stage')
+        return hasattr(self, "rotation_stage")
 
     def is_enabled_function(self):
-        return False if not self.is_connected_function() else not \
-            self.rotation_stage.get_status() == []
+        return (
+            False
+            if not self.is_connected_function()
+            else not self.rotation_stage.get_status() == []
+        )
 
     def finalize_steps(self):
         # disconnect rotation stage after use so it can be connected without
