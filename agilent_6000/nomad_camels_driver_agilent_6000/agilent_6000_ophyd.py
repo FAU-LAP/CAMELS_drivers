@@ -74,91 +74,190 @@ class Agilent_6000(VISA_Device):
 
     idn = Cpt(VISA_Signal_RO, name="idn", query="*IDN?", kind="config")
     invert_colors = Cpt(
-        Custom_Function_Signal, value=False, name="invert_colors", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="invert_colors",
+        kind="config",
+        metadata={"description": "invert colors of screenshots"},
     )
     grayscale = Cpt(
-        Custom_Function_Signal, value=False, name="grayscale", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="grayscale",
+        kind="config",
+        metadata={"description": "grayscale for screenshots"},
     )
     image_type = Cpt(
-        Custom_Function_Signal, value="png", name="image_type", kind="config"
+        Custom_Function_Signal,
+        value="png",
+        name="image_type",
+        kind="config",
+        metadata={"description": "image type for screenshots"},
     )
     acquisition_type = Cpt(
         Custom_Function_Signal, value="normal", name="acquisition_type", kind="config"
     )
-    n_averages = Cpt(Custom_Function_Signal, value=8, name="n_averages", kind="config")
+    n_averages = Cpt(
+        Custom_Function_Signal,
+        value=8,
+        name="n_averages",
+        kind="config",
+        metadata={"description": 'number of averages if acquisition_type is "average"'},
+    )
 
-    timebase_get = Cpt(Custom_Function_SignalRO, value=20e-9, name="timebase_get")
-    timebase_set = Cpt(Custom_Function_Signal, value=20e-9, name="timebase_set")
+    timebase_get = Cpt(
+        Custom_Function_SignalRO,
+        value=20e-9,
+        name="timebase_get",
+        metadata={"units": "s", "description": "timebase for oscilloscope"},
+    )
+    timebase_set = Cpt(
+        Custom_Function_Signal,
+        value=20e-9,
+        name="timebase_set",
+        metadata={"units": "s", "description": "timebase for oscilloscope"},
+    )
     timebase_offset = Cpt(
-        Custom_Function_Signal, value=0, name="timebase_offset", kind="config"
+        Custom_Function_Signal,
+        value=0,
+        name="timebase_offset",
+        kind="config",
+        metadata={"units": "s", "description": "timebase offset for oscilloscope"},
     )
     min_record_length = Cpt(
         Custom_Function_Signal, name="min_record_length", kind="config"
     )
     trigger_mode = Cpt(
-        Custom_Function_Signal, name="trigger_mode", kind="config"
+        Custom_Function_Signal,
+        name="trigger_mode",
+        kind="config",
+        metadata={"description": "trigger mode (normal or auto)"},
     )  # auto or normal
 
     get_channel_range_1 = Cpt(
-        Custom_Function_SignalRO, value=1, name="get_channel_range_1"
+        Custom_Function_SignalRO,
+        value=1,
+        name="get_channel_range_1",
+        metadata={"units": "V", "description": "vertical range of channel 1"},
     )
     get_channel_range_2 = Cpt(
-        Custom_Function_SignalRO, value=1, name="get_channel_range_2"
+        Custom_Function_SignalRO,
+        value=1,
+        name="get_channel_range_2",
+        metadata={"units": "V", "description": "vertical range of channel 2"},
     )
     get_channel_range_3 = Cpt(
-        Custom_Function_SignalRO, value=1, name="get_channel_range_3"
+        Custom_Function_SignalRO,
+        value=1,
+        name="get_channel_range_3",
+        metadata={"units": "V", "description": "vertical range of channel 3"},
     )
     get_channel_range_4 = Cpt(
-        Custom_Function_SignalRO, value=1, name="get_channel_range_4"
+        Custom_Function_SignalRO,
+        value=1,
+        name="get_channel_range_4",
+        metadata={"units": "V", "description": "vertical range of channel 4"},
     )
     set_channel_range_1 = Cpt(
-        Custom_Function_Signal, value=1, name="set_channel_range_1"
+        Custom_Function_Signal,
+        value=1,
+        name="set_channel_range_1",
+        metadata={"units": "V", "description": "vertical range of channel 1"},
     )
     set_channel_range_2 = Cpt(
-        Custom_Function_Signal, value=1, name="set_channel_range_2"
+        Custom_Function_Signal,
+        value=1,
+        name="set_channel_range_2",
+        metadata={"units": "V", "description": "vertical range of channel 2"},
     )
     set_channel_range_3 = Cpt(
-        Custom_Function_Signal, value=1, name="set_channel_range_3"
+        Custom_Function_Signal,
+        value=1,
+        name="set_channel_range_3",
+        metadata={"units": "V", "description": "vertical range of channel 3"},
     )
     set_channel_range_4 = Cpt(
-        Custom_Function_Signal, value=1, name="set_channel_range_4"
+        Custom_Function_Signal,
+        value=1,
+        name="set_channel_range_4",
+        metadata={"units": "V", "description": "vertical range of channel 4"},
     )
     get_vertical_offset_1 = Cpt(
-        Custom_Function_SignalRO, value=0, name="get_vertical_offset_1"
+        Custom_Function_SignalRO,
+        value=0,
+        name="get_vertical_offset_1",
+        metadata={"units": "V", "description": "vertical offset of channel 1"},
     )
     get_vertical_offset_2 = Cpt(
-        Custom_Function_SignalRO, value=0, name="get_vertical_offset_2"
+        Custom_Function_SignalRO,
+        value=0,
+        name="get_vertical_offset_2",
+        metadata={"units": "V", "description": "vertical offset of channel 2"},
     )
     get_vertical_offset_3 = Cpt(
-        Custom_Function_SignalRO, value=0, name="get_vertical_offset_3"
+        Custom_Function_SignalRO,
+        value=0,
+        name="get_vertical_offset_3",
+        metadata={"units": "V", "description": "vertical offset of channel 3"},
     )
     get_vertical_offset_4 = Cpt(
-        Custom_Function_SignalRO, value=0, name="get_vertical_offset_4"
+        Custom_Function_SignalRO,
+        value=0,
+        name="get_vertical_offset_4",
+        metadata={"units": "V", "description": "vertical offset of channel 4"},
     )
     set_vertical_offset_1 = Cpt(
-        Custom_Function_Signal, value=0, name="set_vertical_offset_1"
+        Custom_Function_Signal,
+        value=0,
+        name="set_vertical_offset_1",
+        metadata={"units": "V", "description": "vertical offset of channel 1"},
     )
     set_vertical_offset_2 = Cpt(
-        Custom_Function_Signal, value=0, name="set_vertical_offset_2"
+        Custom_Function_Signal,
+        value=0,
+        name="set_vertical_offset_2",
+        metadata={"units": "V", "description": "vertical offset of channel 2"},
     )
     set_vertical_offset_3 = Cpt(
-        Custom_Function_Signal, value=0, name="set_vertical_offset_3"
+        Custom_Function_Signal,
+        value=0,
+        name="set_vertical_offset_3",
+        metadata={"units": "V", "description": "vertical offset of channel 3"},
     )
     set_vertical_offset_4 = Cpt(
-        Custom_Function_Signal, value=0, name="set_vertical_offset_4"
+        Custom_Function_Signal,
+        value=0,
+        name="set_vertical_offset_4",
+        metadata={"units": "V", "description": "vertical offset of channel 4"},
     )
 
     ac_coupling_1 = Cpt(
-        Custom_Function_Signal, value=False, name="ac_coupling_1", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="ac_coupling_1",
+        kind="config",
+        metadata={"description": "set AC coupling for channel 1"},
     )
     ac_coupling_2 = Cpt(
-        Custom_Function_Signal, value=False, name="ac_coupling_2", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="ac_coupling_2",
+        kind="config",
+        metadata={"description": "set AC coupling for channel 2"},
     )
     ac_coupling_3 = Cpt(
-        Custom_Function_Signal, value=False, name="ac_coupling_3", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="ac_coupling_3",
+        kind="config",
+        metadata={"description": "set AC coupling for channel 3"},
     )
     ac_coupling_4 = Cpt(
-        Custom_Function_Signal, value=False, name="ac_coupling_4", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="ac_coupling_4",
+        kind="config",
+        metadata={"description": "set AC coupling for channel 4"},
     )
     probe_attenuation_1 = Cpt(
         Custom_Function_Signal, value=10, name="probe_attenuation_1", kind="config"
@@ -174,37 +273,128 @@ class Agilent_6000(VISA_Device):
     )
 
     waveform_meas_source = Cpt(
-        Custom_Function_Signal, name="waveform_meas_source", kind="config"
+        Custom_Function_Signal,
+        name="waveform_meas_source",
+        kind="config",
+        metadata={"description": "source for waveform_meas"},
     )
     waveform_meas_source_2 = Cpt(
-        Custom_Function_Signal, name="waveform_meas_source_2", kind="config"
+        Custom_Function_Signal,
+        name="waveform_meas_source_2",
+        kind="config",
+        metadata={
+            "description": "second source for waveform_meas, used in measurements like frequency ratio"
+        },
     )
     waveform_meas_function = Cpt(
-        Custom_Function_Signal, name="waveform_meas_function", kind="config"
+        Custom_Function_Signal,
+        name="waveform_meas_function",
+        kind="config",
+        metadata={
+            "description": "function for waveform_meas, e.g. frequency, voltage peak to peak, ..."
+        },
     )
 
-    waveform_meas = Cpt(Custom_Function_SignalRO, name="waveform_meas")
+    waveform_meas = Cpt(
+        Custom_Function_SignalRO,
+        name="waveform_meas",
+        metadata={
+            "description": "measure the waveform with the given source and function"
+        },
+    )
 
-    error = Cpt(VISA_Signal_RO, name="error", query=":SYST:ERR?", kind="normal")
+    error = Cpt(
+        VISA_Signal_RO,
+        name="error",
+        query=":SYST:ERR?",
+        kind="normal",
+        metadata={"description": "query the instrument for errors"},
+    )
 
-    image = Cpt(Custom_Function_SignalRO, name="image")
-    channel1 = Cpt(Custom_Function_SignalRO, name="channel1")
-    channel2 = Cpt(Custom_Function_SignalRO, name="channel2")
-    channel3 = Cpt(Custom_Function_SignalRO, name="channel3")
-    channel4 = Cpt(Custom_Function_SignalRO, name="channel4")
-    math_data = Cpt(Custom_Function_SignalRO, name="math_data")
-    digital1 = Cpt(Custom_Function_SignalRO, name="digital1")
-    digital2 = Cpt(Custom_Function_SignalRO, name="digital2")
+    image = Cpt(
+        Custom_Function_SignalRO,
+        name="image",
+        metadata={"description": "take a screenshot of the oscilloscope"},
+    )
+    channel1 = Cpt(
+        Custom_Function_SignalRO,
+        name="channel1",
+        metadata={"description": "get data from channel 1", "units": "V"},
+    )
+    channel2 = Cpt(
+        Custom_Function_SignalRO,
+        name="channel2",
+        metadata={"description": "get data from channel 2", "units": "V"},
+    )
+    channel3 = Cpt(
+        Custom_Function_SignalRO,
+        name="channel3",
+        metadata={"description": "get data from channel 3", "units": "V"},
+    )
+    channel4 = Cpt(
+        Custom_Function_SignalRO,
+        name="channel4",
+        metadata={"description": "get data from channel 4", "units": "V"},
+    )
+    math_data = Cpt(
+        Custom_Function_SignalRO,
+        name="math_data",
+        metadata={"description": "get data from math mode"},
+    )
+    digital1 = Cpt(
+        Custom_Function_SignalRO,
+        name="digital1",
+        metadata={"description": "get data from digital 1 as bool array"},
+    )
+    digital2 = Cpt(
+        Custom_Function_SignalRO,
+        name="digital2",
+        metadata={"description": "get data from digital 2 as bool array"},
+    )
 
-    time_1 = Cpt(Custom_Function_SignalRO, name="time_1")
-    time_2 = Cpt(Custom_Function_SignalRO, name="time_2")
-    time_3 = Cpt(Custom_Function_SignalRO, name="time_3")
-    time_4 = Cpt(Custom_Function_SignalRO, name="time_4")
-    time_math = Cpt(Custom_Function_SignalRO, name="time_math")
-    time_digital_1 = Cpt(Custom_Function_SignalRO, name="time_digital_1")
-    time_digital_2 = Cpt(Custom_Function_SignalRO, name="time_digital_2")
+    time_1 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_1",
+        metadata={"units": "s", "description": "time axis for channel 1"},
+    )
+    time_2 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_2",
+        metadata={"units": "s", "description": "time axis for channel 2"},
+    )
+    time_3 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_3",
+        metadata={"units": "s", "description": "time axis for channel 3"},
+    )
+    time_4 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_4",
+        metadata={"units": "s", "description": "time axis for channel 4"},
+    )
+    time_math = Cpt(
+        Custom_Function_SignalRO,
+        name="time_math",
+        metadata={"description": "x-axis for math mode"},
+    )
+    time_digital_1 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_digital_1",
+        metadata={"units": "s", "description": "time axis for digital 1"},
+    )
+    time_digital_2 = Cpt(
+        Custom_Function_SignalRO,
+        name="time_digital_2",
+        metadata={"units": "s", "description": "time axis for digital 2"},
+    )
 
-    acquisition_success = Cpt(Custom_Function_SignalRO, name="acquisition_success")
+    acquisition_success = Cpt(
+        Custom_Function_SignalRO,
+        name="acquisition_success",
+        metadata={
+            "description": "trigger an acquisition and check whether it was successful"
+        },
+    )
 
     def __init__(
         self,
