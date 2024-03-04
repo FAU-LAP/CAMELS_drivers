@@ -1,4 +1,4 @@
-# NOMAD-CAMELS Driver for PyLabLibs Cam-Control 
+# NOMAD-CAMELS Driver for PyLabLibs Cam-Control
 
 Connects to the server of Cam-Control to save, snap and request frames. Written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
