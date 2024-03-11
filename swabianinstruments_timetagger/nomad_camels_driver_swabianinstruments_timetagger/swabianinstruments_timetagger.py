@@ -181,9 +181,9 @@ class Channel_Settings(QWidget):
         if "test_signal" in settings:
             self.check_test_signal.setChecked(settings["test_signal"])
 
-        layout.addWidget(label_rising_edge, 10, 0, 1, 2)
-        layout.addWidget(label_trigger_level, 11, 0)
-        layout.addWidget(self.line_trigger_level, 11, 1)
+        layout.addWidget(label_rising_edge, 11, 0, 1, 2)
+        layout.addWidget(label_trigger_level, 10, 0)
+        layout.addWidget(self.line_trigger_level, 10, 1)
         layout.addWidget(label_dead_time, 12, 0)
         layout.addWidget(self.line_dead_time, 12, 1)
         layout.addWidget(label_input_delay, 13, 0)
@@ -192,7 +192,6 @@ class Channel_Settings(QWidget):
 
         label_dead_time = QLabel("dead time (ps)")
         label_input_delay = QLabel("input delay (ps)")
-        label_trigger_level = QLabel("trigger level (V)")
         label_falling_edge = QLabel("falling edge")
         label_falling_edge.setFont(bold_font)
 
@@ -202,13 +201,8 @@ class Channel_Settings(QWidget):
         self.line_input_delay_fall = QLineEdit(str(0))
         if "input_delay" in settings_fall:
             self.line_input_delay_fall.setText(str(settings_fall["input_delay"]))
-        self.line_trigger_level_fall = QLineEdit(str(0.5))
-        if "trigger_level" in settings_fall:
-            self.line_trigger_level_fall.setText(str(settings_fall["trigger_level"]))
 
         layout.addWidget(label_falling_edge, 20, 0, 1, 2)
-        layout.addWidget(label_trigger_level, 21, 0)
-        layout.addWidget(self.line_trigger_level_fall, 21, 1)
         layout.addWidget(label_dead_time, 22, 0)
         layout.addWidget(self.line_dead_time_fall, 22, 1)
         layout.addWidget(label_input_delay, 23, 0)
@@ -221,7 +215,7 @@ class Channel_Settings(QWidget):
         settings["dead_time"] = int(self.line_dead_time.text())
         settings["input_delay"] = int(self.line_input_delay.text())
         settings["test_signal"] = self.check_test_signal.isChecked()
-        settings_fall["trigger_level"] = float(self.line_trigger_level_fall.text())
+        settings_fall["trigger_level"] = float(self.line_trigger_level.text())
         settings_fall["dead_time"] = int(self.line_dead_time_fall.text())
         settings_fall["input_delay"] = int(self.line_input_delay_fall.text())
         settings_fall["test_signal"] = self.check_test_signal.isChecked()
