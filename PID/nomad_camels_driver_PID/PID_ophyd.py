@@ -263,6 +263,7 @@ class PID_Controller(Device):
         if not self.auto_pid:
             if self.bias_func is not None:
                 self.bias_func(0)
+            self.update_vals_to_thread(setpoint)
             return
         old_vals = copy.deepcopy(self.pid_vals)
         pid_val_table = pd.DataFrame(self.pid_val_table)
@@ -304,6 +305,9 @@ class PID_Controller(Device):
                     att.put(self.pid_vals[key][0])
         self.stability_time = self.pid_vals["stability-time"][0]
         self.stability_delta = self.pid_vals["stability-delta"][0]
+        self.update_vals_to_thread(setpoint)
+
+    def update_vals_to_thread(self, setpoint):
         self.pid_thread.stability_delta = self.pid_vals["stability-delta"][0]
         # self.setpoint = setpoint
         self.pid_thread.pid.setpoint = setpoint
