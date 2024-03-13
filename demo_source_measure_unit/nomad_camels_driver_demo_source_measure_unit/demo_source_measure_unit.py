@@ -1,11 +1,6 @@
 from nomad_camels.main_classes import device_class
 from .demo_source_measure_unit_ophyd import Demo_SMU
 
-import sys
-
-sys.path.append(r"C:\Users\od93yces\FAIRmat")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox\CAMELS_sandbox")
 from nomad_camels_sandbox.server_signals import ServerConnection
 
 

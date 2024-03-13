@@ -1,9 +1,4 @@
 from ophyd import Component as Cpt
-import sys
-
-sys.path.append(r"C:\Users\od93yces\FAIRmat")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox\CAMELS_sandbox")
 
 from nomad_camels_sandbox.server_signals import (
     Demo_Server_Signal,

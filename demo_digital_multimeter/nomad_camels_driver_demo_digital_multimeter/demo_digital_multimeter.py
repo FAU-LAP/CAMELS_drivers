@@ -3,12 +3,6 @@ from nomad_camels_driver_demo_digital_multimeter.demo_digital_multimeter_ophyd i
 )
 
 from nomad_camels.main_classes import device_class
-
-import sys
-
-sys.path.append(r"C:\Users\od93yces\FAIRmat")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox")
-sys.path.append(r"C:\Users\od93yces\FAIRmat\CAMELS_sandbox\CAMELS_sandbox")
 from nomad_camels_sandbox.server_signals import ServerConnection
 
 
