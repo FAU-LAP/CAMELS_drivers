@@ -19,6 +19,7 @@ except_drivers = [
     "thorlabs_MFF",
     "rhode_and_schwarz_smp_02",
     "zaber_rst240b_e08",
+    "lakeshore_f41",
 ]
 
 if os.name != "nt":
