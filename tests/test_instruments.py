@@ -17,6 +17,8 @@ except_drivers = [
     "swabianinstruments_timetagger",
     "thorlabs_K10CR1",
     "thorlabs_MFF",
+    "rhode_and_schwarz_smp_02",
+    "zaber_rst240b_e08",
 ]
 
 if os.name != "nt":
