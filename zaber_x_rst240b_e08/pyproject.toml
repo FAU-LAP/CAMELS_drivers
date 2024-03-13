@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_driver_zaber_rst240b_e08"
+version = "0.1.0"
+authors = [
+    {name="Rouven Craemer", email="craemer.rouven@gmail.com"},
+    {name="Simon Sochiera", email="s.sochiera@web.de"}
+]
+description = "Basic instrument driver for the Zaber rotation stage RST240B E08."
+readme = "README.md"
+requires-python = ">=3.11.3"
+dependencies = [
+    "pyvisa",
+    "pyvisa-py",
+    "zaber-motion"
+]
+
+[project.urls]
+"GitHub Page" = "https://github.com/FAU-LAP/CAMELS_drivers"
+"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS"

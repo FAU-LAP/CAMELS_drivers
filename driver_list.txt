@@ -2,7 +2,9 @@ agilent_34401a==0.1.1
 andor_newton==0.1.0
 andor_shamrock_500==0.1.0
 cam_control_pylablib==0.1.3
+demo_digital_multimeter==0.1.1
 demo_instrument==0.1.1
+demo_source_measure_unit==0.1.1
 keithley_2000==0.1.0
 keithley_2182a==0.0.2
 keithley_237==0.1.1
@@ -10,10 +12,12 @@ keithley_2400==0.1.1
 keithley_6221==0.0.2
 keysight_b2912a==0.1.0
 keysight_e5270b==0.1.1
+lakeshore_f41==0.1.0
 mechonics_cu30cl==0.1.0
 ni_daq==0.1.1
-PID==0.1.6
+PID==0.1.8
 pi_stage_e709==0.1.1
+rhode_and_schwarz_smp_02==0.1.0
 swabianinstruments_timetagger==0.1.0
 thorlabs_ddr_25==0.0.2
 thorlabs_K10CR1==0.1.0
@@ -21,4 +25,5 @@ thorlabs_MFF==0.1.0
 thorlabs_TLPM==0.1.0
 trinamic_tmcm_1110==0.1.0
 voltcraft_pps==0.1.1
-zurich_instruments_mfli==0.0.1
+zaber_rst240b_e08==0.1.0
+zurich_instruments_mfli==0.1.0

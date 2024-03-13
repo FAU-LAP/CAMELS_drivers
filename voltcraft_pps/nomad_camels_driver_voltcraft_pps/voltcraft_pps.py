@@ -9,44 +9,54 @@ from .voltcraft_pps_ophyd import Voltcraft_PPS
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
-        super().__init__(name='voltcraft_pps', tags=['power supply', 'voltage'],
-                         ophyd_device=Voltcraft_PPS,
-                         ophyd_class_name='Voltcraft_PPS',
-                         **kwargs)
+        super().__init__(
+            name="voltcraft_pps",
+            tags=["power supply", "voltage"],
+            ophyd_device=Voltcraft_PPS,
+            ophyd_class_name="Voltcraft_PPS",
+            **kwargs
+        )
 
     def get_channels(self):
         channels = copy.deepcopy(super().get_channels())
         conf = self.get_config()
-        if 'outputMode' in conf:
-            if conf['outputMode'] == 'voltage' or conf['outputMode'] == 0:
+        if "outputMode" in conf:
+            if conf["outputMode"] == "voltage" or conf["outputMode"] == 0:
                 for chan in channels:
-                    if chan.endswith('setP'):
+                    if chan.endswith("setP"):
                         channels.pop(chan)
                         break
             else:
                 for chan in channels:
-                    if chan.endswith('setV'):
+                    if chan.endswith("setV"):
                         channels.pop(chan)
                         break
         return channels
 
 
 class subclass_config(device_class.Device_Config):
-    def __init__(self, parent=None, data='', settings_dict=None,
-                 config_dict=None, additional_info=None):
-        super().__init__(parent, 'Voltcraft PPS', data, settings_dict,
-                         config_dict, additional_info)
-        self.comboBox_connection_type.addItem('Local VISA')
+    def __init__(
+        self,
+        parent=None,
+        data="",
+        settings_dict=None,
+        config_dict=None,
+        additional_info=None,
+    ):
+        super().__init__(
+            parent, "Voltcraft PPS", data, settings_dict, config_dict, additional_info
+        )
+        self.comboBox_connection_type.addItem("Local VISA")
         self.lineEdit_R = QLineEdit()
-        self.lineEdit_R.setText(str(config_dict['setR']))
-        self.labelR = QLabel('Resistance:')
-        labelOutput = QLabel('Output mode:')
+        self.lineEdit_R.setText(str(config_dict["setR"]))
+        self.labelR = QLabel("Resistance:")
+        labelOutput = QLabel("Output mode:")
 
-        modes = ['voltage', 'power']
+        modes = ["voltage", "power"]
         self.comboBox_output_mode = QComboBox()
         self.comboBox_output_mode.addItems(modes)
-        if 'outputMode' in config_dict and config_dict['outputMode'] in modes:
-            self.comboBox_output_mode.setCurrentText(config_dict['outputMode'])
+        if "outputMode" in config_dict and config_dict["outputMode"] in modes:
+            self.comboBox_output_mode.setCurrentText(config_dict["outputMode"])
         self.comboBox_output_mode.currentTextChanged.connect(self.mode_change)
 
         self.layout().addWidget(labelOutput, 20, 0)
@@ -57,15 +67,14 @@ class subclass_config(device_class.Device_Config):
         self.mode_change()
         self.load_settings()
 
-
     def mode_change(self):
-        power = self.comboBox_output_mode.currentText() == 'power'
+        power = self.comboBox_output_mode.currentText() == "power"
         self.labelR.setEnabled(power)
         self.lineEdit_R.setEnabled(power)
 
     def get_config(self):
         super().get_config()
-        self.config_dict['outputMode'] = self.comboBox_output_mode.currentText()
+        self.config_dict["outputMode"] = self.comboBox_output_mode.currentText()
         r = self.lineEdit_R.text()
-        self.config_dict['setR'] = float(r) if r else 0
+        self.config_dict["setR"] = float(r) if r else 0
         return self.config_dict

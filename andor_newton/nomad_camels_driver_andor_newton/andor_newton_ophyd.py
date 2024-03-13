@@ -3,44 +3,79 @@ from ophyd import Device
 
 import pylablib as pll
 
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from nomad_camels.bluesky_handling.custom_function_signal import (
+    Custom_Function_Signal,
+    Custom_Function_SignalRO,
+)
 
 
-read_modes = {'FVB - full vertical binning': 'fvb',
-              'multi track': 'multi_track',
-              'random track': 'random_track'}
+read_modes = {
+    "FVB - full vertical binning": "fvb",
+    "multi track": "multi_track",
+    "random track": "random_track",
+}
+
 
 class Andor_Newton(Device):
     """
     Driver for the Andor Newton CCD camera
     """
-    read_camera = Cpt(Custom_Function_SignalRO, name='read_camera', metadata={'units': 'intensity'})
 
-    get_temperature = Cpt(Custom_Function_SignalRO, name='get_temperature', kind='config')
-    temperature_status = Cpt(Custom_Function_SignalRO, name='temperature_status', kind='config')
+    read_camera = Cpt(
+        Custom_Function_SignalRO, name="read_camera", metadata={"units": "intensity"}
+    )
+
+    get_temperature = Cpt(
+        Custom_Function_SignalRO, name="get_temperature", kind="config"
+    )
+    temperature_status = Cpt(
+        Custom_Function_SignalRO, name="temperature_status", kind="config"
+    )
 
     # Configuration settings
-    set_temperature = Cpt(Custom_Function_Signal, name='set_temperature', kind='config')
-    shutter_mode = Cpt(Custom_Function_Signal, name='shutter_mode', kind='config')
-    exposure_time = Cpt(Custom_Function_Signal, name='exposure_time', kind='config')
-    readout_mode = Cpt(Custom_Function_Signal, name='readout_mode', kind='config')
-    preamp_gain = Cpt(Custom_Function_Signal, name='preamp_gain', kind='config')
-    horizontal_binning = Cpt(Custom_Function_Signal, name='horizontal_binning', kind='config')
-    hs_speed = Cpt(Custom_Function_Signal, name='hs_speed', kind='config')
-    vs_speed = Cpt(Custom_Function_Signal, name='vs_speed', kind='config')
-    multi_tracks = Cpt(Custom_Function_Signal, name='multi_tracks', kind='config')
+    set_temperature = Cpt(Custom_Function_Signal, name="set_temperature", kind="config")
+    shutter_mode = Cpt(Custom_Function_Signal, name="shutter_mode", kind="config")
+    exposure_time = Cpt(Custom_Function_Signal, name="exposure_time", kind="config")
+    readout_mode = Cpt(Custom_Function_Signal, name="readout_mode", kind="config")
+    preamp_gain = Cpt(Custom_Function_Signal, name="preamp_gain", kind="config")
+    horizontal_binning = Cpt(
+        Custom_Function_Signal, name="horizontal_binning", kind="config"
+    )
+    hs_speed = Cpt(Custom_Function_Signal, name="hs_speed", kind="config")
+    vs_speed = Cpt(Custom_Function_Signal, name="vs_speed", kind="config")
+    multi_tracks = Cpt(Custom_Function_Signal, name="multi_tracks", kind="config")
     # read_settings = Cpt(Custom_Function_SignalRO, name='read_settings', kind='config')
-    shutter_ttl_open = Cpt(Custom_Function_Signal, name='shutter_ttl_open', kind='config')
+    shutter_ttl_open = Cpt(
+        Custom_Function_Signal, name="shutter_ttl_open", kind="config"
+    )
 
-    def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
-                 configuration_attrs=None, parent=None, dll_path='',
-                 camera=0, **kwargs):
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs,
-                         configuration_attrs=configuration_attrs, parent=parent, **kwargs)
-        if name == 'test':
+    def __init__(
+        self,
+        prefix="",
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        dll_path="",
+        camera=0,
+        **kwargs
+    ):
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            **kwargs
+        )
+        if name == "test":
             return
-        pll.par['devices/dlls/andor_sdk2'] = dll_path
+        pll.par["devices/dlls/andor_sdk2"] = dll_path
         from pylablib.devices import Andor
+
         self.camera = Andor.AndorSDK2Camera(idx=camera)
 
         self.read_camera.read_function = self.read_camera_function
@@ -73,8 +108,8 @@ class Andor_Newton(Device):
     def read_camera_function(self):
         time = self.exposure_time.get()
         self.readout_mode.put(self.readout_mode.get())
-        dat = self.camera.snap(timeout=10*time)
-        if self.readout_mode.get() != 'image':
+        dat = self.camera.snap(timeout=10 * time)
+        if self.readout_mode.get() != "image":
             return dat[0]
         else:
             return dat
@@ -87,13 +122,13 @@ class Andor_Newton(Device):
 
     def set_temperature_function(self, value):
         self.camera.set_temperature(value, enable_cooler=True)
-        self.camera.set_fan_mode('full')
+        self.camera.set_fan_mode("full")
 
     def shutter_mode_function(self, value):
         self.camera.setup_shutter(value, ttl_mode=self.shutter_ttl_setting)
 
     def shutter_ttl_open_function(self, value):
-        self.shutter_ttl_setting = 1 if value == 'high' else 0
+        self.shutter_ttl_setting = 1 if value == "high" else 0
         self.shutter_mode_function(self.shutter_mode.get())
 
     def exposure_time_function(self, value):
@@ -102,10 +137,10 @@ class Andor_Newton(Device):
     def readout_mode_function(self, value):
         if value in read_modes:
             value = read_modes[value]
-        if value == 'fvb':
-            value = 'multi_track'
+        if value == "fvb":
+            value = "multi_track"
             self.camera.setup_multi_track_mode(1, 255, 0)
-        elif value == 'multi_track':
+        elif value == "multi_track":
             self.multi_tracks.put(self.multi_tracks.get())
         self.camera.set_read_mode(value)
 
@@ -127,16 +162,13 @@ class Andor_Newton(Device):
 
     def multi_tracks_function(self, track_data):
         try:
-            width = track_data['End'][0] - track_data['Start'][0]
-            offset = track_data['Start'][0] - 128 + int(width/2)
-            n = len(track_data['Start'])
+            width = track_data["End"][0] - track_data["Start"][0]
+            offset = track_data["Start"][0] - 128 + int(width / 2)
+            n = len(track_data["Start"])
         except Exception as e:
             n = 1
             width = 255
             offset = 0
             print(e)
-            print('Failed to setup multi track, using FVB settings')
+            print("Failed to setup multi track, using FVB settings")
         self.camera.setup_multi_track_mode(n, width, offset)
-
-
-

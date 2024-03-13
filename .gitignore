@@ -129,3 +129,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+thorlabs_TLPM/nomad_camels_driver_thorlabs_TLPM/TLPM_64.dll
+thorlabs_TLPM/nomad_camels_driver_thorlabs_TLPM/TLPM.py
+CAMELS_drivers.code-workspace

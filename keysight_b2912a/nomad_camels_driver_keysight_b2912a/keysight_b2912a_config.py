@@ -60,7 +60,9 @@ class Ui_Form(object):
         self.lineEdit_11.setObjectName("lineEdit_11")
         self.checkBox = QtWidgets.QCheckBox(Form)
         self.checkBox.setGeometry(QtCore.QRect(10, 90, 120, 17))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.checkBox.sizePolicy().hasHeightForWidth())
@@ -119,7 +121,9 @@ class Ui_Form(object):
         self.line_2.setObjectName("line_2")
         self.checkBox_4 = QtWidgets.QCheckBox(Form)
         self.checkBox_4.setGeometry(QtCore.QRect(322, 90, 120, 17))
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
+        sizePolicy = QtWidgets.QSizePolicy(
+            QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed
+        )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.checkBox_4.sizePolicy().hasHeightForWidth())

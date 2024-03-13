@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_driver_lakeshore_f41"
+version = "0.1.0"
+authors = [
+    {name="Rouven Craemer", email="craemer.rouven@gmail.com"},
+    {name="Simon Sochiera", email="s.sochiera@web.de"}
+]
+description = "Basic instrument driver for the Lakeshore teslameter F41."
+readme = "README.md"
+requires-python = ">=3.11.3"
+dependencies = [
+    "pyvisa",
+    "pyvisa-py",
+    "lakeshore"
+]
+
+[project.urls]
+"GitHub Page" = "https://github.com/FAU-LAP/CAMELS_drivers"
+"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS"

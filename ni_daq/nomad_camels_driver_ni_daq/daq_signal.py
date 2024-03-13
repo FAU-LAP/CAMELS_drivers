@@ -11,37 +11,70 @@ from ophyd.signal import SignalRO
 
 tasks = []
 
+
 def close_tasks():
     for task in tasks:
         task.close()
     tasks.clear()
 
-    
-def get_dig_config(terminal_config='default'):
-    if terminal_config.lower() == 'open_collector':
+
+def get_dig_config(terminal_config="default"):
+    if terminal_config.lower() == "open_collector":
         return nidaqmx.constants.DigitalDriveType.OPEN_COLLECTOR
     return nidaqmx.constants.DigitalDriveType.ACTIVE_DRIVE
 
-def get_an_config(terminal_config='default'):
-    if terminal_config.lower() == 'bal_diff':
+
+def get_an_config(terminal_config="default"):
+    if terminal_config.lower() == "bal_diff":
         return nidaqmx.constants.TerminalConfiguration.BAL_DIFF
-    if terminal_config.lower() == 'nrse':
+    if terminal_config.lower() == "nrse":
         return nidaqmx.constants.TerminalConfiguration.NRSE
-    if terminal_config.lower() == 'pseudodifferential':
+    if terminal_config.lower() == "pseudodifferential":
         return nidaqmx.constants.TerminalConfiguration.PSEUDODIFFERENTIAL
-    if terminal_config.lower() == 'rse':
+    if terminal_config.lower() == "rse":
         return nidaqmx.constants.TerminalConfiguration.RSE
     return nidaqmx.constants.TerminalConfiguration.DEFAULT
-    
+
 
 class DAQ_Signal_Output(Signal):
-    def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', line_name='', digital=False, minV=-10, maxV=10, terminal_config='default', wait_time=0):
-        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
+    def __init__(
+        self,
+        name,
+        value=0.0,
+        timestamp=None,
+        parent=None,
+        labels=None,
+        kind="hinted",
+        tolerance=None,
+        rtolerance=None,
+        metadata=None,
+        cl=None,
+        attr_name="",
+        line_name="",
+        digital=False,
+        minV=-10,
+        maxV=10,
+        terminal_config="default",
+        wait_time=0,
+    ):
+        super().__init__(
+            name=name,
+            value=value,
+            timestamp=timestamp,
+            parent=parent,
+            labels=labels,
+            kind=kind,
+            tolerance=tolerance,
+            rtolerance=rtolerance,
+            metadata=metadata,
+            cl=cl,
+            attr_name=attr_name,
+        )
         try:
             self.task = nidaqmx.Task()
             tasks.append(self.task)
         except:
-            print('could not use an nidaqmx task!')
+            print("could not use an nidaqmx task!")
             self.task = None
         self.digital = digital
         self.terminal_config = terminal_config
@@ -51,8 +84,9 @@ class DAQ_Signal_Output(Signal):
             self.setup_line(line_name)
         self.wait_time = wait_time
 
-    def setup_line(self, line_name, digital=None, terminal_config=None, minV=None,
-                   maxV=None):
+    def setup_line(
+        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None
+    ):
         if minV is not None:
             self.minV = minV
         if maxV is not None:
@@ -62,15 +96,15 @@ class DAQ_Signal_Output(Signal):
         if digital is not None:
             self.digital = digital
         if self.digital:
-            if self.terminal_config != 'default':
+            if self.terminal_config != "default":
                 self.task.do_channels.add_do_chan(line_name)
             else:
                 self.task.do_channels.add_do_chan(line_name)
         else:
-            self.task.ao_channels.add_ao_voltage_chan(line_name,
-                                                      min_val=self.minV,
-                                                      max_val=self.maxV)
-    
+            self.task.ao_channels.add_ao_voltage_chan(
+                line_name, min_val=self.minV, max_val=self.maxV
+            )
+
     def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
         if self.digital and (type(value) is not bool):
             if value > 0:
@@ -78,21 +112,53 @@ class DAQ_Signal_Output(Signal):
             else:
                 value = False
         self.task.write(value)
-        super().put(value, timestamp=timestamp, force=force, metadata=metadata, **kwargs)
+        super().put(
+            value, timestamp=timestamp, force=force, metadata=metadata, **kwargs
+        )
 
     def close_task(self):
         self.task.close()
         tasks.remove(self.task)
-        
-        
+
+
 class DAQ_Signal_Input(SignalRO):
-    def __init__(self,  name, value=0., timestamp=None, parent=None, labels=None, kind='hinted', tolerance=None, rtolerance=None, metadata=None, cl=None, attr_name='', line_name='', digital=False, minV=-10, maxV=10, terminal_config='default'):
-        super().__init__(name=name, value=value, timestamp=timestamp, parent=parent, labels=labels, kind=kind, tolerance=tolerance, rtolerance=rtolerance, metadata=metadata, cl=cl, attr_name=attr_name)
+    def __init__(
+        self,
+        name,
+        value=0.0,
+        timestamp=None,
+        parent=None,
+        labels=None,
+        kind="hinted",
+        tolerance=None,
+        rtolerance=None,
+        metadata=None,
+        cl=None,
+        attr_name="",
+        line_name="",
+        digital=False,
+        minV=-10,
+        maxV=10,
+        terminal_config="default",
+    ):
+        super().__init__(
+            name=name,
+            value=value,
+            timestamp=timestamp,
+            parent=parent,
+            labels=labels,
+            kind=kind,
+            tolerance=tolerance,
+            rtolerance=rtolerance,
+            metadata=metadata,
+            cl=cl,
+            attr_name=attr_name,
+        )
         try:
             self.task = nidaqmx.Task()
             tasks.append(self.task)
         except:
-            print('could not use an nidaqmx task!')
+            print("could not use an nidaqmx task!")
             self.task = None
         tasks.append(self.task)
         self.digital = digital
@@ -102,8 +168,9 @@ class DAQ_Signal_Input(SignalRO):
         if line_name:
             self.setup_line(line_name)
 
-    def setup_line(self, line_name, digital=None, terminal_config=None, minV=None,
-                   maxV=None):
+    def setup_line(
+        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None
+    ):
         if minV is not None:
             self.minV = minV
         if maxV is not None:
@@ -115,11 +182,12 @@ class DAQ_Signal_Input(SignalRO):
         if self.digital:
             self.task.di_channels.add_di_chan(line_name)
         else:
-            self.task.ai_channels.add_ai_voltage_chan(line_name,
-                                                      terminal_config=get_an_config(self.terminal_config),
-                                                      min_val=self.minV,
-                                                      max_val=self.maxV)
-
+            self.task.ai_channels.add_ai_voltage_chan(
+                line_name,
+                terminal_config=get_an_config(self.terminal_config),
+                min_val=self.minV,
+                max_val=self.maxV,
+            )
 
     # def destroy(self):
     #     self.task.close()
@@ -128,19 +196,17 @@ class DAQ_Signal_Input(SignalRO):
     def close_task(self):
         self.task.close()
         tasks.remove(self.task)
-                        
+
     def get(self):
         try:
-            self._readback = self.task.read()
+            n_samples = self.task.timing.samp_quant_samp_per_chan
+            if n_samples > 1:
+                self._readback = self.task.read(n_samples)
+            else:
+                self._readback = self.task.read()
         except:
             self._readback = np.nan
         return super().get()
-
-    
-
-    
-
-
 
 
 # def testplan(dets, on, off, rev):

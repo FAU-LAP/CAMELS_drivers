@@ -3,26 +3,101 @@ import time
 
 from ophyd import Device
 from ophyd import Component as Cpt
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from nomad_camels.bluesky_handling.custom_function_signal import (
+    Custom_Function_Signal,
+    Custom_Function_SignalRO,
+)
+
 
 def gauss(x, sig, a, mu):
-    return a / sig / np.sqrt(2 * np.pi) * np.exp(-(x - mu)**2 / 2 / sig**2)
+    return a / sig / np.sqrt(2 * np.pi) * np.exp(-((x - mu) ** 2) / 2 / sig**2)
 
 
 class Demo_Device(Device):
-    motorX = Cpt(Custom_Function_Signal, name='motorX', metadata={'units': 'm', 'description': 'This is the X-axis of the virtual motor.'})
-    motorY = Cpt(Custom_Function_Signal, name='motorY', metadata={'units': 'm', 'description': 'This is the Y-axis of the virtual motor.'})
-    motorZ = Cpt(Custom_Function_Signal, name='motorZ', metadata={'units': 'm', 'description': 'This is the Z-axis of the virtual motor.'})
-    detectorX = Cpt(Custom_Function_SignalRO, name='detectorX', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorX value.'})
-    detectorY = Cpt(Custom_Function_SignalRO, name='detectorY', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorY value.'})
-    detectorZ = Cpt(Custom_Function_SignalRO, name='detectorZ', metadata={'units': 'counts/s', 'description': 'Returns gaussian function depending on the motorZ value.'})
-    detectorComm = Cpt(Custom_Function_SignalRO, name='detectorComm', metadata={'units': 'counts/s', 'description': 'Returns sum of gaussian functions of detector X, Y and Z.'})
+    motorX = Cpt(
+        Custom_Function_Signal,
+        name="motorX",
+        metadata={
+            "units": "m",
+            "description": "This is the X-axis of the virtual motor.",
+        },
+    )
+    motorY = Cpt(
+        Custom_Function_Signal,
+        name="motorY",
+        metadata={
+            "units": "m",
+            "description": "This is the Y-axis of the virtual motor.",
+        },
+    )
+    motorZ = Cpt(
+        Custom_Function_Signal,
+        name="motorZ",
+        metadata={
+            "units": "m",
+            "description": "This is the Z-axis of the virtual motor.",
+        },
+    )
+    detectorX = Cpt(
+        Custom_Function_SignalRO,
+        name="detectorX",
+        metadata={
+            "units": "counts/s",
+            "description": "Returns gaussian function depending on the motorX value.",
+        },
+    )
+    detectorY = Cpt(
+        Custom_Function_SignalRO,
+        name="detectorY",
+        metadata={
+            "units": "counts/s",
+            "description": "Returns gaussian function depending on the motorY value.",
+        },
+    )
+    detectorZ = Cpt(
+        Custom_Function_SignalRO,
+        name="detectorZ",
+        metadata={
+            "units": "counts/s",
+            "description": "Returns gaussian function depending on the motorZ value.",
+        },
+    )
+    detectorComm = Cpt(
+        Custom_Function_SignalRO,
+        name="detectorComm",
+        metadata={
+            "units": "counts/s",
+            "description": "Returns sum of gaussian functions of detector X, Y and Z.",
+        },
+    )
 
-    def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
-                 configuration_attrs=None, parent=None, motor_noises=None,
-                 detector_noises=None, sigmas=None, mus=None, amps=None,
-                 set_delays=None, system_delays=None, **kwargs):
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs, configuration_attrs=configuration_attrs, parent=parent, **kwargs)
+    def __init__(
+        self,
+        prefix="",
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        motor_noises=None,
+        detector_noises=None,
+        sigmas=None,
+        mus=None,
+        amps=None,
+        set_delays=None,
+        system_delays=None,
+        **kwargs,
+    ):
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            **kwargs,
+        )
         self.motor_vals = [0, 0, 0]
         self.motor_last_vals = [0, 0, 0]
         self.motor_noises = motor_noises or [0, 0, 0]
@@ -57,10 +132,14 @@ class Demo_Device(Device):
 
     def motor_read_func(self, n):
         val_dist = np.abs(self.motor_old_vals[n] - self.motor_vals[n])
-        set_val = np.interp(time.time(),
-                            [self.motor_set_times[n],
-                             self.motor_set_times[n] + val_dist * self.set_delays[n]],
-                            [self.motor_old_vals[n], self.motor_vals[n]])
+        set_val = np.interp(
+            time.time(),
+            [
+                self.motor_set_times[n],
+                self.motor_set_times[n] + val_dist * self.set_delays[n],
+            ],
+            [self.motor_old_vals[n], self.motor_vals[n]],
+        )
         return set_val + self.motor_noises[n] * (np.random.rand() - 0.5)
 
     def det_func(self, n):
@@ -70,33 +149,35 @@ class Demo_Device(Device):
         g_new = gauss(mot_val, self.sigmas[n], self.amps[n], self.mus[n])
         g_old = self.system_old_vals[n]
         if self.system_delays[n]:
-            g = g_new + (g_old - g_new) * np.exp(-(time.time() - self.motor_set_times[n]) / self.system_delays[n])
+            g = g_new + (g_old - g_new) * np.exp(
+                -(time.time() - self.motor_set_times[n]) / self.system_delays[n]
+            )
         else:
             g = g_new
         return g + self.detector_noises[n] * (1 - np.random.rand())
 
     def printing_function(self, new_lines=True):
         if new_lines:
-            end = '\n'
+            end = "\n"
         else:
-            end = '; '
-        print(f'motor_vals: {self.motor_vals}', end=end)
-        print(f'motor_last_vals: {self.motor_last_vals}', end=end)
-        print(f'motor_noises: {self.motor_noises}', end=end)
-        print(f'detector_noises: {self.detector_noises}', end=end)
-        print(f'set_delays: {self.set_delays}', end=end)
-        print(f'system_delays: {self.system_delays}', end=end)
-        print(f'motor_set_times: {self.motor_set_times}', end=end)
-        print(f'motor_old_vals: {self.motor_old_vals}', end=end)
-        print(f'system_old_vals: {self.system_old_vals}', end=end)
-        print(f'sigmas: {self.sigmas}', end=end)
-        print(f'mus: {self.mus}', end=end)
-        print(f'amps: {self.amps}', end=end)
+            end = "; "
+        print(f"motor_vals: {self.motor_vals}", end=end)
+        print(f"motor_last_vals: {self.motor_last_vals}", end=end)
+        print(f"motor_noises: {self.motor_noises}", end=end)
+        print(f"detector_noises: {self.detector_noises}", end=end)
+        print(f"set_delays: {self.set_delays}", end=end)
+        print(f"system_delays: {self.system_delays}", end=end)
+        print(f"motor_set_times: {self.motor_set_times}", end=end)
+        print(f"motor_old_vals: {self.motor_old_vals}", end=end)
+        print(f"system_old_vals: {self.system_old_vals}", end=end)
+        print(f"sigmas: {self.sigmas}", end=end)
+        print(f"mus: {self.mus}", end=end)
+        print(f"amps: {self.amps}", end=end)
 
     def finalize_steps(self):
-        print(f'{self.name} is being closed')
+        print(f"{self.name} is being closed")
 
 
-if __name__ == '__main__':
-    dem = Demo_Device(name='dem')
+if __name__ == "__main__":
+    dem = Demo_Device(name="dem")
     print(dem.motorX.get())

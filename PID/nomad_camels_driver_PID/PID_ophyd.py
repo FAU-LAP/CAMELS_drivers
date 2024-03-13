@@ -10,68 +10,104 @@ import simple_pid
 from ophyd import Device
 from ophyd import Component as Cpt
 
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from nomad_camels.bluesky_handling.custom_function_signal import (
+    Custom_Function_Signal,
+    Custom_Function_SignalRO,
+)
 from nomad_camels.utility import device_handling
 
 from PySide6.QtCore import QThread, Signal
 
 
 def helper_ptX(x, r, a, b, c):
-    return 1 - r + a*x + b*x**2 + c*(x - 100) * x**3
+    return 1 - r + a * x + b * x**2 + c * (x - 100) * x**3
+
 
 def ptX(rMeas, rX=1000):
-    r = rMeas/rX
-    a = 3.9083E-3
-    b = -5.775E-7
-    c = -4.183E-12
-    t = 273.15 + (-a + np.sqrt(a**2-4*(1-r)*b))/2/b
+    r = rMeas / rX
+    a = 3.9083e-3
+    b = -5.775e-7
+    c = -4.183e-12
+    t = 273.15 + (-a + np.sqrt(a**2 - 4 * (1 - r) * b)) / 2 / b
     if t < 273.15:
         zero = root(lambda x: helper_ptX(x, r, a, b, c), -150).x
         return zero[0] + 273.15
     return t
 
+
 def ptX_inv(T, rX=1000):
     return root(lambda r: ptX(r, rX) - T, 300).x[0]
 
+
 def pt1000(rMeas):
     return ptX(rMeas)
+
 
 def pt1000_inv(T):
     return ptX_inv(T)
 
 
 class PID_Controller(Device):
-    output_value = Cpt(Custom_Function_SignalRO, name='output_value')
-    current_value = Cpt(Custom_Function_SignalRO, name='current_value')
-    setpoint = Cpt(Custom_Function_Signal, name='setpoint')
-    pid_stable = Cpt(Custom_Function_SignalRO, name='pid_stable')
-    pid_on = Cpt(Custom_Function_Signal, value=False, name='pid_on')
-    p_value = Cpt(Custom_Function_SignalRO, name='p_value')
-    i_value = Cpt(Custom_Function_SignalRO, name='i_value')
-    d_value = Cpt(Custom_Function_SignalRO, name='d_value')
+    output_value = Cpt(Custom_Function_SignalRO, name="output_value")
+    current_value = Cpt(Custom_Function_SignalRO, name="current_value")
+    setpoint = Cpt(Custom_Function_Signal, name="setpoint")
+    pid_stable = Cpt(Custom_Function_SignalRO, name="pid_stable")
+    pid_on = Cpt(Custom_Function_Signal, value=False, name="pid_on")
+    p_value = Cpt(Custom_Function_SignalRO, name="p_value")
+    i_value = Cpt(Custom_Function_SignalRO, name="i_value")
+    d_value = Cpt(Custom_Function_SignalRO, name="d_value")
 
-    kp = Cpt(Custom_Function_Signal, name='kp', kind='config')
-    ki = Cpt(Custom_Function_Signal, name='ki', kind='config')
-    kd = Cpt(Custom_Function_Signal, name='kd', kind='config')
-    dt = Cpt(Custom_Function_Signal, name='dt', kind='config')
-    min_value = Cpt(Custom_Function_Signal, name='min_value', kind='config')
-    max_value = Cpt(Custom_Function_Signal, name='max_value', kind='config')
+    kp = Cpt(Custom_Function_Signal, name="kp", kind="config")
+    ki = Cpt(Custom_Function_Signal, name="ki", kind="config")
+    kd = Cpt(Custom_Function_Signal, name="kd", kind="config")
+    dt = Cpt(Custom_Function_Signal, name="dt", kind="config")
+    min_value = Cpt(Custom_Function_Signal, name="min_value", kind="config")
+    max_value = Cpt(Custom_Function_Signal, name="max_value", kind="config")
 
-    def __init__(self, prefix='', *, name, kind=None, read_attrs=None,
-                 configuration_attrs=None, parent=None, pid_val_table=None,
-                 read_conv_func=None, auto_pid=True, interpolate_auto=True,
-                 set_conv_func=None, bias_signal=None, set_signal=None, read_signal=None, show_plot=False, **kwargs):
-        pops = ['val_choice', 'val_file', 'read_signal_name', 'set_signal_name',
-                'bias_signal_name']
+    def __init__(
+        self,
+        prefix="",
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        pid_val_table=None,
+        read_conv_func=None,
+        auto_pid=True,
+        interpolate_auto=True,
+        set_conv_func=None,
+        bias_signal=None,
+        set_signal=None,
+        read_signal=None,
+        show_plot=False,
+        **kwargs
+    ):
+        pops = [
+            "val_choice",
+            "val_file",
+            "read_signal_name",
+            "set_signal_name",
+            "bias_signal_name",
+        ]
         for p in pops:
             if p in kwargs:
                 kwargs.pop(p)
-        super().__init__(prefix=prefix, name=name, kind=kind, read_attrs=read_attrs, configuration_attrs=configuration_attrs, parent=parent, **kwargs)
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            **kwargs
+        )
         if isinstance(read_signal, str):
             read_signal = device_handling.get_channel_from_string(read_signal)
         if isinstance(set_signal, str):
             set_signal = device_handling.get_channel_from_string(set_signal)
-        if bias_signal == 'None':
+        if bias_signal == "None":
             bias_signal = None
         if isinstance(bias_signal, str):
             bias_signal = device_handling.get_channel_from_string(bias_signal)
@@ -88,12 +124,14 @@ class PID_Controller(Device):
         def read_function():
             x = read_signal.get()
             return read_conv_func(x)
+
         self.read_function = read_function
 
         def set_function(x):
             x = set_conv_func(x)
             set_signal.put(x)
             self.current_output = x
+
         self.set_function = set_function
         self.current_output = 0
 
@@ -115,28 +153,42 @@ class PID_Controller(Device):
         self.setpoint.put_function = self.update_PID_vals
 
         if pid_val_table is None:
-            pid_val_table = pd.DataFrame({'setpoint': [0], 'kp': [0], 'ki': [0], 'kd': [0], 'max_value': [np.inf], 'min_value': [-np.inf], 'bias': [0], 'stability-delta': [0], 'stability-time': [0]})
+            pid_val_table = pd.DataFrame(
+                {
+                    "setpoint": [0],
+                    "kp": [0],
+                    "ki": [0],
+                    "kd": [0],
+                    "max_value": [np.inf],
+                    "min_value": [-np.inf],
+                    "bias": [0],
+                    "stability-delta": [0],
+                    "stability-time": [0],
+                }
+            )
         elif type(pid_val_table) is str:
-            pid_val_table = pd.read_csv(pid_val_table, delimiter='\t')
+            pid_val_table = pd.read_csv(pid_val_table, delimiter="\t")
         self.pid_val_table = pid_val_table
         self.auto_pid = auto_pid
         self.interpolate_auto = interpolate_auto
         self.pid_vals = None
         self.stability_time = np.inf
         self.stability_delta = 0
-        if name != 'test':
+        if name != "test":
             self.pid_thread = PID_Thread(self)
             # if show_plot:
             from nomad_camels.main_classes.plot_widget import PlotWidget_NoBluesky
-            y_axes = {'output': 2,
-                      'k': 2,
-                      'i': 2,
-                      'd': 2}
-            self.plot = PlotWidget_NoBluesky('time', title='PID plot',
-                                             ylabel='value', ylabel2='PID-values',
-                                             y_axes=y_axes,
-                                             first_hidden=list(y_axes.keys()),
-                                             show_plot=show_plot)
+
+            y_axes = {"output": 2, "k": 2, "i": 2, "d": 2}
+            self.plot = PlotWidget_NoBluesky(
+                "time",
+                title="PID plot",
+                ylabel="value",
+                ylabel2="PID-values",
+                y_axes=y_axes,
+                first_hidden=list(y_axes.keys()),
+                show_plot=show_plot,
+            )
             # for y in y_axes:
             #     self.plot.plot.current_lines[y].setLinestyle('None')
             self.pid_thread.new_data.connect(self.data_update)
@@ -152,17 +204,18 @@ class PID_Controller(Device):
         return self.pid_thread.current_value
 
     def data_update(self, timestamp, setpoint, current, output, kid):
-        ys = {'current value': current,
-              'setpoint': setpoint,
-              'output': output,
-              'k': kid[0],
-              'i': kid[1],
-              'd': kid[2]}
+        ys = {
+            "current value": current,
+            "setpoint": setpoint,
+            "output": output,
+            "k": kid[0],
+            "i": kid[1],
+            "d": kid[2],
+        }
         self.plot.plot.add_data(timestamp, ys)
 
     def stable_check(self):
         return self.pid_thread.stable_time >= self.stability_time
-
 
     def get_output(self):
         return self.current_output
@@ -206,66 +259,95 @@ class PID_Controller(Device):
         self.pid_thread.still_running = False
         # self.plot.close()
 
-
     def update_PID_vals(self, setpoint, force=False):
         if not self.auto_pid:
             if self.bias_func is not None:
                 self.bias_func(0)
+            self.update_vals_to_thread(setpoint)
             return
         old_vals = copy.deepcopy(self.pid_vals)
         pid_val_table = pd.DataFrame(self.pid_val_table)
-        setpoints = pid_val_table['setpoint']
+        setpoints = pid_val_table["setpoint"]
         if setpoint >= max(setpoints):
-            self.pid_vals = pid_val_table[setpoints == max(setpoints)].to_dict(orient='list')
+            self.pid_vals = pid_val_table[setpoints == max(setpoints)].to_dict(
+                orient="list"
+            )
         elif setpoint <= min(setpoints):
-            self.pid_vals = pid_val_table[setpoints == min(setpoints)].to_dict(orient='list')
+            self.pid_vals = pid_val_table[setpoints == min(setpoints)].to_dict(
+                orient="list"
+            )
         elif not self.interpolate_auto:
             next_lo = max(setpoints[setpoints <= setpoint])
-            self.pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient='list')
+            self.pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
         else:
             next_lo = max(setpoints[setpoints <= setpoint])
             next_hi = min(setpoints[setpoints > setpoint])
-            lo_vals = pid_val_table[setpoints == next_lo].to_dict(orient='list')
-            hi_vals = pid_val_table[setpoints == next_hi].to_dict(orient='list')
+            lo_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
+            hi_vals = pid_val_table[setpoints == next_hi].to_dict(orient="list")
             self.pid_vals = {}
             for key, lo_val in lo_vals.items():
-                self.pid_vals[key] = [lo_val[0] + (hi_vals[key][0] - lo_val[0]) * (setpoint - next_lo)/(next_hi - next_lo)]
+                self.pid_vals[key] = [
+                    lo_val[0]
+                    + (hi_vals[key][0] - lo_val[0])
+                    * (setpoint - next_lo)
+                    / (next_hi - next_lo)
+                ]
         if old_vals != self.pid_vals or force:
             for key in self.pid_vals:
-                if key in ['setpoint', 'stability-time', 'stability-delta'] or (key == 'bias' and self.bias_func is None):
+                if key in ["setpoint", "stability-time", "stability-delta"] or (
+                    key == "bias" and self.bias_func is None
+                ):
                     continue
-                elif key == 'bias':
+                elif key == "bias":
                     self.bias_func(self.pid_vals[key][0])
                 else:
                     att = getattr(self, key)
                     att.put(self.pid_vals[key][0])
-        self.stability_time = self.pid_vals['stability-time'][0]
-        self.stability_delta = self.pid_vals['stability-delta'][0]
-        self.pid_thread.stability_delta = self.pid_vals['stability-delta'][0]
+        self.stability_time = self.pid_vals["stability-time"][0]
+        self.stability_delta = self.pid_vals["stability-delta"][0]
+        self.update_vals_to_thread(setpoint)
+
+    def update_vals_to_thread(self, setpoint):
+        self.pid_thread.stability_delta = self.pid_vals["stability-delta"][0]
         # self.setpoint = setpoint
         self.pid_thread.pid.setpoint = setpoint
         self.pid_thread.stable_time = 0
 
     def update_pid_settings(self, settings):
-        self.pid_val_table = settings['pid_val_table']
-        self.interpolate_auto = settings['interpolate_auto']
+        self.pid_val_table = settings["pid_val_table"]
+        self.interpolate_auto = settings["interpolate_auto"]
         self.update_PID_vals(self.pid_thread.pid.setpoint)
-
 
 
 class PID_Thread(QThread):
     new_data = Signal(float, float, float, float, tuple)
 
-    def __init__(self, pid_device, Kp=1.0, Ki=1.0, Kd=1.0, setpoint=0,
-                 sample_time=1, output_limits=(None, None), auto_mode=False,
-                 proportional_on_measurement=False, error_map=None, **kwargs):
+    def __init__(
+        self,
+        pid_device,
+        Kp=1.0,
+        Ki=1.0,
+        Kd=1.0,
+        setpoint=0,
+        sample_time=1,
+        output_limits=(None, None),
+        auto_mode=False,
+        proportional_on_measurement=False,
+        error_map=None,
+        **kwargs
+    ):
         super().__init__()
-        self.pid = simple_pid.PID(Kp=Kp, Ki=Ki, Kd=Kd, setpoint=setpoint,
-                                  sample_time=sample_time,
-                                  output_limits=output_limits,
-                                  auto_mode=auto_mode,
-                                  proportional_on_measurement=proportional_on_measurement,
-                                  error_map=error_map)
+        self.pid = simple_pid.PID(
+            Kp=Kp,
+            Ki=Ki,
+            Kd=Kd,
+            setpoint=setpoint,
+            sample_time=sample_time,
+            output_limits=output_limits,
+            auto_mode=auto_mode,
+            proportional_on_measurement=proportional_on_measurement,
+            error_map=error_map,
+        )
         self.device = pid_device
         self.sample_time = sample_time
         self.stable_time = 0
@@ -277,9 +359,18 @@ class PID_Thread(QThread):
         self.last_I = 0
         self.last_output = 0
 
-    def update_pid(self, Kp=None, Ki=None, Kd=None, setpoint=None,
-                   sample_time=None, output_limits=None, auto_mode=True,
-                   proportional_on_measurement=False, error_map=None,):
+    def update_pid(
+        self,
+        Kp=None,
+        Ki=None,
+        Kd=None,
+        setpoint=None,
+        sample_time=None,
+        output_limits=None,
+        auto_mode=True,
+        proportional_on_measurement=False,
+        error_map=None,
+    ):
         pass
 
     def run(self):
@@ -293,7 +384,7 @@ class PID_Thread(QThread):
         dis = now - self.last
         if dis < self.sample_time:
             time.sleep(self.sample_time - dis)
-            dis = time.monotonic() - self.last
+            return
         self.current_value = self.device.read_function()
         if self.pid.auto_mode:
             new_output = self.pid(self.current_value)
@@ -312,6 +403,10 @@ class PID_Thread(QThread):
             self.stable_time += dis
         else:
             self.stable_time = 0
-        self.new_data.emit(self.last - self.starttime, self.pid.setpoint, self.current_value,
-                           new_output or 0, self.pid.components)
-
+        self.new_data.emit(
+            self.last - self.starttime,
+            self.pid.setpoint,
+            self.current_value,
+            new_output or 0,
+            self.pid.components,
+        )
