@@ -384,7 +384,7 @@ class PID_Thread(QThread):
         dis = now - self.last
         if dis < self.sample_time:
             time.sleep(self.sample_time - dis)
-            dis = time.monotonic() - self.last
+            return
         self.current_value = self.device.read_function()
         if self.pid.auto_mode:
             new_output = self.pid(self.current_value)
