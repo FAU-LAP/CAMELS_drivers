@@ -23,7 +23,10 @@ class Demo_DMM(Demo_Server_Device):
         Demo_Server_SignalRO,
         name="resistance",
         parameter_name="dmm_pt1000.R",
-        metadata={"units": "Ohm"},
+        metadata={
+            "units": "Ohm",
+            "description": "Resistance of the Pt1000 temperature sensor",
+        },
     )
     # resistance_4_wire = Cpt(
     #     VISA_Signal_RO,

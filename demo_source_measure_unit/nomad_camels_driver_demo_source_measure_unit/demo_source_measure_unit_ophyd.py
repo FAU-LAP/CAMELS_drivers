@@ -12,49 +12,49 @@ class Demo_SMU(Demo_Server_Device):
         Demo_Server_SignalRO,
         name="mesV1",
         parameter_name="smu_diode.U",
-        metadata={"units": "V"},
+        metadata={"units": "V", "description": "Voltage of the diode"},
     )
     mesI1 = Cpt(
         Demo_Server_SignalRO,
         name="mesI1",
         parameter_name="smu_diode.I",
-        metadata={"units": "A"},
+        metadata={"units": "A", "description": "Current of the diode"},
     )
     mesV2 = Cpt(
         Demo_Server_SignalRO,
         name="mesV2",
         parameter_name="smu_heater.U",
-        metadata={"units": "V"},
+        metadata={"units": "V", "description": "Voltage of the heater"},
     )
     mesI2 = Cpt(
         Demo_Server_SignalRO,
         name="mesI2",
         parameter_name="smu_heater.I",
-        metadata={"units": "A"},
+        metadata={"units": "A", "description": "Current of the heater"},
     )
     setV1 = Cpt(
         Demo_Server_Signal,
         name="setV1",
         parameter_name="smu_diode.U",
-        metadata={"units": "V"},
+        metadata={"units": "V", "description": "Voltage of the diode"},
     )
     setI1 = Cpt(
         Demo_Server_Signal,
         name="setI1",
         parameter_name="smu_diode.I",
-        metadata={"units": "A"},
+        metadata={"units": "A", "description": "Current of the diode"},
     )
     setV2 = Cpt(
         Demo_Server_Signal,
         name="setV2",
         parameter_name="smu_heater.U",
-        metadata={"units": "V"},
+        metadata={"units": "V", "description": "Voltage of the heater"},
     )
     setI2 = Cpt(
         Demo_Server_Signal,
         name="setI2",
         parameter_name="smu_heater.I",
-        metadata={"units": "A"},
+        metadata={"units": "A", "description": "Current of the heater"},
     )
 
     NPLC1 = Cpt(
