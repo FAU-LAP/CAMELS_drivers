@@ -71,6 +71,20 @@ class Demo_SMU(Demo_Server_Device):
         kind="config",
     )
 
+    compliance_1 = Cpt(
+        Demo_Server_Signal,
+        name="compliance_1",
+        parameter_name="smu_diode.COMPL",
+        kind="config",
+    )
+
+    compliance_2 = Cpt(
+        Demo_Server_Signal,
+        name="compliance_2",
+        parameter_name="smu_heater.COMPL",
+        kind="config",
+    )
+
 
 if __name__ == "__main__":
     smu = Demo_SMU(name="smu")

@@ -16,6 +16,8 @@ class subclass(device_class.Device):
         )
         self.config["NPLC1"] = 1
         self.config["NPLC2"] = 1
+        self.config["compliance_1"] = 1
+        self.config["compliance_2"] = 1
 
 
 class subclass_config(device_class.Simple_Config):
@@ -27,6 +29,12 @@ class subclass_config(device_class.Simple_Config):
         config_dict=None,
         additional_info=None,
     ):
+        labels = {
+            "NPLC1": "NPLC channel 1",
+            "NPLC2": "NPLC channel 2",
+            "compliance_1": "Compliance channel 1",
+            "compliance_2": "Compliance channel 2",
+        }
         super().__init__(
             parent,
             "Keysight B2912A",
@@ -34,6 +42,7 @@ class subclass_config(device_class.Simple_Config):
             settings_dict,
             config_dict,
             additional_info,
+            labels=labels,
         )
 
     def connection_type_changed(self):
