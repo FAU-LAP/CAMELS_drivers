@@ -2,7 +2,8 @@ import requests
 
 
 def get_latest_version(package_name):
-    response = requests.get(f"https://pypi.org/pypi/{package_name}/json")
+    name = f'nomad-camels-driver-{package_name.replace("_", "-")}'
+    response = requests.get(f"https://pypi.org/pypi/{name}/json")
     return response.json()["info"]["version"]
 
 
