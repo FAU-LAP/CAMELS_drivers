@@ -16,8 +16,8 @@ class subclass(device_class.Device):
         )
         self.config["NPLC1"] = 1
         self.config["NPLC2"] = 1
-        self.config["compliance_1"] = 1
-        self.config["compliance_2"] = 1
+        self.config["compliance_1"] = 0.1
+        self.config["compliance_2"] = 0.1
 
 
 class subclass_config(device_class.Simple_Config):
