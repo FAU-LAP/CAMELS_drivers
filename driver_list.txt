@@ -2,9 +2,9 @@ agilent_34401a==0.1.1
 andor_newton==0.1.0
 andor_shamrock_500==0.1.0
 cam_control_pylablib==0.1.3
-demo_digital_multimeter==0.1.1
+demo_digital_multimeter==0.1.2
 demo_instrument==0.1.1
-demo_source_measure_unit==0.1.1
+demo_source_measure_unit==0.1.5
 keithley_2000==0.1.0
 keithley_2182a==0.0.2
 keithley_237==0.1.1
