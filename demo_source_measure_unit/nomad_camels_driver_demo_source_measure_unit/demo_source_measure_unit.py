@@ -37,7 +37,7 @@ class subclass_config(device_class.Simple_Config):
         }
         super().__init__(
             parent,
-            "Keysight B2912A",
+            "SandboxForCAMELS Demo Source-Measure Unit",
             data,
             settings_dict,
             config_dict,
