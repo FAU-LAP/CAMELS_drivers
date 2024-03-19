@@ -18,7 +18,7 @@ ni_daq==0.1.1
 PID==0.1.8
 pi_stage_e709==0.1.1
 rhode_and_schwarz_smp_02==0.1.0
-swabianinstruments_timetagger==0.1.0
+swabianinstruments_timetagger==0.1.1
 thorlabs_ddr_25==0.0.2
 thorlabs_K10CR1==0.1.0
 thorlabs_MFF==0.1.0
