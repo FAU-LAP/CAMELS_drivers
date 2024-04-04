@@ -5,6 +5,8 @@ from ophyd import Device, Signal, SignalRO
 import os
 import re
 
+port_manager = pysweepme.PortManager.PortManager()
+
 
 def make_valid_python_identifier(s):
     # Replace invalid characters
@@ -25,7 +27,7 @@ special_keys = [
 ]
 
 
-def get_driver(path, port=""):
+def get_driver(path, port="None"):
     name = os.path.basename(path)
     folder = os.path.dirname(path)
     driver = pysweepme.get_driver(name, folder, port)
@@ -34,7 +36,7 @@ def get_driver(path, port=""):
 
 def get_ports(driver):
     keys = driver.port_types
-    return pysweepme.Ports.get_resources(keys)
+    return port_manager.get_resources_available(keys)
 
 
 def make_ophyd_instance(
@@ -68,9 +70,9 @@ def make_ophyd_instance(
 
 def make_ophyd_class(driver_path, class_name):
     driver = get_driver(driver_path)
-    configs = driver.set_GUIparameter().keys()
+    configs = driver.set_GUIparameter()
     config_signals = {}
-    for config in configs:
+    for config in configs.keys():
         if config in special_keys:
             continue
         name = make_valid_python_identifier(config)
@@ -123,9 +125,10 @@ class SweepMe_Device(Device):
             **kwargs,
         )
         self.driver = get_driver(driver, port)
-        self.driver.connect()
-        self.driver.initialize()
-        self.driver.poweron()
+        if name != "test":
+            self.driver.connect()
+            self.driver.initialize()
+            self.driver.poweron()
         for component in self.walk_signals():
             if isinstance(
                 component.item,

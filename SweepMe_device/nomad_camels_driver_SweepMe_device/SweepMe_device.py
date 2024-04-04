@@ -33,14 +33,14 @@ class subclass(device_class.Device):
         class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
         self.ophyd_class = make_ophyd_class(driver_path, class_name)
         self.ophyd_instance = self.ophyd_class(driver=driver_path, name="test")
-        for comp in self.ophyd_instance.walk_components():
-            name = comp.item.attr
-            dev_class = comp.item.cls
-            if name in self.ophyd_instance.configuration_attrs:
-                if device_class.check_output(dev_class):
-                    self.config.update({f"{name}": 0})
-                else:
-                    self.passive_config.update({f"{name}": 0})
+        config, passive_config = get_configs_from_ophyd(self.ophyd_instance)
+        for key, value in config.items():
+            if key not in self.config:
+                self.config[key] = value
+        for key, value in passive_config.items():
+            if key not in self.config:
+                self.config[key] = value
+    
 
     def get_channels(self):
         self.update_driver()
@@ -81,25 +81,30 @@ class subclass_config(device_class.Device_Config):
 
     def get_config(self):
         config = super().get_config()
+        config.update(self.sub_widget.get_config())
         if "Port" in config:
             config.pop("Port")
-        config.update(self.sub_widget.get_config())
         return config
 
     def driver_changed(self):
-        driver = get_driver(self.driver_selection.get_path())
+        try:
+            driver = get_driver(self.driver_selection.get_path())
+        except Exception as e:
+            print(e)
+            return
         comboboxes = {}
+        labels = {}
         if not driver.port_manager and "Port" in self.config_dict:
             self.config_dict.pop("Port")
         elif driver.port_manager and "Port" not in self.config_dict:
             self.config_dict.update({"Port": ""})
-        # if driver.port_manager:
-        #     ports = get_ports(driver)
-        #     comboboxes.update({"Port": ports})
+        if driver.port_manager:
+            ports = get_ports(driver)
+            comboboxes.update({"Port": ports})
         parameters = driver.set_GUIparameter()
         removers = []
         for key in self.config_dict:
-            if key not in parameters:
+            if key not in list(parameters.keys()) + ["Port"]:
                 removers.append(key)
         for key in removers:
             self.config_dict.pop(key)
@@ -107,20 +112,37 @@ class subclass_config(device_class.Device_Config):
         for key, value in parameters.items():
             if key in special_keys:
                 continue
+            name = make_valid_python_identifier(key)
+            if name != key:
+                labels.update({name: key})
             islist = False
             if isinstance(value, list):
-                comboboxes.update({key: value})
+                comboboxes.update({name: value})
                 islist = True
-            if key not in self.config_dict:
+            if name not in self.config_dict:
                 if islist:
-                    self.config_dict.update({key: value[0]})
+                    self.config_dict.update({name: value[0]})
                 else:
-                    self.config_dict.update({key: parameters[key]})
+                    self.config_dict.update({name: parameters[key]})
 
         if self.sub_widget:
             self.sub_widget.deleteLater()
         self.sub_widget = device_class.Simple_Config_Sub(
             config_dict=self.config_dict,
             comboBoxes=comboboxes,
+            labels=labels,
         )
         self.layout().addWidget(self.sub_widget, 25, 0, 1, 5)
+
+def get_configs_from_ophyd(ophyd_instance):
+    config = {}
+    passive_config = {}
+    for comp in ophyd_instance.walk_components():
+        name = comp.item.attr
+        dev_class = comp.item.cls
+        if name in ophyd_instance.configuration_attrs:
+            if device_class.check_output(dev_class):
+                config.update({f"{name}": 0})
+            else:
+                passive_config.update({f"{name}": 0})
+    return config, passive_config
