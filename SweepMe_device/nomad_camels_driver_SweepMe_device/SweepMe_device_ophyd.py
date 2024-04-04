@@ -27,10 +27,10 @@ special_keys = [
 ]
 
 
-def get_driver(path, port="None"):
+def get_driver(path):
     name = os.path.basename(path)
     folder = os.path.dirname(path)
-    driver = pysweepme.get_driver(name, folder, port)
+    driver = pysweepme.DeviceManager.get_driver_instance(name=name, folder=folder)
     return driver
 
 
@@ -124,8 +124,11 @@ class SweepMe_Device(Device):
             parent=parent,
             **kwargs,
         )
-        self.driver = get_driver(driver, port)
+        driver_name = os.path.basename(driver)
+        folder = os.path.dirname(driver)
+        self.driver = pysweepme.DeviceManager.get_driver_instance(name=driver_name, folder=folder)
         if name != "test":
+            self.driver = pysweepme.DeviceManager.get_driver(name=driver_name, folder=folder, port_string=port)
             self.driver.connect()
             self.driver.initialize()
             self.driver.poweron()
