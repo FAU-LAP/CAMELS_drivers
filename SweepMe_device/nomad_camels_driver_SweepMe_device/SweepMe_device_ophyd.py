@@ -9,6 +9,7 @@ port_manager = pysweepme.PortManager.PortManager()
 
 
 def make_valid_python_identifier(s):
+    """Returns a valid python identifier for the string "s". This is necessary since the parameters from SweepMe! drivers are handled as strings while they are python variables in the ophyd classes used by NOMAD CAMELS."""
     # Replace invalid characters
     s = re.sub("[^0-9a-zA-Z_]", "_", s)
     # Remove leading characters until we find a letter or underscore
@@ -16,6 +17,7 @@ def make_valid_python_identifier(s):
     return s
 
 
+# those keys have specific meaning in SweepMe! drivers and are not converted to "normal" variables
 special_keys = [
     "Label",
     "Port",
@@ -28,6 +30,7 @@ special_keys = [
 
 
 def get_driver(path):
+    """Returns the SweepMe! driver instance for the driver at the given path."""
     name = os.path.basename(path)
     folder = os.path.dirname(path)
     driver = pysweepme.DeviceManager.get_driver_instance(name=name, folder=folder)
@@ -35,6 +38,7 @@ def get_driver(path):
 
 
 def get_ports(driver):
+    """Uses SweepMe!'s port manager to get the available ports for the given driver."""
     keys = driver.port_types
     return port_manager.get_resources_available(keys)
 
@@ -51,6 +55,7 @@ def make_ophyd_instance(
     port="",
     **kwargs,
 ):
+    """Creates an ophyd instance for the given driver. The driver is used to create the ophyd class using `make_ophyd_class` and the instance is created with the given parameters."""
     driver_name = os.path.basename(driver)
     class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
     ophyd_class = make_ophyd_class(driver, class_name)
@@ -69,6 +74,7 @@ def make_ophyd_instance(
 
 
 def make_ophyd_class(driver_path, class_name):
+    """Creates an ophyd class for the given driver. The driver's GUI parameters are used to create the configuration signals, the sweep modes are used to create the set channels and the variables are used to create the readback signals. The class is created with the given class name."""
     driver = get_driver(driver_path)
     configs = driver.set_GUIparameter()
     config_signals = {}
@@ -102,6 +108,16 @@ def make_ophyd_class(driver_path, class_name):
 
 
 class SweepMe_Device(Device):
+    """This class is a parent for wrappers of SweepMe! drivers. It loads the given `driver` and gives it to all its components. It also initializes the driver and connects to the device. The driver is disconnected and powered off when the device is finalized.
+
+    Parameters
+    ----------
+    driver : str
+        The path to the driver file.
+    port : str
+        The port the device is connected to.
+    """
+
     def __init__(
         self,
         prefix="",
@@ -126,9 +142,13 @@ class SweepMe_Device(Device):
         )
         driver_name = os.path.basename(driver)
         folder = os.path.dirname(driver)
-        self.driver = pysweepme.DeviceManager.get_driver_instance(name=driver_name, folder=folder)
+        self.driver = pysweepme.DeviceManager.get_driver_instance(
+            name=driver_name, folder=folder
+        )
         if name != "test":
-            self.driver = pysweepme.DeviceManager.get_driver(name=driver_name, folder=folder, port_string=port)
+            self.driver = pysweepme.DeviceManager.get_driver(
+                name=driver_name, folder=folder, port_string=port
+            )
             self.driver.connect()
             self.driver.initialize()
             self.driver.poweron()
@@ -140,16 +160,17 @@ class SweepMe_Device(Device):
                 component.item.driver = self.driver
 
     def configure(self, d):
+        """Calls ophyd's parent configure method, then calls configure on the driver to set the parameters."""
         ret = super().configure(d)
         self.driver.configure()
         return ret
 
     def finalize_steps(self):
+        """Powers the device off, unconfigures it, deinitializes it and disconnects it."""
         self.driver.poweroff()
         self.driver.unconfigure()
         self.driver.deinitialize()
         self.driver.disconnect()
-        self.driver.measure()
 
 
 class SweepMe_Signal(Signal):
