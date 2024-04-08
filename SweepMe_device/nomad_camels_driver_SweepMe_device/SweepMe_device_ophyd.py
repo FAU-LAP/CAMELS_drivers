@@ -55,7 +55,15 @@ def make_ophyd_instance(
     port="",
     **kwargs,
 ):
-    """Creates an ophyd instance for the given driver. The driver is used to create the ophyd class using `make_ophyd_class` and the instance is created with the given parameters."""
+    """Creates an ophyd instance for the given driver. The driver is used to create the ophyd class using `make_ophyd_class` and the instance is created with the given parameters.
+
+    Parameters
+    ----------
+    driver : str
+        The path to the SweepMe! driver
+    port : str
+        The port the device is connected to. This is handled by SweepMe's port manager
+    """
     driver_name = os.path.basename(driver)
     class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
     ophyd_class = make_ophyd_class(driver, class_name)
@@ -77,6 +85,7 @@ def make_ophyd_class(driver_path, class_name):
     """Creates an ophyd class for the given driver. The driver's GUI parameters are used to create the configuration signals, the sweep modes are used to create the set channels and the variables are used to create the readback signals. The class is created with the given class name."""
     driver = get_driver(driver_path)
     configs = driver.set_GUIparameter()
+    # create the signals for the driver's parameters
     config_signals = {}
     for config in configs.keys():
         if config in special_keys:
@@ -85,12 +94,14 @@ def make_ophyd_class(driver_path, class_name):
         config_signals[name] = Cpt(
             SweepMe_Parameter_Signal, name=name, parameter_name=config, kind="config"
         )
+    # create the signals for the sweep modes
     set_channels = {}
     if "SweepMode" in configs:
         sweep_modes = configs["SweepMode"]
         for mode in sweep_modes:
             name = make_valid_python_identifier(mode)
             set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
+    # create the signals for the variables
     variables = {}
     for i, var_name in enumerate(driver.variables):
         name = make_valid_python_identifier(var_name)
@@ -100,6 +111,7 @@ def make_ophyd_class(driver_path, class_name):
             variable_name=var_name,
             metadata={"units": driver.units[i]},
         )
+    # create a class inheriting from SweepMe_Device with the signals created above
     return type(
         make_valid_python_identifier(class_name),
         (SweepMe_Device,),
@@ -149,9 +161,11 @@ class SweepMe_Device(Device):
             self.driver = pysweepme.DeviceManager.get_driver(
                 name=driver_name, folder=folder, port_string=port
             )
+            # do SweeMe! initialization
             self.driver.connect()
             self.driver.initialize()
             self.driver.poweron()
+        # give the driver to all components
         for component in self.walk_signals():
             if isinstance(
                 component.item,
@@ -160,7 +174,7 @@ class SweepMe_Device(Device):
                 component.item.driver = self.driver
 
     def configure(self, d):
-        """Calls ophyd's parent configure method, then calls configure on the driver to set the parameters."""
+        """Calls ophyd's parent configure method, then calls configure on the driver to actually set the parameters."""
         ret = super().configure(d)
         self.driver.configure()
         return ret
@@ -174,12 +188,23 @@ class SweepMe_Device(Device):
 
 
 class SweepMe_Signal(Signal):
+    """This class is a wrapper to make SweepMe!'s SweepMode a settable signal. It sets the SweepMode of the driver to the mode of the signal before writing the value. The driver is given to the signal when it is created, but can also be changed later.
+
+    Parameters
+    ----------
+    mode_name : str
+        The name of the SweepMode to set.
+    driver : pysweepme.Driver
+        The driver to use for communication.
+    """
+
     def __init__(self, mode_name, driver=None, **kwargs):
         super().__init__(**kwargs)
         self.mode_name = mode_name
         self.driver = driver
 
     def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
+        """Sets the SweepMode of the driver to the mode of the signal, then calls `configure` on the driver, before writing the value."""
         if not self.driver:
             raise ValueError(f"Driver not set for signal {self.name}")
         last_mode = self.driver.get_parameters()["SweepMode"]
@@ -193,6 +218,16 @@ class SweepMe_Signal(Signal):
 
 
 class SweepMe_SignalRO(SignalRO):
+    """This class is a wrapper to make SweepMe!'s variables readable. It reads the value from the driver when the signal is read. The driver is given to the signal when it is created, but can also be changed later.
+
+    Parameters
+    ----------
+    variable_name : str
+        The name of the variable to read. It is used to get the position of the variable in the driver's variables list.
+    driver : pysweepme.Driver
+        The driver to use for communication.
+    """
+
     def __init__(self, variable_name, driver=None, **kwargs):
         super().__init__(**kwargs)
         self.variable_name = variable_name
@@ -200,6 +235,7 @@ class SweepMe_SignalRO(SignalRO):
         self.driver = driver
 
     def get(self, **kwargs):
+        """Reads the value from the driver and returns it."""
         if not self.driver:
             raise ValueError(f"Driver not set for signal {self.name}")
         if self.data_position is None:
@@ -210,12 +246,15 @@ class SweepMe_SignalRO(SignalRO):
 
 
 class SweepMe_Parameter_Signal(Signal):
+    """This class is a wrapper to make SweepMe!'s parameters settable. It sets the parameter of the driver to the value of the signal before writing the value. The driver is given to the signal when it is created, but can also be changed later."""
+
     def __init__(self, parameter_name, driver=None, **kwargs):
         super().__init__(**kwargs)
         self.parameter_name = parameter_name
         self.driver = driver
 
     def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
+        """Sets the parameter of the driver to the value of the signal. It does not call `configure`, since this is done by the SweepMe_Device or when changing the SweepMode."""
         if not self.driver:
             raise ValueError(f"Driver not set for parameter signal {self.name}")
         self.driver.set_parameters({self.parameter_name: value})
