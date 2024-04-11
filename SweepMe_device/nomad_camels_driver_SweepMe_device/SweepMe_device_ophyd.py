@@ -40,6 +40,7 @@ def get_driver(path):
 def get_ports(driver):
     """Uses SweepMe!'s port manager to get the available ports for the given driver."""
     keys = driver.port_types
+    global port_manager
     if port_manager is None:
         port_manager = pysweepme.PortManager.PortManager()
     return port_manager.get_resources_available(keys)
