@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nomad_camels_driver_swabianinstruments_timetagger"
-version = "0.1.1"
+name = "nomad_camels_driver_SweepMe_device"
+version = "0.1.0"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
-description = "Instrument driver for a SwabianInstruments TimeTagger for NOMAD-CAMELS"
+description = "Instrument driver wrapper to enable usage of SweepMe! drivers"
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [

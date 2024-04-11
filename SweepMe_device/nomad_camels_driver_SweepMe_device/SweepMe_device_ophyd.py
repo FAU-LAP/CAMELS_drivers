@@ -102,10 +102,12 @@ def make_ophyd_class(driver_path, class_name):
             # make one signal for each channel
             if "Channel" in configs:
                 for channel in configs["Channel"]:
-                    name = make_valid_python_identifier(f"{mode}_{channel}")
-                    set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
+                    name = make_valid_python_identifier(f"set_{mode}_{channel}")
+                    set_channels[name] = Cpt(
+                        SweepMe_Signal, name=name, mode_name=mode, channel=channel
+                    )
             else:
-                name = make_valid_python_identifier(mode)
+                name = make_valid_python_identifier(f"set_{mode}")
                 set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
     # create the signals for the variables
     variables = {}
@@ -113,15 +115,16 @@ def make_ophyd_class(driver_path, class_name):
         # make one signal for each channel
         if "Channel" in configs:
             for channel in configs["Channel"]:
-                name = make_valid_python_identifier(f"{var_name}_{channel}")
+                name = make_valid_python_identifier(f"read_{var_name}_{channel}")
                 variables[name] = Cpt(
                     SweepMe_SignalRO,
                     name=name,
                     variable_name=var_name,
                     metadata={"units": driver.units[i]},
+                    channel=channel,
                 )
         else:
-            name = make_valid_python_identifier(var_name)
+            name = make_valid_python_identifier(f"read_{var_name}")
             variables[name] = Cpt(
                 SweepMe_SignalRO,
                 name=name,
@@ -215,23 +218,40 @@ class SweepMe_Signal(Signal):
         The driver to use for communication.
     """
 
-    def __init__(self, mode_name, driver=None, **kwargs):
+    def __init__(self, mode_name, driver=None, channel=None, **kwargs):
         super().__init__(**kwargs)
         self.mode_name = mode_name
         self.driver = driver
+        self.channel = channel
 
     def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
         """Sets the SweepMode of the driver to the mode of the signal, then calls `configure` on the driver, before writing the value."""
         if not self.driver:
             raise ValueError(f"Driver not set for signal {self.name}")
         last_mode = self.driver.get_parameters()["SweepMode"]
-        if last_mode != self.mode_name:
-            self.driver.set_parameters({"SweepMode": self.mode_name})
+        if last_mode != self.mode_name or not self.check_last_channel():
+            if self.channel:
+                self.driver.set_parameters(
+                    {"SweepMode": self.mode_name, "Channel": self.channel}
+                )
+            else:
+                self.driver.set_parameters({"SweepMode": self.mode_name})
             self.driver.configure()
         self.driver.write(value)
         super().put(
             value, timestamp=timestamp, force=force, metadata=metadata, **kwargs
         )
+
+    def check_last_channel(self):
+        """Checks if the driver's last channel is the same as the one of the signal."""
+        if not self.driver:
+            raise ValueError(f"Driver not set for signal {self.name}")
+        if not self.channel:
+            return True
+        last_channel = self.driver.get_parameters()["Channel"]
+        if last_channel != self.channel:
+            return False
+        return True
 
 
 class SweepMe_SignalRO(SignalRO):
@@ -245,21 +265,36 @@ class SweepMe_SignalRO(SignalRO):
         The driver to use for communication.
     """
 
-    def __init__(self, variable_name, driver=None, **kwargs):
+    def __init__(self, variable_name, driver=None, channel=None, **kwargs):
         super().__init__(**kwargs)
         self.variable_name = variable_name
         self.data_position = None
         self.driver = driver
+        self.channel = channel
 
     def get(self, **kwargs):
         """Reads the value from the driver and returns it."""
         if not self.driver:
             raise ValueError(f"Driver not set for signal {self.name}")
+        if not self.check_last_channel():
+            self.driver.set_parameters({"Channel": self.channel})
+            self.driver.configure()
         if self.data_position is None:
             self.data_position = self.driver.variables.index(self.variable_name)
         data = self.driver.read()
         self._readback = data[self.data_position]
         return super().get(**kwargs)
+
+    def check_last_channel(self):
+        """Checks if the driver's last channel is the same as the one of the signal."""
+        if not self.driver:
+            raise ValueError(f"Driver not set for signal {self.name}")
+        if not self.channel:
+            return True
+        last_channel = self.driver.get_parameters()["Channel"]
+        if last_channel != self.channel:
+            return False
+        return True
 
 
 class SweepMe_Parameter_Signal(Signal):
