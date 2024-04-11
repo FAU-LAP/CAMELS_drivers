@@ -79,10 +79,11 @@ class TimeTagger(Device):
 
         channels = channels or {}
         for channel, info in channels.items():
-            self.tagger.setTriggerLevel(int(channel), float(info["trigger_level"]))
             self.tagger.setInputDelay(int(channel), int(info["input_delay"]))
             self.tagger.setDeadtime(int(channel), int(info["dead_time"]))
             self.tagger.setTestSignal(int(channel), info["test_signal"])
+            self.tagger.setEventDivider(int(channel), 1)
+            self.tagger.setTriggerLevel(int(channel), float(info["trigger_level"]))
 
         self.countrate.read_function = self.read_countrate
         self.countrate.trigger_function = self.start_countrate
@@ -121,7 +122,9 @@ class TimeTagger(Device):
                 channels = channels.split(",")
             elif ";" in channels:
                 channels = channels.split(";")
-        if isinstance(channels[0], str):
+        if isinstance(channels, str):
+            channels = [int(channels)]
+        elif isinstance(channels[0], str):
             for i, chan in enumerate(channels):
                 channels[i] = int(chan)
         self.tt_countrate.stop()
@@ -196,117 +199,3 @@ class TimeTagger(Device):
     def finalize_steps(self):
         TT.freeTimeTagger(self.tagger)
 
-
-if __name__ == "__main__":
-    # tagg = TimeTagger(name='tagg', serial_number='1729000IDH')
-
-    settings = {
-        "serial_number": "1729000IDH",
-        "channels": {
-            "0": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "8": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "1": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "9": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "2": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "10": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "3": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "11": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "4": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "12": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "5": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "13": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "6": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "14": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "7": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "15": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-        },
-    }
-    additional_info = {"description": "", "device_class_name": "TimeTagger"}
-    tagg = TimeTagger(
-        "swabianinstruments_timetagger:",
-        name="swabianinstruments_timetagger",
-        **settings
-    )
-    tagg.countrate.trigger()
-    print(tagg.countrate.get())
-    tagg.finalize_steps()

@@ -14,3 +14,11 @@ Currently supported measurement types are Countrate, Correlation and Count-Betwe
 ## Documentation
 
 For more information visit the [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+## Changelog
+### 0.1.1
+Fixes:
+- Several issues with configuration were fixed
+
+
