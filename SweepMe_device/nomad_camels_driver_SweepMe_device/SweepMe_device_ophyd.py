@@ -99,18 +99,35 @@ def make_ophyd_class(driver_path, class_name):
     if "SweepMode" in configs:
         sweep_modes = configs["SweepMode"]
         for mode in sweep_modes:
-            name = make_valid_python_identifier(mode)
-            set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
+            # make one signal for each channel
+            if "Channel" in configs:
+                for channel in configs["Channel"]:
+                    name = make_valid_python_identifier(f"{mode}_{channel}")
+                    set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
+            else:
+                name = make_valid_python_identifier(mode)
+                set_channels[name] = Cpt(SweepMe_Signal, name=name, mode_name=mode)
     # create the signals for the variables
     variables = {}
     for i, var_name in enumerate(driver.variables):
-        name = make_valid_python_identifier(var_name)
-        variables[name] = Cpt(
-            SweepMe_SignalRO,
-            name=name,
-            variable_name=var_name,
-            metadata={"units": driver.units[i]},
-        )
+        # make one signal for each channel
+        if "Channel" in configs:
+            for channel in configs["Channel"]:
+                name = make_valid_python_identifier(f"{var_name}_{channel}")
+                variables[name] = Cpt(
+                    SweepMe_SignalRO,
+                    name=name,
+                    variable_name=var_name,
+                    metadata={"units": driver.units[i]},
+                )
+        else:
+            name = make_valid_python_identifier(var_name)
+            variables[name] = Cpt(
+                SweepMe_SignalRO,
+                name=name,
+                variable_name=var_name,
+                metadata={"units": driver.units[i]},
+            )
     # create a class inheriting from SweepMe_Device with the signals created above
     return type(
         make_valid_python_identifier(class_name),
