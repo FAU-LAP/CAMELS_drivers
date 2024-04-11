@@ -73,7 +73,8 @@ class subclass_config(device_class.Device_Config):
     def get_settings(self):
         settings = super().get_settings()
         settings["driver"] = self.driver_selection.get_path()
-        config = self.sub_widget.get_config()
+        if self.sub_widget:
+            config = self.sub_widget.get_config()
         if "Port" in config:
             settings["port"] = config["Port"]
         return settings
