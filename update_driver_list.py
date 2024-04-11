@@ -1,6 +1,6 @@
 import os.path
 import pathlib
-import tomllib
+import toml as tomllib
 import subprocess
 import sys
 
@@ -29,8 +29,7 @@ driver_list = []
 for f in pathlib.Path(os.path.dirname(__file__)).rglob("pyproject.toml"):
     if ".desertenv" in str(f):
         continue
-    with open(f, "rb") as toml_f:
-        toml = tomllib.load(toml_f)
+    toml = tomllib.load(f)
     if "project" in toml:
         toml_proj = toml["project"]
         name = ""
