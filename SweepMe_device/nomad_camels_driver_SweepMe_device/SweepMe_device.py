@@ -40,7 +40,6 @@ class subclass(device_class.Device):
         for key, value in passive_config.items():
             if key not in self.config:
                 self.config[key] = value
-    
 
     def get_channels(self):
         self.update_driver()
@@ -81,7 +80,8 @@ class subclass_config(device_class.Device_Config):
 
     def get_config(self):
         config = super().get_config()
-        config.update(self.sub_widget.get_config())
+        if self.sub_widget:
+            config.update(self.sub_widget.get_config())
         if "Port" in config:
             config.pop("Port")
         return config
@@ -133,6 +133,7 @@ class subclass_config(device_class.Device_Config):
             labels=labels,
         )
         self.layout().addWidget(self.sub_widget, 25, 0, 1, 5)
+
 
 def get_configs_from_ophyd(ophyd_instance):
     config = {}
