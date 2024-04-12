@@ -4,9 +4,11 @@ from ophyd import Device, Signal, SignalRO
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
+    Sequential_Device,
 )
 
 from pylablib.devices import Toptica
+import time
 
 
 def make_ophyd_instance(
@@ -142,7 +144,7 @@ def make_ophyd_class(
     )
 
 
-class Ibeam_Smart(Device):
+class Ibeam_Smart(Sequential_Device):
     laser_data = Cpt(
         Custom_Function_SignalRO,
         name="laser_data",
@@ -196,6 +198,16 @@ class Ibeam_Smart(Device):
         name="disable_output",
         metadata={"units": "", "description": ""},
     )
+    enable_digitial_modulation = Cpt(
+        Custom_Function_Signal,
+        name="enable_digitial_modulation",
+        metadata={"units": "", "description": ""},
+    )
+    disable_digitial_modulation = Cpt(
+        Custom_Function_Signal,
+        name="disable_digitial_modulation",
+        metadata={"units": "", "description": ""},
+    )
 
     def __init__(
         self,
@@ -225,6 +237,10 @@ class Ibeam_Smart(Device):
         )
         if name == "test":
             return
+        # The following line forces the channels to wait for others to finish before setting and reading
+        # This is because Custom_Function_SignalRO and Custom_Function_Signal are typically run asynchronously
+        self.force_sequential = True
+        
         self.laser = Toptica.TopticaIBeam(f"COM{Com_port}")
         self.channels = channels
         self.read_laser_temp.read_function = self.read_laser_temp_read_function
@@ -234,6 +250,12 @@ class Ibeam_Smart(Device):
         self.use_SKILL.put_function = self.set_SKILL_function
         self.enable_output.put_function = self.enable_output_function
         self.disable_output.put_function = self.disable_output_function
+        self.enable_digitial_modulation.put_function = (
+            self.enable_digitial_modulation_function
+        )
+        self.disable_digitial_modulation.put_function = (
+            self.disable_digitial_modulation_function
+        )
 
     def read_laser_temp_read_function(self):
         return str(self.laser.get_temperatures())
@@ -246,49 +268,65 @@ class Ibeam_Smart(Device):
 
     def set_FINE_function(self, value):
         if value:
-            self.laser.instr.write(f"fine {self.use_FINE_type.get()}")
-            self.laser.instr.write("fine on")
+            self.laser.query(f"fine {value}", reply=False)
+            self.laser.query("fine on", reply=False)
 
     def set_SKILL_function(self, value):
         if value:
-            self.laser.instr.write(f"skill {self.use_SKILL_type.get()}")
-            self.laser.instr.write("skill on")
+            self.laser.query(f"skill {value}", reply=False)
+            self.laser.query("skill on", reply=False)
 
     def read_power_channel(self, channel_number):
         try:
             return self.laser.get_channel_power(channel_number)
         except:
-            print("cant read power")
-
-    def enable_channel(self, channel_number):
-        try:
-            self.laser.enable_channel(channel_number)
-        except:
-            print("cant enable channel")
+            print("failed to read power")
 
     def set_power_channel(self, channel_number, value):
         try:
             self.laser.set_channel_power(channel_number, value)
         except:
-            print("cant set power")
+            print("failed to set power")
+
+    def enable_channel(self, channel_number):
+        try:
+            if not self.laser.is_channel_enabled(channel_number):
+                self.laser.enable_channel(channel_number)
+        except:
+            print("failed to enable channel")
 
     def disable_channel(self, channel_number):
         try:
-            self.laser.instr.write(f"di {channel_number}")
+            if self.laser.is_channel_enabled(channel_number):
+                self.laser.enable_channel(channel_number, enabled=False)
         except:
-            print("cant disable channel")
+            print("failed to disable channel")
 
     def enable_output_function(self, value):
         try:
-            self.laser.enable()
+            if not self.laser.is_enabled():
+                self.laser.enable()
         except:
-            print("cant enable output")
+            print("failed to enable output")
 
     def disable_output_function(self, value):
         try:
-            self.laser.instr.write("laser off")
+            if self.laser.is_enabled():
+                self.laser.enable(enabled=False)
         except:
-            print("cant disable output")
+            print("failed to disable output")
+
+    def enable_digitial_modulation_function(self, value):
+        try:
+            self.laser.query("en ext", reply=False)
+        except:
+            print("failed to enable digital modulation")
+
+    def disable_digitial_modulation_function(self, value):
+        try:
+            self.laser.instr.query("di ext", reply=False)
+        except:
+            print("failed to disable digital modulation")
 
     def finalize_steps(self):
         self.laser.close()
