@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "nomad_camels_driver_iBeam_smart"
 version = "0.1.0"
 authors = [
-	{name="enter your name here!", email="contact@email.com"}
+	{name="FAIRmat - HU Berlin", email="nomad-camels@fau.de"}
 ]
 description = "Instrument driver for iBeam_smart for NOMAD CAMELS"
 readme = "README.md"
