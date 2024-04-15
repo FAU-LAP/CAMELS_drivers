@@ -88,14 +88,14 @@ class TimeTagger(Device):
         self.countrate.read_function = self.read_countrate
         self.countrate.trigger_function = self.start_countrate
 
-        self._countrate_avg_time = 1e12
+        self._countrate_avg_time = int(1e12)
         self.countrate_time.put_function = self._set_countrate_time
         self.countrate_channels.put_function = self._update_countrate_channels
 
         self.correlation.trigger_function = self.start_correlation
         self.correlation.read_function = self.read_correlation
 
-        self._correlation_meas_time = 1e12
+        self._correlation_meas_time = int(1e12)
         self.correlation_bins.put_function = self._set_correlation_config
         self.correlation_binwidth.put_function = self._set_correlation_config
         self.correlation_channel_1.put_function = self._set_correlation_config
@@ -105,7 +105,7 @@ class TimeTagger(Device):
         self.count_between_markers.trigger_function = self.start_cbm
         self.count_between_markers.read_function = self.read_cbm
 
-        self._cbm_meas_time = 1e12
+        self._cbm_meas_time = int(1e12)
         self.cbm_n_values.put_function = self._set_cbm_config
         self.cbm_click_channel.put_function = self._set_cbm_config
         self.cbm_begin_channel.put_function = self._set_cbm_config
@@ -132,19 +132,19 @@ class TimeTagger(Device):
         self.tt_countrate.stop()
 
     def _set_countrate_time(self, value):
-        self._countrate_avg_time = value * 1e12
+        self._countrate_avg_time = int(value * 1e12)
 
     def _set_correlation_config(self, value):
         self.correlation_config_change = True
 
     def _set_correlation_meas_time(self, value):
-        self._correlation_meas_time = value * 1e12
+        self._correlation_meas_time = int(value * 1e12)
 
     def _set_cbm_config(self, value):
         self.cbm_config_change = True
 
     def _set_cbm_meas_time(self, value):
-        self._cbm_meas_time = value * 1e12
+        self._cbm_meas_time = int(value * 1e12)
 
     def start_correlation(self):
         if self.correlation_config_change:
