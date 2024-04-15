@@ -1,27 +1,16 @@
 import os.path
 import pathlib
 import toml as tomllib
-import subprocess
+import requests
 import sys
 
 
 def get_latest_version(instr):
-    latest_version = str(
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                f'nomad-camels-driver-{instr.replace("_", "-")}==random',
-            ],
-            capture_output=True,
-            text=True,
-        )
-    )
-    latest_version = latest_version[latest_version.find("(from versions:") + 15 :]
-    latest_version = latest_version[: latest_version.find(")")]
-    return latest_version.replace(" ", "").split(",")[-1]
+    name = f'nomad-camels-driver-{instr.replace("_", "-")}'
+    response = requests.get(f"https://pypi.org/pypi/{name}/json")
+    if response.status_code != 200:
+        return None
+    return response.json()["info"]["version"]
 
 
 driver_list = []
@@ -41,14 +30,16 @@ for f in pathlib.Path(os.path.dirname(__file__)).rglob("pyproject.toml"):
         if name and version:
             driver_list.append(f"{name}=={version}\n")
 
-print(driver_list)
-with open("driver_list.txt", "w") as f:
-    f.writelines(driver_list)
 
+with open("driver_list.txt", "w") as f:
+    f.write("")
 
 for d in driver_list:
     name, version = d[:-1].split("==")
     last_v = get_latest_version(name)
+    if last_v:
+        with open("driver_list.txt", "a") as f:
+            f.write(f"{name}=={last_v}\n")
     if version == last_v:
         sys.stdout.write(
             "\x1b[1;32m" + f"{name}\t{version}\t{last_v}" + "\x1b[0m" + "\n"
