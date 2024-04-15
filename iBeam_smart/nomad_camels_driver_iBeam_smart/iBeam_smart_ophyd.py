@@ -321,7 +321,7 @@ class Ibeam_Smart(Sequential_Device):
 
     def disable_digitial_modulation_function(self, value):
         try:
-            self.laser.instr.query("di ext", reply=False)
+            self.laser.query("di ext", reply=False)
         except:
             print("failed to disable digital modulation")
 
