@@ -8,7 +8,7 @@ version = "0.1.0"
 authors = [
 	{name="FAIRmat - HU Berlin", email="nomad-camels@fau.de"}
 ]
-description = "Instrument driver for iBeam_smart for NOMAD CAMELS"
+description = "Instrument driver for iBeam_smart for NOMAD CAMELS using pylablib as the backend."
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [
@@ -17,9 +17,10 @@ classifiers = [
 ]
 
 dependencies = [
-	"nomad-camels",
+	"nomad-camels>=1.0.6",
 	"pyvisa",
-	"pyvisa-py"
+	"pyvisa-py",
+    "pylablib>=1.4.2",
 ]
 
 [project.urls]
