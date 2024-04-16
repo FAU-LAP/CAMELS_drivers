@@ -5,7 +5,7 @@ from .SweepMe_device_ophyd import (
     get_driver,
     get_ports,
     special_keys,
-    make_ophyd_class,
+    make_SweepMe_ophyd_class,
     make_valid_python_identifier,
 )
 
@@ -19,7 +19,7 @@ class subclass(device_class.Device):
             name="SweepMe_device",
             virtual=False,
             ophyd_device=None,
-            ophyd_class_name="make_ophyd_instance",
+            ophyd_class_name="make_SweepMe_ophyd_instance",
             **kwargs,
         )
         self.settings["driver"] = ""
@@ -31,7 +31,7 @@ class subclass(device_class.Device):
         driver_path = self.settings["driver"]
         driver_name = os.path.basename(driver_path)
         class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
-        self.ophyd_class = make_ophyd_class(driver_path, class_name)
+        self.ophyd_class = make_SweepMe_ophyd_class(driver_path, class_name)
         self.ophyd_instance = self.ophyd_class(driver=driver_path, name="test")
         config, passive_config = get_configs_from_ophyd(self.ophyd_instance)
         for key, value in config.items():
