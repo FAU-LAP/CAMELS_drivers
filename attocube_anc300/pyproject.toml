@@ -17,7 +17,8 @@ classifiers = [
 ]
 
 dependencies = [
-	"nomad-camels"
+	"nomad-camels>=1.0.6",
+    "pylablib>=1.4.2",
 ]
 
 [project.urls]
