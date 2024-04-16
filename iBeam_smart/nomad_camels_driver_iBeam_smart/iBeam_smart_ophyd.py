@@ -20,9 +20,7 @@ def make_ophyd_instance(
     configuration_attrs=None,
     parent=None,
     resource_name="",
-    write_termination="\r\n",
-    read_termination="\r\n",
-    baud_rate=115200,
+    baudrate=115200,
     channels=None,
     Com_port="",
     **kwargs,
@@ -37,9 +35,7 @@ def make_ophyd_instance(
         configuration_attrs=configuration_attrs,
         parent=parent,
         resource_name=resource_name,
-        write_termination=write_termination,
-        read_termination=read_termination,
-        baud_rate=baud_rate,
+        baudrate=baudrate,
         channels=channels,
         Com_port=Com_port,
         **kwargs,
@@ -219,9 +215,7 @@ class Ibeam_Smart(Sequential_Device):
         configuration_attrs=None,
         parent=None,
         resource_name="",
-        write_termination="\r\n",
-        read_termination="\r\n",
-        baud_rate=115200,
+        baudrate=115200,
         channels=None,
         Com_port="",
         **kwargs,
@@ -240,8 +234,7 @@ class Ibeam_Smart(Sequential_Device):
         # The following line forces the channels to wait for others to finish before setting and reading
         # This is because Custom_Function_SignalRO and Custom_Function_Signal are typically run asynchronously
         self.force_sequential = True
-        
-        self.laser = Toptica.TopticaIBeam(f"COM{Com_port}")
+        self.laser = Toptica.TopticaIBeam((f"COM{Com_port}", baudrate))
         self.channels = channels
         self.read_laser_temp.read_function = self.read_laser_temp_read_function
         self.laser_data.read_function = self.read_laser_data_read_function
@@ -324,7 +317,7 @@ class Ibeam_Smart(Sequential_Device):
 
     def disable_digitial_modulation_function(self, value):
         try:
-            self.laser.instr.query("di ext", reply=False)
+            self.laser.query("di ext", reply=False)
         except:
             print("failed to disable digital modulation")
 

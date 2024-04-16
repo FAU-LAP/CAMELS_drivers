@@ -42,7 +42,9 @@ class subclass(device_class.Device):
             return
         self.ophyd_class = make_ophyd_class(self.settings["channels"])
         self.ophyd_instance = self.ophyd_class(
-            channels=self.settings["channels"], name="test"
+            channels=self.settings["channels"],
+            baudrate=self.settings["baudrate"],
+            name="test",
         )
         config, passive_config = get_configs_from_ophyd(self.ophyd_instance)
         for key, value in config.items():
@@ -82,6 +84,12 @@ class subclass_config(device_class.Simple_Config):
             channels = {}
         if "Com_port" in settings_dict:
             com_port = settings_dict.pop("Com_port")
+        else:
+            com_port = ""
+        if "baudrate" in settings_dict:
+            baudrate = settings_dict.pop("baudrate")
+        else:
+            baudrate = "115200"
         super().__init__(
             parent,
             "iBeam_smart",
@@ -93,6 +101,7 @@ class subclass_config(device_class.Simple_Config):
             labels=labels,
         )
         self.settings_dict["channels"] = channels
+        self.settings_dict["Com_port"] = com_port
         self.get_iBeam_channels_label = QLabel("")
         self.layout().addWidget(self.get_iBeam_channels_label, 21, 0, 1, 5)
         self.channels = []
@@ -100,11 +109,12 @@ class subclass_config(device_class.Simple_Config):
         self.comboBox_connection_type.addItem("Local VISA")
         self.load_settings()
         self.connector.set_only_resource_name()
+        self.connector.lineEdit_baud.setHidden(False)
+        self.connector.lineEdit_baud.setText(baudrate)
         self.get_iBeam_channels()
         self.connector.comboBox_port.currentIndexChanged.connect(
             self.get_iBeam_channels
         )
-        # self.connector.lineEdit_baud.setText("115200")
 
     def get_iBeam_channels(self):
         self.setCursor(Qt.WaitCursor)
@@ -113,7 +123,9 @@ class subclass_config(device_class.Simple_Config):
         ).group(1)
         self.settings_dict["Com_port"] = com_port
         try:
-            laser = Toptica.TopticaIBeam(f"COM{com_port}")
+            laser = Toptica.TopticaIBeam(
+                (f"COM{com_port}", self.connector.lineEdit_baud.text())
+            )
             channels_number = laser.get_channels_number()
             laser.close()
             self.channels = [f"{i}" for i in range(1, channels_number + 1)]
@@ -127,12 +139,13 @@ class subclass_config(device_class.Simple_Config):
             self.get_iBeam_channels_label.setText(
                 f"Failed to get the number of available channels. Check if you have selected the correct ASRL(COM) port."
             )
-            # REMOVE THIS !!! this is for testing the driver with out a connected laser
-            self.channels = [f"{i}" for i in range(1, 2 + 1)]
-            self.settings_dict["channels"] = self.channels
-            # !!!!!!!!!!!!!!!!
             self.setCursor(Qt.ArrowCursor)
             return
+
+    def get_settings(self):
+        settings = super().get_settings()
+        settings["baudrate"] = self.connector.lineEdit_baud.text()
+        return settings
 
 
 def get_configs_from_ophyd(ophyd_instance):
