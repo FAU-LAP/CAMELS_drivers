@@ -46,7 +46,7 @@ def get_ports(driver):
     return port_manager.get_resources_available(keys)
 
 
-def make_ophyd_instance(
+def make_SweepMe_ophyd_instance(
     prefix="",
     *args,
     name,
@@ -58,7 +58,7 @@ def make_ophyd_instance(
     port="",
     **kwargs,
 ):
-    """Creates an ophyd instance for the given driver. The driver is used to create the ophyd class using `make_ophyd_class` and the instance is created with the given parameters.
+    """Creates an ophyd instance for the given driver. The driver is used to create the ophyd class using `make_SweepMe_ophyd_class` and the instance is created with the given parameters.
 
     Parameters
     ----------
@@ -69,7 +69,7 @@ def make_ophyd_instance(
     """
     driver_name = os.path.basename(driver)
     class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
-    ophyd_class = make_ophyd_class(driver, class_name)
+    ophyd_class = make_SweepMe_ophyd_class(driver, class_name)
     kwargs["driver"] = driver
     return ophyd_class(
         prefix,
@@ -84,7 +84,7 @@ def make_ophyd_instance(
     )
 
 
-def make_ophyd_class(driver_path, class_name):
+def make_SweepMe_ophyd_class(driver_path, class_name):
     """Creates an ophyd class for the given driver. The driver's GUI parameters are used to create the configuration signals, the sweep modes are used to create the set channels and the variables are used to create the readback signals. The class is created with the given class name."""
     driver = get_driver(driver_path)
     configs = driver.set_GUIparameter()
