@@ -20,9 +20,7 @@ def make_ophyd_instance(
     configuration_attrs=None,
     parent=None,
     resource_name="",
-    write_termination="\r\n",
-    read_termination="\r\n",
-    baud_rate=115200,
+    baudrate=115200,
     channels=None,
     Com_port="",
     **kwargs,
@@ -37,9 +35,7 @@ def make_ophyd_instance(
         configuration_attrs=configuration_attrs,
         parent=parent,
         resource_name=resource_name,
-        write_termination=write_termination,
-        read_termination=read_termination,
-        baud_rate=baud_rate,
+        baudrate=baudrate,
         channels=channels,
         Com_port=Com_port,
         **kwargs,
@@ -321,7 +317,7 @@ class Ibeam_Smart(Sequential_Device):
 
     def disable_digitial_modulation_function(self, value):
         try:
-            self.laser.instr.query("di ext", reply=False)
+            self.laser.query("di ext", reply=False)
         except:
             print("failed to disable digital modulation")
 
