@@ -91,6 +91,18 @@ def make_attocube_anc300_class(available_axis_numbers):
 
         return stop
 
+    def enable_axis_generator(axis_number):
+        def enable_axis(_self_instance, value):
+            return lambda: _self_instance.parent.enable_axis(axis_number)
+
+        return enable_axis
+
+    def disable_axis_generator(axis_number):
+        def disable_axis(_self_instance, value):
+            return lambda: _self_instance.parent.disable_axis(axis_number)
+
+        return disable_axis
+
     def get_capacitance_generator(axis_number):
         def get_capacitance(_self_instance):
             return lambda: _self_instance.parent.get_capacitance(axis_number)
@@ -134,7 +146,7 @@ def make_attocube_anc300_class(available_axis_numbers):
         signal_dictionary[f"set_mode_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"set_mode_{axis}",
-            metadata={"units": "", "description": f"Set mode for axis {axis}"},
+            metadata={"description": f"Set mode for axis {axis}"},
             put_function=set_mode_generator(axis),
         )
         signal_dictionary[f"set_offset_axis{axis}"] = Cpt(
@@ -147,7 +159,6 @@ def make_attocube_anc300_class(available_axis_numbers):
             Custom_Function_Signal,
             name=f"wait_move_{axis}",
             metadata={
-                "units": "",
                 "description": f"Wait for axis {axis} to finish moving",
             },
             put_function=wait_move_generator(axis),
@@ -165,7 +176,6 @@ def make_attocube_anc300_class(available_axis_numbers):
             Custom_Function_Signal,
             name=f"jog_{axis}",
             metadata={
-                "units": "steps",
                 "description": f"Jog axis {axis} by a certain number of steps until a new step command or stop is sent.",
             },
             put_function=jog_generator(axis),
@@ -174,10 +184,21 @@ def make_attocube_anc300_class(available_axis_numbers):
             Custom_Function_Signal,
             name=f"stop_{axis}",
             metadata={
-                "units": "",
                 "description": f"Stop axis {axis}",
             },
             put_function=stop_generator(axis),
+        )
+        signal_dictionary[f"enable_axis{axis}"] = Cpt(
+            Custom_Function_Signal,
+            name=f"enable_axis_{axis}",
+            metadata={"description": f"Enable axis {axis}. Set to 'stp' mode"},
+            put_function=enable_axis_generator(axis),
+        )
+        signal_dictionary[f"disable_axis{axis}"] = Cpt(
+            Custom_Function_Signal,
+            name=f"disable_axis_{axis}",
+            metadata={"description": f"Disable axis {axis}. Set to 'gnd' mode"},
+            put_function=disable_axis_generator(axis),
         )
         signal_dictionary[f"get_capacitance_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
@@ -200,7 +221,7 @@ def make_attocube_anc300_class(available_axis_numbers):
         signal_dictionary[f"get_mode_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
             name=f"get_mode_{axis}",
-            metadata={"units": "", "description": f"Get mode for axis {axis}"},
+            metadata={"description": f"Get mode for axis {axis}"},
             read_function=get_mode_generator(axis),
         )
         device_string += f"_{axis}"
@@ -216,7 +237,7 @@ class Attocube_Anc300(Sequential_Device):
     get_full_info = Cpt(
         Custom_Function_SignalRO,
         name="get_full_info",
-        metadata={"units": "", "description": "Get full instrument info"},
+        metadata={"description": "Get full instrument info"},
         kind="config",
     )
 
@@ -224,7 +245,6 @@ class Attocube_Anc300(Sequential_Device):
         Custom_Function_SignalRO,
         name="read_instrument",
         metadata={
-            "units": "",
             "description": "Read the instrument. You must have used 'write_instrument' loop step before.\nUses Attocube.ANC300.instr.read_multichar_term",
         },
     )
@@ -233,7 +253,6 @@ class Attocube_Anc300(Sequential_Device):
         Custom_Function_Signal,
         name="write_instrument",
         metadata={
-            "units": "",
             "description": "Write arbitrary string to instrument. Uses Attocube.ANC300.instr.write\nUse single quotation marks: ' around string in value field, like: 'write this'\nUse 'read instrument' in the next loop step to read the resposne to the write.",
         },
     )
@@ -308,7 +327,11 @@ class Attocube_Anc300(Sequential_Device):
         self.atc.wait_move(axis_number)
 
     def move_by(self, axis_number, value):
-        self.atc.move_by(axis_number, value)
+        if self.atc.is_enabled(axis=axis_number):
+            self.atc.move_by(axis_number, value)
+        else:
+            self.atc.enable_axis(axis=axis_number)
+            self.atc.move_by(axis_number, value)
 
     def jog(self, axis_number, value):
         if direction not in ["up", "down", "+", "-"]:
@@ -317,10 +340,20 @@ class Attocube_Anc300(Sequential_Device):
             direction = True
         elif value == "down" or "-":
             direction = False
-        self.atc.jog(axis_number, direction)
+        if self.atc.is_enabled(axis=axis_number):
+            self.atc.jog(axis_number, direction)
+        else:
+            self.atc.enable_axis(axis=axis_number)
+            self.atc.jog(axis_number, direction)
 
     def stop(self, axis_number, value):
         self.atc.stop(axis_number)
+
+    def enable_axis(self, axis_number):
+        self.atc.enable_axis(axis_number)
+
+    def disable_axis(self, axis_number):
+        self.atc.disable_axis(axis_number)
 
     def get_frequency(self, axis_number):
         return self.atc.get_frequency(axis_number)
