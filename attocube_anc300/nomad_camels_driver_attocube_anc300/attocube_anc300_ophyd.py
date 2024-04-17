@@ -119,31 +119,31 @@ def make_attocube_anc300_class(available_axis_numbers):
     device_string = f"attocube_anc300_axis"
     for axis in available_axis_numbers:
         axis = int(axis)
-        signal_dictionary[f"set_frequency_{axis}"] = Cpt(
+        signal_dictionary[f"set_frequency_axis{axis}"] = Cpt(
             Custom_Function_Signal,
-            name=f"set_frequency_{axis}",
+            name=f"set_frequency_axis{axis}",
             metadata={"units": "Hz", "description": f"Set frequency for axis {axis}"},
             put_function=set_frequency_generator(axis),
         )
-        signal_dictionary[f"set_voltage_{axis}"] = Cpt(
+        signal_dictionary[f"set_voltage_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"set_voltage_{axis}",
             metadata={"units": "V", "description": f"Set voltage for axis {axis}"},
             put_function=set_voltage_generator(axis),
         )
-        signal_dictionary[f"set_mode_{axis}"] = Cpt(
+        signal_dictionary[f"set_mode_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"set_mode_{axis}",
             metadata={"units": "", "description": f"Set mode for axis {axis}"},
             put_function=set_mode_generator(axis),
         )
-        signal_dictionary[f"set_offset_{axis}"] = Cpt(
+        signal_dictionary[f"set_offset_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"set_offset_{axis}",
             metadata={"units": "V", "description": f"Set offset for axis {axis}"},
             put_function=set_offset_generator(axis),
         )
-        signal_dictionary[f"wait_move_{axis}"] = Cpt(
+        signal_dictionary[f"wait_move_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"wait_move_{axis}",
             metadata={
@@ -152,7 +152,7 @@ def make_attocube_anc300_class(available_axis_numbers):
             },
             put_function=wait_move_generator(axis),
         )
-        signal_dictionary[f"move_by_{axis}"] = Cpt(
+        signal_dictionary[f"move_by_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"move_by_{axis}",
             metadata={
@@ -161,7 +161,7 @@ def make_attocube_anc300_class(available_axis_numbers):
             },
             put_function=move_by_generator(axis),
         )
-        signal_dictionary[f"jog_{axis}"] = Cpt(
+        signal_dictionary[f"jog_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"jog_{axis}",
             metadata={
@@ -170,7 +170,7 @@ def make_attocube_anc300_class(available_axis_numbers):
             },
             put_function=jog_generator(axis),
         )
-        signal_dictionary[f"stop_{axis}"] = Cpt(
+        signal_dictionary[f"stop_axis{axis}"] = Cpt(
             Custom_Function_Signal,
             name=f"stop_{axis}",
             metadata={
@@ -179,25 +179,25 @@ def make_attocube_anc300_class(available_axis_numbers):
             },
             put_function=stop_generator(axis),
         )
-        signal_dictionary[f"get_capacitance_{axis}"] = Cpt(
+        signal_dictionary[f"get_capacitance_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
             name=f"get_capacitance_{axis}",
             metadata={"units": "F", "description": f"Get capacitance for axis {axis}"},
             read_function=get_capacitance_generator(axis),
         )
-        signal_dictionary[f"get_frequency_{axis}"] = Cpt(
+        signal_dictionary[f"get_frequency_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
             name=f"get_frequency_{axis}",
             metadata={"units": "Hz", "description": f"Get frequency for axis {axis}"},
             read_function=get_frequency_generator(axis),
         )
-        signal_dictionary[f"get_voltage_{axis}"] = Cpt(
+        signal_dictionary[f"get_voltage_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
             name=f"get_voltage_{axis}",
             metadata={"units": "V", "description": f"Get voltage for axis {axis}"},
             read_function=get_voltage_generator(axis),
         )
-        signal_dictionary[f"get_mode_{axis}"] = Cpt(
+        signal_dictionary[f"get_mode_axis{axis}"] = Cpt(
             Custom_Function_SignalRO,
             name=f"get_mode_{axis}",
             metadata={"units": "", "description": f"Get mode for axis {axis}"},
