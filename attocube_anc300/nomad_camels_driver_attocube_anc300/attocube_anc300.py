@@ -174,9 +174,14 @@ class subclass_config(device_class.Simple_Config):
         settings["connection_type"] = self.sub_widget.setting_combos[
             "connection_type"
         ].currentText()
-        settings["com_port"] = int(
-            re.match("ASRL(\d+)", self.widget_com_port.currentText()).group(1)
-        )
+        try:
+            settings["com_port"] = int(
+                re.match("ASRL(\d+)", self.widget_com_port.currentText()).group(1)
+            )
+        except AttributeError:
+            settings["com_port"] = None
+            self.widget_com_port.setCurrentText("No COM Port available")
+
         settings["ip_address"] = self.widget_ip_address.text()
         settings["port"] = int(self.widget_port.text())
         if settings["connection_type"] == "USB":
@@ -191,9 +196,13 @@ class subclass_config(device_class.Simple_Config):
         return settings
 
     def update_com_port(self):
-        self.settings_dict["com_port"] = int(
-            re.match("ASRL(\d+)", self.widget_com_port.currentText()).group(1)
-        )
+        try:
+            self.settings_dict["com_port"] = int(
+                re.match("ASRL(\d+)", self.widget_com_port.currentText()).group(1)
+            )
+        except AttributeError:
+            self.settings_dict["com_port"] = None
+            self.widget_com_port.setCurrentText("No COM Port available")
 
     def update_port(self):
         self.settings_dict["port"] = int(self.widget_port.text())
