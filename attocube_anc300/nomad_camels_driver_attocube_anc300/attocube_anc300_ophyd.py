@@ -7,6 +7,7 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
 )
 from ophyd import Device
 from pylablib.devices import Attocube
+import json
 
 
 def make_attocube_anc300_instance(
@@ -239,6 +240,7 @@ class Attocube_Anc300(Sequential_Device):
         name="get_full_info",
         metadata={"description": "Get full instrument info"},
         kind="config",
+        value=None,
     )
 
     read_instrument = Cpt(
@@ -294,7 +296,7 @@ class Attocube_Anc300(Sequential_Device):
             self.atc = Attocube.ANC300((ip_address, int(port)))
 
     def get_full_info_function(self):
-        self.atc.get_full_info()
+        return json.dumps(self.atc.get_full_info())
 
     def write_instrument_function(self, value):
         self.atc.instr.flush_read()
@@ -369,3 +371,6 @@ class Attocube_Anc300(Sequential_Device):
 
     def get_capacitance(self, axis_number):
         return self.atc.get_capacitance(axis_number)
+    
+    def finalize_steps(self):
+        self.atc.close()
