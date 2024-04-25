@@ -367,6 +367,16 @@ class PyMeasureDevice(Device):
         manufacturer=None,
         **kwargs,
     ):
+        if "controls" in kwargs:
+            kwargs.pop("controls")
+        if "measurements" in kwargs:
+            kwargs.pop("measurements")
+        if "settings" in kwargs:
+            kwargs.pop("settings")
+        if "channels" in kwargs:
+            kwargs.pop("channels")
+        if "config_info" in kwargs:
+            kwargs.pop("config_info")
         super().__init__(
             prefix=prefix,
             name=name,
