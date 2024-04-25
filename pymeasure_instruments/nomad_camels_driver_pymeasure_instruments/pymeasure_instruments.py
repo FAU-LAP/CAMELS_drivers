@@ -6,7 +6,7 @@ import importlib
 import pymeasure.instruments
 
 from nomad_camels.main_classes import device_class
-from nomad_camels.ui_widgets.add_remove_table import AddRemoveDialoge
+from nomad_camels.ui_widgets.add_remove_table import MultiTableDialog
 
 from PySide6.QtWidgets import QLabel, QComboBox, QPushButton
 
@@ -184,17 +184,13 @@ class subclass_config(device_class.Device_Config):
                 tableData["name"].append(key)
                 tableData["is channel"].append(False)
                 tableData["provide read (if channel)"].append(True)
-        config_selection = AddRemoveDialoge(
-            headerLabels=headerLabels,
-            editables=[],
-            checkables=[1, 2],
-            tableData=tableData,
-            title="Select set and read as channels",
-        )
-        config_selection.table.addButton.setHidden(True)
-        config_selection.table.removeButton.setHidden(True)
-        if config_selection.exec():
-            config_info = config_selection.table.update_table_data()
+        config_selection = {
+            "headerLabels": headerLabels,
+            "editables": [],
+            "checkables": [1, 2],
+            "tableData": tableData,
+            "title": "Select set and read as channels",
+        }
 
         headerLabels = ["name", "is channel"]
         tableData = {"name": [], "is channel": []}
@@ -212,16 +208,21 @@ class subclass_config(device_class.Device_Config):
             else:
                 tableData["name"].append(key)
                 tableData["is channel"].append(False)
-        config_selection = AddRemoveDialoge(
-            headerLabels=headerLabels,
-            editables=[],
-            checkables=[1],
-            tableData=tableData,
-            title="Select set / read only as channels",
+        config_selection_2 = {
+            "headerLabels": headerLabels,
+            "editables": [],
+            "checkables": [1],
+            "tableData": tableData,
+            "title": "Select set / read only as channels",
+        }
+        table_dialog = MultiTableDialog(
+            title="Select configs / channels",
+            table_args=[config_selection, config_selection_2],
         )
-        config_selection.table.addButton.setHidden(True)
-        config_selection.table.removeButton.setHidden(True)
-        if config_selection.exec():
+        table_dialog.hide_add_remove_buttons()
+        if table_dialog.exec():
+            data = table_dialog.get_data()
+            config_info = data[0]
             n = 0
             for key, value in config_selection.table.update_table_data().items():
                 config_info[key] += value
