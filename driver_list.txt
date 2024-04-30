@@ -1,6 +1,6 @@
 agilent_34401a==0.1.1
-andor_newton==0.1.0
-andor_shamrock_500==0.1.0
+andor_newton==0.1.1
+andor_shamrock_500==0.1.1
 cam_control_pylablib==0.1.4
 demo_digital_multimeter==0.1.2
 demo_instrument==0.1.1
