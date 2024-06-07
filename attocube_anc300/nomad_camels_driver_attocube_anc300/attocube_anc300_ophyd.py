@@ -169,7 +169,7 @@ def make_attocube_anc300_class(available_axis_numbers):
             name=f"move_by_{axis}",
             metadata={
                 "units": "steps",
-                "description": f"Move axis {axis} by a certain number of steps",
+                "description": f"Move axis {axis} by a certain number of steps. Positive values move upwards, negative values move downwards",
             },
             put_function=move_by_generator(axis),
         )
@@ -177,7 +177,7 @@ def make_attocube_anc300_class(available_axis_numbers):
             Custom_Function_Signal,
             name=f"jog_{axis}",
             metadata={
-                "description": f"Jog axis {axis} by a certain number of steps until a new step command or stop is sent.",
+                "description": f"Jog axis {axis} Jog continuously in the given direction use '+' '-' or 'up' down' or 1 -1 for up or down correspondingly. The motion will continue until another move or stop command is called.",
             },
             put_function=jog_generator(axis),
         )
@@ -336,11 +336,11 @@ class Attocube_Anc300(Sequential_Device):
             self.atc.move_by(axis_number, value)
 
     def jog(self, axis_number, value):
-        if direction not in ["up", "down", "+", "-"]:
-            raise ValueError("Direction must be '+' or 'up'; or '-' or 'down'")
-        if value == "up" or "+":
+        if value not in ["up", "down", "+", "-", 1, -1]:
+            raise ValueError("Direction value must be '+' or 'up' or 1; or '-' or 'down' or -1")
+        if value == "up" or "+" or 1:
             direction = True
-        elif value == "down" or "-":
+        elif value == "down" or "-" or -1:
             direction = False
         if self.atc.is_enabled(axis=axis_number):
             self.atc.jog(axis_number, direction)
