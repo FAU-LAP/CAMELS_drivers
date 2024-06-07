@@ -121,7 +121,7 @@ class PID_manual_control(Manual_Control):
         self.adjustSize()
 
     def change_show_plot(self):
-        showing = self.ophyd_device.plot.plot.show_plot
+        showing = self.ophyd_device.plot.livePlot.show_plot
         self.ophyd_device.change_show_plot(not showing)
         if showing:
             self.pushButton_plot.setText("show plot")

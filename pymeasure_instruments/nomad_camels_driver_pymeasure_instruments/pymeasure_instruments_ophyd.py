@@ -1,4 +1,5 @@
 import pymeasure.instruments
+import re
 import importlib
 import inspect
 import ast
@@ -100,9 +101,14 @@ def get_classes_from_driver_file(driver):
     return classes
 
 
-def get_driver_information(manufacturer, instrument):
+def get_driver(manufacturer, instrument):
     module = importlib.import_module(f"pymeasure.instruments.{manufacturer}")
     driver = getattr(module, instrument)
+    return driver
+
+
+def get_driver_information(manufacturer, instrument):
+    driver = get_driver(manufacturer, instrument)
     return check_driver_info(driver)
 
 
@@ -152,16 +158,244 @@ def check_driver_info(driver, source=None):
     }
 
 
+def make_valid_python_identifier(s):
+    """Returns a valid python identifier for the string "s". This is necessary since the parameters from SweepMe! drivers are handled as strings while they are python variables in the ophyd classes used by NOMAD CAMELS."""
+    # Replace invalid characters
+    s = re.sub("[^0-9a-zA-Z_]", "_", s)
+    # Remove leading characters until we find a letter or underscore
+    s = re.sub("^[^a-zA-Z_]+", "", s)
+    return s
+
+
+def make_signal_cpt(name, info, is_channel=False, provide_read=False, only_read=False):
+    if is_channel:
+        kind = "hinted"
+    else:
+        kind = "config"
+    values = None
+    if info["discrete"]:
+        values = info["values"]
+        if info["boolean"]:
+            value = False
+        else:
+            value = info["values"][0]
+    else:
+        value = 0.0
+    signals = {}
+    if provide_read and is_channel:
+        if only_read:
+            signals[name] = Cpt(
+                PyMeasureSignalRO, name=name, kind=kind, value=value, property_name=name
+            )
+        else:
+            signals[f"{name}_set"] = Cpt(
+                PyMeasureSignal,
+                name=f"{name}_set",
+                kind=kind,
+                value=value,
+                values=values,
+                property_name=name,
+            )
+            signals[f"{name}_get"] = Cpt(
+                PyMeasureSignal,
+                name=f"{name}_get",
+                kind=kind,
+                value=value,
+                values=values,
+                property_name=name,
+            )
+    elif provide_read:
+        signals[name] = Cpt(
+            PyMeasureSignalRO, name=name, kind=kind, value=value, property_name=name
+        )
+    else:
+        signals[name] = Cpt(
+            PyMeasureSignal,
+            name=name,
+            kind=kind,
+            value=value,
+            property_name=name,
+            values=values,
+        )
+    return signals
+
+
+def make_pymeasure_instruments_ophyd_instance(
+    prefix="",
+    *args,
+    name,
+    manufacturer,
+    instrument,
+    measurements,
+    settings,
+    controls,
+    channels,
+    config_info,
+    kind=None,
+    read_attrs=None,
+    configuration_attrs=None,
+    parent=None,
+    resource_name=None,
+    **kwargs,
+):
+    ophyd_class = make_pymeasure_instruments_ophyd_class(
+        instrument,
+        manufacturer,
+        controls,
+        measurements,
+        settings,
+        channels,
+        config_info,
+    )
+    return ophyd_class(
+        prefix,
+        *args,
+        name=name,
+        kind=kind,
+        parent=parent,
+        read_attrs=read_attrs,
+        configuration_attrs=configuration_attrs,
+        resource_name=resource_name,
+        instrument=instrument,
+        manufacturer=manufacturer,
+        **kwargs,
+    )
+
+
+def make_pymeasure_instruments_ophyd_class(
+    instrument, manufacturer, controls, measurements, settings, channels, config_info
+):
+    if not config_info or not config_info["name"]:
+        return
+    class_name = f"PyMeasure_{manufacturer}_{instrument}"
+    signals = make_signals(controls, measurements, settings, config_info)
+    for channel_name, info in channels.items():
+        channel_signals = make_signals(
+            channel_name,
+            manufacturer,
+            info["controls"],
+            info["measurements"],
+            info["settings"],
+            info["channels"],
+            config_info,
+        )
+        for name, signal in channel_signals.items():
+            signals[f"{channel_name}_{name}"] = signal
+    return type(class_name, (PyMeasureDevice,), signals)
+
+
+def make_signals(controls, measurements, settings, config_info):
+    signals = {}
+    for name, info in controls.items():
+        n = config_info["name"].index(name)
+        is_channel = config_info["is channel"][n]
+        provide_read = config_info["provide read (if channel)"][n]
+        signals.update(
+            make_signal_cpt(name, info, is_channel, provide_read, only_read=False)
+        )
+    for name, info in measurements.items():
+        n = config_info["name"].index(name)
+        is_channel = config_info["is channel"][n]
+        signals.update(
+            make_signal_cpt(
+                name, info, is_channel=is_channel, provide_read=True, only_read=True
+            )
+        )
+    for name, info in settings.items():
+        n = config_info["name"].index(name)
+        is_channel = config_info["is channel"][n]
+        signals.update(
+            make_signal_cpt(
+                name, info, is_channel=is_channel, provide_read=False, only_read=False
+            )
+        )
+    return signals
+
+
 class PyMeasureSignal(Signal):
-    pass
+    def __init__(self, property_name, driver=None, values=None, **kwargs):
+        super().__init__(**kwargs)
+        self.property_name = property_name
+        self.driver = driver
+        self.values = values
+
+    def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
+        """Sets the SweepMode of the driver to the mode of the signal, then calls `configure` on the driver, before writing the value."""
+        if not self.driver:
+            raise ValueError(f"Driver not set for signal {self.name}")
+        if self.values and value not in self.values:
+            try:
+                value = type(self.values)(value)
+            except ValueError:
+                try:
+                    value = self.values[value]
+                except KeyError:
+                    raise ValueError(
+                        f"Value {value} of type {type(value)} not supported for {self.name} with values {self.values}"
+                    )
+        setattr(self.driver, self.property_name, value)
+        super().put(
+            value, timestamp=timestamp, force=force, metadata=metadata, **kwargs
+        )
 
 
 class PyMeasureSignalRO(SignalRO):
-    pass
+    def __init__(self, property_name, driver=None, **kwargs):
+        super().__init__(**kwargs)
+        self.property_name = property_name
+        self.driver = driver
+
+    def get(self, **kwargs):
+        if not self.driver:
+            raise ValueError(f"Driver not set for signal {self.name}")
+        self._readback = getattr(self.driver, self.property_name)
+        return super().get(**kwargs)
 
 
 class PyMeasureDevice(Device):
-    pass
+    def __init__(
+        self,
+        prefix="",
+        *,
+        name,
+        kind=None,
+        read_attrs=None,
+        configuration_attrs=None,
+        parent=None,
+        resource_name=None,
+        instrument=None,
+        manufacturer=None,
+        **kwargs,
+    ):
+        if "controls" in kwargs:
+            kwargs.pop("controls")
+        if "measurements" in kwargs:
+            kwargs.pop("measurements")
+        if "settings" in kwargs:
+            kwargs.pop("settings")
+        if "channels" in kwargs:
+            kwargs.pop("channels")
+        if "config_info" in kwargs:
+            kwargs.pop("config_info")
+        super().__init__(
+            prefix=prefix,
+            name=name,
+            kind=kind,
+            read_attrs=read_attrs,
+            configuration_attrs=configuration_attrs,
+            parent=parent,
+            **kwargs,
+        )
+        if name == "test":
+            return
+        self.driver = get_driver(manufacturer, instrument)(resource_name)
+        # give the driver to all components
+        for component in self.walk_signals():
+            if isinstance(
+                component.item,
+                (PyMeasureSignal, PyMeasureSignalRO),
+            ):
+                component.item.driver = self.driver
 
 
 if __name__ == "__main__":

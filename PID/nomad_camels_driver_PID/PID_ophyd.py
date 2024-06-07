@@ -177,17 +177,19 @@ class PID_Controller(Device):
         if name != "test":
             self.pid_thread = PID_Thread(self)
             # if show_plot:
-            from nomad_camels.main_classes.plot_widget import PlotWidget_NoBluesky
+            from nomad_camels.main_classes.plot_pyqtgraph import PlotWidget
 
             y_axes = {"output": 2, "k": 2, "i": 2, "d": 2}
-            self.plot = PlotWidget_NoBluesky(
+            self.plot = PlotWidget(
                 "time",
+                None,
                 title="PID plot",
                 ylabel="value",
                 ylabel2="PID-values",
                 y_axes=y_axes,
                 first_hidden=list(y_axes.keys()),
                 show_plot=show_plot,
+                use_bluesky=False,
             )
             # for y in y_axes:
             #     self.plot.plot.current_lines[y].setLinestyle('None')
@@ -197,7 +199,7 @@ class PID_Controller(Device):
             self.update_PID_vals(self.pid_thread.pid.setpoint)
 
     def change_show_plot(self, show):
-        self.plot.plot.show_plot = show
+        self.plot.livePlot.show_plot = show
         self.plot.setHidden(not show)
 
     def current_value_read(self):
@@ -212,7 +214,7 @@ class PID_Controller(Device):
             "i": kid[1],
             "d": kid[2],
         }
-        self.plot.plot.add_data(timestamp, ys)
+        self.plot.livePlot.add_data(timestamp, ys)
 
     def stable_check(self):
         return self.pid_thread.stable_time >= self.stability_time

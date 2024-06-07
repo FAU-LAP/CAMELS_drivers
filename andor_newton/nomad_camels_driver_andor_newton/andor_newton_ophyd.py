@@ -1,11 +1,11 @@
 from ophyd import Component as Cpt
-from ophyd import Device
 
 import pylablib as pll
 
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
+    Sequential_Device,
 )
 
 
@@ -16,7 +16,7 @@ read_modes = {
 }
 
 
-class Andor_Newton(Device):
+class Andor_Newton(Sequential_Device):
     """
     Driver for the Andor Newton CCD camera
     """
@@ -69,6 +69,7 @@ class Andor_Newton(Device):
             read_attrs=read_attrs,
             configuration_attrs=configuration_attrs,
             parent=parent,
+            force_sequential=True,
             **kwargs
         )
         if name == "test":
@@ -141,7 +142,7 @@ class Andor_Newton(Device):
             value = "multi_track"
             self.camera.setup_multi_track_mode(1, 255, 0)
         elif value == "multi_track":
-            self.multi_tracks.put(self.multi_tracks.get())
+            self.multi_tracks_function(self.multi_tracks.get())
         self.camera.set_read_mode(value)
 
     def preamp_gain_function(self, value):

@@ -1,14 +1,14 @@
 from ophyd import Component as Cpt
 import pylablib as pll
 
-from ophyd import Device
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
+    Sequential_Device,
 )
 
 
-class Andor_Shamrock_500(Device):
+class Andor_Shamrock_500(Sequential_Device):
     """
     Driver for the Andor Shamrock 500 spectrometer (not the camera!).
     The camera is implemented separately.
@@ -56,6 +56,7 @@ class Andor_Shamrock_500(Device):
             read_attrs=read_attrs,
             configuration_attrs=configuration_attrs,
             parent=parent,
+            force_sequential=True,
             **kwargs,
         )
         if name == "test":
@@ -64,8 +65,12 @@ class Andor_Shamrock_500(Device):
         from pylablib.devices import Andor
 
         specs = Andor.list_shamrock_spectrographs()
-        spec = specs.index(spectrometer)
-        self.spectrometer = Andor.ShamrockSpectrograph(idx=spec)
+        try:
+            spec = specs.index(spectrometer)
+            self.spectrometer = Andor.ShamrockSpectrograph(idx=spec)
+        except:
+            self.spectrometer = Andor.ShamrockSpectrograph(idx=0)
+
         self.set_grating_number.put_function = self.set_grating_number_function
         self.center_wavelength.put_function = self.center_wavelength_function
         self.input_port.put_function = self.input_port_function
