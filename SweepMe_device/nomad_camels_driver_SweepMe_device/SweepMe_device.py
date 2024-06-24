@@ -23,7 +23,7 @@ class subclass(device_class.Device):
             **kwargs,
         )
         self.settings["driver"] = ""
-        self.settings["port"] = ""
+        self.settings["Port"] = ""
 
     def update_driver(self):
         if not "driver" in self.settings or not self.settings["driver"]:
@@ -31,7 +31,14 @@ class subclass(device_class.Device):
         driver_path = self.settings["driver"]
         driver_name = os.path.basename(driver_path)
         class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
-        self.ophyd_class = make_SweepMe_ophyd_class(driver_path, class_name)
+        # if "Port" in self.settings:
+        #     settings_config = self.config
+        #     settings_config.update({"Port": self.settings["Port"]})
+        # else:
+        settings_config = self.config
+        self.ophyd_class = make_SweepMe_ophyd_class(
+            driver_path, class_name, replace_underscores_in_keys(settings_config)
+        )
         self.ophyd_instance = self.ophyd_class(driver=driver_path, name="test")
         config, passive_config = get_configs_from_ophyd(self.ophyd_instance)
         for key, value in config.items():
@@ -77,7 +84,7 @@ class subclass_config(device_class.Device_Config):
         if self.sub_widget:
             config = self.sub_widget.get_config()
         if "Port" in config:
-            settings["port"] = config["Port"]
+            settings["Port"] = config["Port"]
         return settings
 
     def get_config(self):
@@ -149,3 +156,11 @@ def get_configs_from_ophyd(ophyd_instance):
             else:
                 passive_config.update({f"{name}": 0})
     return config, passive_config
+
+
+def replace_underscores_in_keys(original_dict):
+    modified_dict = {}
+    for key, value in original_dict.items():
+        modified_key = key.replace("_", " ")
+        modified_dict[modified_key] = value
+    return modified_dict

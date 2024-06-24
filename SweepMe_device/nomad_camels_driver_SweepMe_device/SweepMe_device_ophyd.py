@@ -84,10 +84,13 @@ def make_SweepMe_ophyd_instance(
     )
 
 
-def make_SweepMe_ophyd_class(driver_path, class_name):
+def make_SweepMe_ophyd_class(driver_path, class_name, GUI_config=None):
     """Creates an ophyd class for the given driver. The driver's GUI parameters are used to create the configuration signals, the sweep modes are used to create the set channels and the variables are used to create the readback signals. The class is created with the given class name."""
     driver = get_driver(driver_path)
     configs = driver.set_GUIparameter()
+    if GUI_config:
+        new_config = {key: GUI_config.get(key, None) for key in configs.keys()}
+        driver.get_GUIparameter(new_config)
     # create the signals for the driver's parameters
     config_signals = {}
     for config in configs.keys():
