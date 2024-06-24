@@ -31,13 +31,8 @@ class subclass(device_class.Device):
         driver_path = self.settings["driver"]
         driver_name = os.path.basename(driver_path)
         class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
-        # if "Port" in self.settings:
-        #     settings_config = self.config
-        #     settings_config.update({"Port": self.settings["Port"]})
-        # else:
-        settings_config = self.config
         self.ophyd_class = make_SweepMe_ophyd_class(
-            driver_path, class_name, replace_underscores_in_keys(settings_config)
+            driver_path, class_name, replace_underscores_in_keys(self.config)
         )
         self.ophyd_instance = self.ophyd_class(driver=driver_path, name="test")
         config, passive_config = get_configs_from_ophyd(self.ophyd_instance)
