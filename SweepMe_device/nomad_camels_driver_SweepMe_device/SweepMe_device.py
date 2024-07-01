@@ -23,7 +23,7 @@ class subclass(device_class.Device):
             **kwargs,
         )
         self.settings["driver"] = ""
-        self.settings["Port"] = ""
+        self.settings["port"] = ""
 
     def update_driver(self):
         if not "driver" in self.settings or not self.settings["driver"]:
@@ -65,6 +65,9 @@ class subclass_config(device_class.Device_Config):
         self.driver_selection = Path_Button_Edit(select_directory=True)
         if "driver" in self.settings_dict:
             self.driver_selection.set_path(self.settings_dict["driver"])
+        if "port" in self.settings_dict:
+            self.save_port = self.settings_dict["port"]
+
         self.layout().addWidget(label_driver, 20, 0)
         self.layout().addWidget(self.driver_selection, 20, 1, 1, 4)
         self.sub_widget = None
@@ -78,16 +81,16 @@ class subclass_config(device_class.Device_Config):
         config = {}
         if self.sub_widget:
             config = self.sub_widget.get_config()
-        if "Port" in config:
-            settings["Port"] = config["Port"]
+        if "port" in config:
+            settings["port"] = config["port"]
         return settings
 
     def get_config(self):
         config = super().get_config()
         if self.sub_widget:
             config.update(self.sub_widget.get_config())
-        if "Port" in config:
-            config.pop("Port")
+        if "port" in config:
+            self.save_port = config.pop("port")
         return config
 
     def driver_changed(self):
@@ -98,17 +101,17 @@ class subclass_config(device_class.Device_Config):
             return
         comboboxes = {}
         labels = {}
-        if not driver.port_manager and "Port" in self.config_dict:
-            self.config_dict.pop("Port")
-        elif driver.port_manager and "Port" not in self.config_dict:
-            self.config_dict.update({"Port": ""})
+        if not driver.port_manager and "port" in self.config_dict:
+            self.config_dict.pop("port")
+        elif driver.port_manager and "port" not in self.config_dict:
+            self.config_dict.update({"port": ""})
         if driver.port_manager:
             ports = get_ports(driver)
-            comboboxes.update({"Port": ports})
+            comboboxes.update({"port": ports})
         parameters = driver.set_GUIparameter()
         removers = []
         for key in self.config_dict:
-            if key not in list(parameters.keys()) + ["Port"]:
+            if key not in list(parameters.keys()) + ["port"]:
                 removers.append(key)
         for key in removers:
             self.config_dict.pop(key)
@@ -136,6 +139,8 @@ class subclass_config(device_class.Device_Config):
             comboBoxes=comboboxes,
             labels=labels,
         )
+        if self.save_port:
+            self.sub_widget.config_combos['port'].setCurrentText(self.save_port)
         self.layout().addWidget(self.sub_widget, 25, 0, 1, 5)
 
 

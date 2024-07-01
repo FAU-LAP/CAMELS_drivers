@@ -4,6 +4,8 @@ from ophyd import Component as Cpt
 from ophyd import Device, Signal, SignalRO
 import os
 import re
+import time
+
 
 port_manager = None
 
@@ -71,6 +73,7 @@ def make_SweepMe_ophyd_instance(
     class_name = make_valid_python_identifier(f"SweepMe_{driver_name}")
     ophyd_class = make_SweepMe_ophyd_class(driver, class_name)
     kwargs["driver"] = driver
+    port = kwargs.pop("Port", port)
     return ophyd_class(
         prefix,
         *args,
@@ -93,6 +96,19 @@ def make_SweepMe_ophyd_class(driver_path, class_name, GUI_config=None):
     # Executes get_GUIparameter with the new dictionary. This populates the self.variables of many instruments. Otherwise most channels are missing.
     if GUI_config:
         new_config = {key: GUI_config.get(key, None) for key in configs.keys()}
+        if not "Port" in new_config:
+            new_config["Port"] = ""
+        driver.get_GUIparameter(new_config)
+    else:
+        new_config = driver.set_GUIparameter()
+        # Add the Port key to the new_config dictionary
+        new_config["Port"] = ""
+        # If any value of new_config is a list, take the last element
+        # This is only called when creating the class at the beginning without the parameters from CAMELS
+        # We call get_GUIparameter with the new_config dictionary to populate the self.variables
+        for key, value in new_config.items():
+            if isinstance(value, list):
+                new_config[key] = value[-1]
         driver.get_GUIparameter(new_config)
 
     # create the signals for the driver's parameters
@@ -192,6 +208,7 @@ class SweepMe_Device(Device):
                 name=driver_name, folder=folder, port_string=port
             )
             # do SweeMe! initialization
+            time.sleep(0.1)
             self.driver.connect()
             self.driver.initialize()
             self.driver.poweron()
@@ -215,6 +232,9 @@ class SweepMe_Device(Device):
         self.driver.unconfigure()
         self.driver.deinitialize()
         self.driver.disconnect()
+        if self.driver.port_manager:
+            pysweepme.close_port(self.driver.get_port())
+
 
 
 class SweepMe_Signal(Signal):
