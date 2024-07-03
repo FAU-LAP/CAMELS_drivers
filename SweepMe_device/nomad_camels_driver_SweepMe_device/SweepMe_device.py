@@ -140,7 +140,7 @@ class subclass_config(device_class.Device_Config):
             labels=labels,
         )
         if self.save_port:
-            self.sub_widget.config_combos['port'].setCurrentText(self.save_port)
+            self.sub_widget.config_combos["port"].setCurrentText(self.save_port)
         self.layout().addWidget(self.sub_widget, 25, 0, 1, 5)
 
 

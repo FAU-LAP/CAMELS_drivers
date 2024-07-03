@@ -98,7 +98,13 @@ def make_SweepMe_ophyd_class(driver_path, class_name, GUI_config=None):
         new_config = {key: GUI_config.get(key, None) for key in configs.keys()}
         if not "Port" in new_config:
             new_config["Port"] = ""
-        driver.get_GUIparameter(new_config)
+        while True:
+            try:
+                driver.get_GUIparameter(new_config)
+                break  # If success, exit the loop
+            except KeyError as e:
+                error_key = str(e).strip("'")
+                new_config[error_key] = None
     else:
         new_config = driver.set_GUIparameter()
         # Add the Port key to the new_config dictionary
@@ -109,7 +115,14 @@ def make_SweepMe_ophyd_class(driver_path, class_name, GUI_config=None):
         for key, value in new_config.items():
             if isinstance(value, list):
                 new_config[key] = value[-1]
-        driver.get_GUIparameter(new_config)
+        while True:
+            try:
+                driver.get_GUIparameter(new_config)
+                break
+            except KeyError as e:
+                error_key = str(e).strip("'")
+                new_config[error_key] = None
+                driver.get_GUIparameter(new_config)
 
     # create the signals for the driver's parameters
     config_signals = {}
@@ -234,7 +247,6 @@ class SweepMe_Device(Device):
         self.driver.disconnect()
         if self.driver.port_manager:
             pysweepme.close_port(self.driver.get_port())
-
 
 
 class SweepMe_Signal(Signal):
