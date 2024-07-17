@@ -233,13 +233,15 @@ class Andor_Manual_Control(Manual_Control):
         self.start_job()
 
     def close(self) -> bool:
-        self.spectrometer_thread.still_running = False
-        self.spectrometer_thread.continuous = False
+        if self.spectrometer_thread:
+            self.spectrometer_thread.still_running = False
+            self.spectrometer_thread.continuous = False
         return super().close()
 
     def closeEvent(self, a0):
-        self.spectrometer_thread.still_running = False
-        self.spectrometer_thread.continuous = False
+        if self.spectrometer_thread:
+            self.spectrometer_thread.still_running = False
+            self.spectrometer_thread.continuous = False
         self.spectrum_plot.close()
         if self.image_plot is not None:
             import matplotlib.pyplot as plt

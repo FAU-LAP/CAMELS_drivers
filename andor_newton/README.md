@@ -7,3 +7,10 @@ It uses [pylablib](https://pylablib.readthedocs.io/en/latest/devices/Andor.html#
 ## Documentation
 
 For more information and documentation visit the [CAMELS documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+
+## Changelog
+
+### 0.1.2
+Fixed camera selection to actually always use the selected camera.

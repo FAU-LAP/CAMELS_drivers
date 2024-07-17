@@ -1,6 +1,7 @@
 from ophyd import Component as Cpt
 
 import pylablib as pll
+from pylablib.devices import Andor
 
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
@@ -14,6 +15,18 @@ read_modes = {
     "multi track": "multi_track",
     "random track": "random_track",
 }
+
+
+def get_cameras():
+    cam_list = []
+    for i in range(Andor.get_cameras_number_SDK2()):
+        cam = Andor.AndorSDK2Camera(idx=i)
+        info = cam.get_device_info()
+        cam_list.append(
+            f"{info.controller_model}, {info.head_model}, {info.serial_number}"
+        )
+        cam.close()
+    return cam_list
 
 
 class Andor_Newton(Sequential_Device):
@@ -60,7 +73,7 @@ class Andor_Newton(Sequential_Device):
         parent=None,
         dll_path="",
         camera=0,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(
             prefix=prefix,
@@ -70,14 +83,18 @@ class Andor_Newton(Sequential_Device):
             configuration_attrs=configuration_attrs,
             parent=parent,
             force_sequential=True,
-            **kwargs
+            **kwargs,
         )
         if name == "test":
             return
         pll.par["devices/dlls/andor_sdk2"] = dll_path
         from pylablib.devices import Andor
 
-        self.camera = Andor.AndorSDK2Camera(idx=camera)
+        if isinstance(camera, int):
+            self.camera = Andor.AndorSDK2Camera(idx=camera)
+        else:
+            index = get_cameras().index(camera)
+            self.camera = Andor.AndorSDK2Camera(idx=index)
 
         self.read_camera.read_function = self.read_camera_function
         self.get_temperature.read_function = self.get_temperature_function
