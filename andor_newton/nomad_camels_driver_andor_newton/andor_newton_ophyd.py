@@ -125,7 +125,7 @@ class Andor_Newton(Sequential_Device):
 
     def read_camera_function(self):
         time = self.exposure_time.get()
-        self.readout_mode.put(self.readout_mode.get())
+        self.readout_mode_function(self.readout_mode.get())
         dat = self.camera.snap(timeout=10 * time)
         if self.readout_mode.get() != "image":
             return dat[0]
