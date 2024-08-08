@@ -52,6 +52,7 @@ class DAQ_Signal_Output(Signal):
         attr_name="",
         line_name="",
         digital=False,
+        boolean=False,
         minV=-10,
         maxV=10,
         terminal_config="default",
@@ -77,15 +78,17 @@ class DAQ_Signal_Output(Signal):
             print("could not use an nidaqmx task!")
             self.task = None
         self.digital = digital
+        self.boolean = boolean
         self.terminal_config = terminal_config
         self.minV = minV
         self.maxV = maxV
+        self.actual_samples_per_channel = 0
         if line_name:
             self.setup_line(line_name)
         self.wait_time = wait_time
 
     def setup_line(
-        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None
+        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None, boolean=None
     ):
         if minV is not None:
             self.minV = minV
@@ -95,6 +98,8 @@ class DAQ_Signal_Output(Signal):
             self.terminal_config = terminal_config
         if digital is not None:
             self.digital = digital
+        if boolean is not None:
+            self.boolean = boolean
         if self.digital:
             if self.terminal_config != "default":
                 self.task.do_channels.add_do_chan(line_name)
@@ -106,12 +111,20 @@ class DAQ_Signal_Output(Signal):
             )
 
     def put(self, value, *, timestamp=None, force=False, metadata=None, **kwargs):
-        if self.digital and (type(value) is not bool):
+        if self.digital and self.boolean and (type(value) is not bool):
             if value > 0:
-                value = True
+                val = True
             else:
-                value = False
-        self.task.write(value)
+                val = False
+        elif self.digital:
+            val = int(value)
+        else:
+            val = value
+        try:
+            self.task.write(val)
+        except Exception as e:
+            print(f"Error writing to task: {e}")
+            raise e
         super().put(
             value, timestamp=timestamp, force=force, metadata=metadata, **kwargs
         )
@@ -137,6 +150,7 @@ class DAQ_Signal_Input(SignalRO):
         attr_name="",
         line_name="",
         digital=False,
+        boolean=False,
         minV=-10,
         maxV=10,
         terminal_config="default",
@@ -164,12 +178,13 @@ class DAQ_Signal_Input(SignalRO):
         self.digital = digital
         self.minV = minV
         self.maxV = maxV
+        self.actual_samples_per_channel = 0
         self.terminal_config = terminal_config
         if line_name:
             self.setup_line(line_name)
 
     def setup_line(
-        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None
+        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None, boolean=None
     ):
         if minV is not None:
             self.minV = minV
@@ -179,6 +194,8 @@ class DAQ_Signal_Input(SignalRO):
             self.terminal_config = terminal_config
         if digital is not None:
             self.digital = digital
+        if boolean is not None:
+            self.boolean = boolean
         if self.digital:
             self.task.di_channels.add_di_chan(line_name)
         else:
@@ -199,12 +216,16 @@ class DAQ_Signal_Input(SignalRO):
 
     def get(self):
         try:
-            n_samples = self.task.timing.samp_quant_samp_per_chan
+            if self.actual_samples_per_channel < 2:
+                n_samples = 1
+            else:
+                n_samples = self.task.timing.samp_quant_samp_per_chan
             if n_samples > 1:
                 self._readback = self.task.read(n_samples)
             else:
-                self._readback = self.task.read()
-        except:
+                self._readback = self.task.read(2)[1]
+        except Exception as e:
+            print(f"Error reading from task: {e}")
             self._readback = np.nan
         return super().get()
 

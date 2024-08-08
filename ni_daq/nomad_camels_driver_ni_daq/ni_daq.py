@@ -26,6 +26,8 @@ class subclass(device_class.Device):
             ophyd_class_name="Custom_DAQ_Device",
             **kwargs,
         )
+        self.config['samples_per_channel'] = '1'
+        self.config['sample_rate'] = '50'
 
     def get_settings(self):
         return {"component_setups": self.settings}
@@ -69,11 +71,15 @@ class subclass_config(device_class.Device_Config):
         self.layout().addWidget(label_samples, 10, 0, 1, 2)
         self.lineedit_samples = QLineEdit()
         self.layout().addWidget(self.lineedit_samples, 10, 2, 1, 3)
+        if "samples_per_channel" in config_dict:
+            self.lineedit_samples.setText(str(config_dict["samples_per_channel"]))
 
         label_rate = QLabel("Sample rate (Hz)")
         self.layout().addWidget(label_rate, 11, 0, 1, 2)
         self.lineedit_rate = QLineEdit()
         self.layout().addWidget(self.lineedit_rate, 11, 2, 1, 3)
+        if "sample_rate" in config_dict:
+            self.lineedit_rate.setText(str(config_dict["sample_rate"]))
 
         label = QLabel("Component setups")
         self.layout().addWidget(label, 19, 0, 1, 5)
@@ -94,8 +100,8 @@ class subclass_config(device_class.Device_Config):
 
     def get_config(self):
         config = super().get_config()
-        config["samples_per_channel"] = self.lineedit_samples.text()
-        config["sample_rate"] = self.lineedit_rate.text()
+        config["samples_per_channel"] = int(float(self.lineedit_samples.text()))
+        config["sample_rate"] = int(float(self.lineedit_rate.text()))
         return config
 
 
@@ -112,6 +118,7 @@ class Channel_Widget(QWidget):
         self.comboboxes = []
         self.checkboxes_use = []
         self.checkboxes_digital = []
+        self.checkboxes_bool = []
         self.lineedits_name = []
         self.lineedits_minv = []
         self.lineedits_maxv = []
@@ -129,6 +136,8 @@ class Channel_Widget(QWidget):
             self.checkboxes_use.append(usebox)
             digbox = QCheckBox("is digital")
             digbox.clicked.connect(self.change_use)
+            bool_box = QCheckBox("is boolean")
+            self.checkboxes_bool.append(bool_box)
             self.checkboxes_digital.append(digbox)
             maxline = QLineEdit()
             self.lineedits_maxv.append(maxline)
@@ -144,7 +153,7 @@ class Channel_Widget(QWidget):
             self.labels_name.append(label_name)
 
             shifter = 3 if i > 4 else 0
-            shifter_down = 6 * ((i - 1) % 4)
+            shifter_down = 7 * ((i - 1) % 4)
             self.layout().addWidget(usebox, shifter_down, shifter)
             self.layout().addWidget(digbox, shifter_down, 1 + shifter)
             self.layout().addWidget(label_name, 1 + shifter_down, shifter)
@@ -153,6 +162,7 @@ class Channel_Widget(QWidget):
             self.layout().addWidget(minline, 2 + shifter_down, 1 + shifter)
             self.layout().addWidget(label_maxv, 3 + shifter_down, shifter)
             self.layout().addWidget(maxline, 3 + shifter_down, 1 + shifter)
+            self.layout().addWidget(bool_box, 4 + shifter_down, shifter)
             if is_input:
                 combobox = QComboBox()
                 combobox.addItems(terminal_configs)
@@ -199,9 +209,11 @@ class Channel_Widget(QWidget):
             self.labels_maxv[i].setHidden(not use or digi)
             self.labels_minv[i].setHidden(not use or digi)
             self.labels_name[i].setHidden(not use)
+            self.checkboxes_bool[i].setHidden(not use or not digi)
             if self.is_input:
                 self.comboboxes[i].setHidden(not use or digi)
                 self.labels_combobox[i].setHidden(not use or digi)
+        self.adjustSize()
 
     def get_settings(self):
         settings = {}
@@ -210,6 +222,7 @@ class Channel_Widget(QWidget):
                 continue
             sets = {}
             sets["digital"] = self.checkboxes_digital[i].isChecked()
+            sets['boolean'] = self.checkboxes_bool[i].isChecked()
             sets["line_name"] = self.lineedits_name[i].text()
             text = self.lineedits_minv[i].text()
             sets["minV"] = float(text) if text else 0
