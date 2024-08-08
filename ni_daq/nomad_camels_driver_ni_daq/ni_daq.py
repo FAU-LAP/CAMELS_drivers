@@ -65,6 +65,20 @@ class subclass_config(device_class.Device_Config):
         self.layout().removeWidget(self.label_connection)
         self.label_connection.deleteLater()
 
+        label_samples = QLabel("Samples per channel")
+        self.layout().addWidget(label_samples, 10, 0, 1, 2)
+        self.lineedit_samples = QLineEdit()
+        self.layout().addWidget(self.lineedit_samples, 10, 2, 1, 3)
+
+        label_rate = QLabel("Sample rate (Hz)")
+        self.layout().addWidget(label_rate, 11, 0, 1, 2)
+        self.lineedit_rate = QLineEdit()
+        self.layout().addWidget(self.lineedit_rate, 11, 2, 1, 3)
+
+        label = QLabel("Component setups")
+        self.layout().addWidget(label, 19, 0, 1, 5)
+        label.setStyleSheet("font-weight: bold; font-size: 12pt")
+
         self.tabwidge = QTabWidget()
         self.input_widge = Channel_Widget(settings=settings_dict)
         self.output_widge = Channel_Widget(is_input=False, settings=settings_dict)
@@ -77,6 +91,12 @@ class subclass_config(device_class.Device_Config):
         sets = self.input_widge.get_settings()
         sets.update(self.output_widge.get_settings())
         return sets
+
+    def get_config(self):
+        config = super().get_config()
+        config["samples_per_channel"] = self.lineedit_samples.text()
+        config["sample_rate"] = self.lineedit_rate.text()
+        return config
 
 
 class Channel_Widget(QWidget):
