@@ -93,6 +93,8 @@ class Agilent_33220A(Device):
             self.visa_instrument.shape = value.upper()
         elif value in user_vals:
             self.visa_instrument.write(f"FUNC:USER {user_vals[value]};:FUNC:SHAP USER;")
+        elif value in user_vals.values():
+            self.visa_instrument.write(f"FUNC:USER {value};:FUNC:SHAP USER;")
         elif value == "triangle":
             self.visa_instrument.write("FUNC:SHAP TRI;")
 
