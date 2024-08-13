@@ -69,6 +69,7 @@ class Agilent_6000_Manual_Control(Manual_Control):
         self.osci_thread = None
         self.adjustSize()
         self.start_device(control_data["device"])
+        self.last_path = ""
 
     def device_ready(self):
         super().device_ready()
@@ -192,10 +193,11 @@ class Agilent_6000_Manual_Control(Manual_Control):
         if self.image is None:
             return
         file_name, _ = QFileDialog.getSaveFileName(
-            self, "Save image", "", "Images (*.png *.bmp)"
+            self, "Save image", self.last_path, "Images (*.png *.bmp)"
         )
         if file_name:
             plt.imsave(file_name, self.image)
+            self.last_path = file_name
 
     def save_data(self):
         if self.data is None:

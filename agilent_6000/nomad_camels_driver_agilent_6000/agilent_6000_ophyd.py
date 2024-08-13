@@ -280,6 +280,7 @@ class Agilent_6000(VISA_Device):
     )
     waveform_meas_source_2 = Cpt(
         Custom_Function_Signal,
+        value=None,
         name="waveform_meas_source_2",
         kind="config",
         metadata={
