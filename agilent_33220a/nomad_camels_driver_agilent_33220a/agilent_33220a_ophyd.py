@@ -26,6 +26,18 @@ class Agilent_33220A(Device):
         Custom_Function_Signal, value="50", name="output_impedance", kind="config"
     )
 
+    arb_wave_frequencies = Cpt(Custom_Function_Signal, name="arb_wave_frequencies", kind="config", metadata={"description": "Comma seperated list of frequencies for each wave-part in the arbitrary waveform."})
+    arb_wave_amplitudes = Cpt(Custom_Function_Signal, name="arb_wave_amplitudes", kind="config", metadata={"description": "Comma seperated list of amplitudes for each wave-part in the arbitrary waveform."})
+    arb_wave_phases = Cpt(Custom_Function_Signal, 
+    name="arb_wave_phases", kind="config", metadata={"description": "Comma seperated list of phases for each wave-part in the arbitrary waveform."})
+    arb_wave_shapes = Cpt(Custom_Function_Signal, name="arb_wave_shapes", kind="config", metadata={"description": "Comma seperated list of shapes for each wave-part in the arbitrary waveform. Possible are \"sine\" and \"triangle\"."})
+    arb_wave_sampling_rate = Cpt(Custom_Function_Signal, name="arb_wave_sampling_rate", kind="config")
+    arb_wave_num_samples = Cpt(Custom_Function_Signal, name="arb_wave_num_samples", kind="config")
+    arb_wave_signal_frequency = Cpt(Custom_Function_Signal, name="arb_wave_signal_frequency", kind="config")
+    arb_wave_signal_gain = Cpt(Custom_Function_Signal, name="arb_wave_signal_gain", kind="config")
+    arb_wave_signal_offset = Cpt(Custom_Function_Signal, name="arb_wave_signal_offset", kind="config")
+    arb_wave_signal_noise_level = Cpt(Custom_Function_Signal, name="arb_wave_signal_noise_level", kind="config")
+
     def __init__(
         self,
         prefix="",
@@ -97,6 +109,29 @@ class Agilent_33220A(Device):
             self.visa_instrument.write(f"FUNC:USER {value};:FUNC:SHAP USER;")
         elif value == "triangle":
             self.visa_instrument.write("FUNC:SHAP TRI;")
+        elif value.upper() == 'ARB' or value.upper() == 'ARBITRARY':
+            frequs = [float(f) for f in self.arb_wave_frequencies.get().split(",")]
+            amps = [float(a) for a in self.arb_wave_amplitudes.get().split(",")]
+            phases = [float(p) for p in self.arb_wave_phases.get().split(",")]
+            shapes = self.arb_wave_shapes.get().split(",")
+            sampling_rate = int(self.arb_wave_sampling_rate.get())
+            num_samples = int(self.arb_wave_num_samples.get())
+            signal_freq = float(self.arb_wave_signal_frequency.get())
+            signal_gain = float(self.arb_wave_signal_gain.get())
+            signal_offset = float(self.arb_wave_signal_offset.get())
+            signal_noise_level = float(self.arb_wave_signal_noise_level.get())
+            wv = generate_waveform(
+                [
+                    {"frequency": frequs[i], "amplitude": amps[i], "phase": phases[i]}
+                    for i in range(len(frequs))
+                ],
+                noise_level=signal_noise_level,
+                offset=signal_offset,
+                sampling_rate=sampling_rate,
+                num_samples=num_samples,
+            )
+            self.configure_arbitrary_waveform(wv)
+            self.set_arbitrary_waveform(frequency=signal_freq, gain=signal_gain)
 
     def set_amplitude_unit(self, value):
         self.visa_instrument.amplitude_unit = value.upper()
@@ -135,6 +170,7 @@ class Agilent_33220A(Device):
 
 def generate_waveform(
     tone_params,
+    shapes=None,
     noise_level=0.0,
     offset=0.0,
     sampling_rate=1000,
@@ -163,6 +199,11 @@ def generate_waveform(
         np.random.seed(seed)
     noise = np.random.normal(scale=noise_level, size=num_samples)
 
+    if not shapes:
+        shapes = ["sine"] * len(tone_params)
+    elif len(shapes) <= len(tone_params):
+        shapes += ["sine"] * (len(tone_params) - len(shapes))
+
     # Generate the waveform by summing sine tones
     if tone_params:
         waveform = np.sum(
@@ -171,7 +212,16 @@ def generate_waveform(
                 * np.sin(
                     2 * np.pi * params["frequency"] * t + np.deg2rad(params["phase"])
                 )
-                for params in tone_params
+                if shapes[i] == "sine"
+                else params["amplitude"]
+                * np.abs(
+                    2
+                    * (params["frequency"] * t + np.deg2rad(params["phase"]))
+                    % (2 * np.pi)
+                    - np.pi
+                )
+                - np.pi
+                for i, params in enumerate(tone_params)
             ],
             axis=0,
         )
