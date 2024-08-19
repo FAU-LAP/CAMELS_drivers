@@ -87,11 +87,13 @@ class Agilent_6000_Manual_Control(Manual_Control):
         raise exception
 
     def close(self):
-        self.osci_thread.still_running = False
+        if self.osci_thread:
+            self.osci_thread.still_running = False
         return super().close()
 
     def closeEvent(self, a0):
-        self.osci_thread.still_running = False
+        if self.osci_thread:
+            self.osci_thread.still_running = False
         if self.shown_image is not None:
             plt.close(self.shown_image)
         if self.analog_plot is not None:
