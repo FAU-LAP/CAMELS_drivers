@@ -185,10 +185,10 @@ class subclass_config(device_class.Simple_Config):
         settings["ip_address"] = self.widget_ip_address.text()
         settings["port"] = int(self.widget_port.text())
         try:
-            if settings["connection_type"] == "USB":
+            if settings["connection_type"] == "USB" and settings["com_port"]:
                 atc = Attocube.ANC300(f"COM{settings['com_port']}")
                 self.settings_dict["available_axis_numbers"] = atc.get_all_axes()
-            elif settings["connection_type"] == "Ethernet":
+            elif settings["connection_type"] == "Ethernet" and settings["ip_address"] and settings["port"]:
                 atc = Attocube.ANC300(
                     (self.settings_dict["ip_address"], int(self.settings_dict["port"]))
                 )
