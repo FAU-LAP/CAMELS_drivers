@@ -118,11 +118,11 @@ class subclass_config(device_class.Simple_Config):
 
     def get_iBeam_channels(self):
         self.setCursor(Qt.WaitCursor)
-        com_port = re.match(
-            "ASRL(\d+)", self.connector.comboBox_port.currentText()
-        ).group(1)
-        self.settings_dict["Com_port"] = com_port
         try:
+            com_port = re.match(
+                "ASRL(\d+)", self.connector.comboBox_port.currentText()
+            ).group(1)
+            self.settings_dict["Com_port"] = com_port
             laser = Toptica.TopticaIBeam(
                 (f"COM{com_port}", self.connector.lineEdit_baud.text())
             )
