@@ -33,7 +33,7 @@ class Andor_Shamrock_500(Sequential_Device):
         Custom_Function_Signal, name="output_slit_size", kind="config"
     )
     horizontal_cam_flip = Cpt(
-        Custom_Function_Signal, name="horizontal_cam_flip", kind="config"
+        Custom_Function_Signal, value=False, name="horizontal_cam_flip", kind="config"
     )
 
     def __init__(

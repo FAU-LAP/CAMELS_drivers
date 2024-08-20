@@ -11,5 +11,8 @@ For more information and documentation visit the [CAMELS documentation](https://
 
 ## Changelog
 
+### 0.1.3
+Small bugfix for UI on first start
+
 ### 0.1.2
 Fixed closing the manual control on error so it can be restarted without restarting CAMELS.
