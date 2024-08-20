@@ -20,6 +20,7 @@ except_drivers = [
     "rhode_and_schwarz_smp_02",
     "zaber_rst240b_e08",
     "lakeshore_f41",
+    "attocube_anc300",
 ]
 
 if os.name != "nt":
