@@ -23,12 +23,13 @@ except_drivers = [
     "attocube_anc300",
 ]
 
+# drivers that run only on windows
 if os.name != "nt":
-    # drivers that run only on windows
     except_drivers += ["mechonics_cu30cl"]
-else:
-    # drivers that don't run on windows
-    except_drivers += []
+
+# drivers that do not run on mac
+if sys.platform == "darwin":
+    except_drivers += ["SweepMe_device"]
 
 try:
     with open("../driver_list.txt") as f:
