@@ -8,3 +8,10 @@ This driver provides voltage and current setting / reading for the available cha
 ## Documentation
 
 For more information and documentation visit the NOMAD-CAMELS [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+## Changelog
+
+### 0.1.2
+Fixes:
+- UI improvement for first use
