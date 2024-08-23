@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_eurotherm_bisynch"
+version = "0.1.0"
+authors = [
+    { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
+]
+description = "Device driver for the Agilent 34401A digital multimeter."
+readme = "README.md"
+requires-python = ">=3.9.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+
+]
+dependencies = [
+    "pyvisa",
+    "pyvisa-py"
+]
+[project.urls]
+"GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
+"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"
