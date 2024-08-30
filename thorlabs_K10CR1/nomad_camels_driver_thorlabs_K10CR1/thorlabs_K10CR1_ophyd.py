@@ -8,11 +8,17 @@ from pylablib.devices.Thorlabs import KinesisMotor
 
 
 class Thorlabs_K10CR1(Device):
-    get_position = Cpt(Custom_Function_SignalRO, name="get_position")
-    set_position = Cpt(Custom_Function_Signal, name="set_relative_position")
+    get_position = Cpt(Custom_Function_SignalRO, name="get_position", retry_on_error=2)
+    set_position = Cpt(
+        Custom_Function_Signal, name="set_relative_position", retry_on_error=2
+    )
 
-    acceleration = Cpt(Custom_Function_Signal, name="acceleration", kind="config")
-    max_velocity = Cpt(Custom_Function_Signal, name="max_velocity", kind="config")
+    acceleration = Cpt(
+        Custom_Function_Signal, name="acceleration", kind="config", retry_on_error=2
+    )
+    max_velocity = Cpt(
+        Custom_Function_Signal, name="max_velocity", kind="config", retry_on_error=2
+    )
 
     def __init__(
         self,
@@ -44,6 +50,7 @@ class Thorlabs_K10CR1(Device):
             self.stage.home()
         self.set_position.put_function = self.set_pos
         self.get_position.read_function = self.read_pos
+        self.force_sequential = True
         self.acceleration.put_function = lambda x: self.stage.setup_velocity(
             acceleration=x
         )
