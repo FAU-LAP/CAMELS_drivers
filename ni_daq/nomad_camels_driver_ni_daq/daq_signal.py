@@ -88,7 +88,13 @@ class DAQ_Signal_Output(Signal):
         self.wait_time = wait_time
 
     def setup_line(
-        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None, boolean=None
+        self,
+        line_name,
+        digital=None,
+        terminal_config=None,
+        minV=None,
+        maxV=None,
+        boolean=None,
     ):
         if minV is not None:
             self.minV = minV
@@ -184,7 +190,13 @@ class DAQ_Signal_Input(SignalRO):
             self.setup_line(line_name)
 
     def setup_line(
-        self, line_name, digital=None, terminal_config=None, minV=None, maxV=None, boolean=None
+        self,
+        line_name,
+        digital=None,
+        terminal_config=None,
+        minV=None,
+        maxV=None,
+        boolean=None,
     ):
         if minV is not None:
             self.minV = minV
