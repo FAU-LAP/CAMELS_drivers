@@ -3,7 +3,7 @@ from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
 from nomad_camels.ui_widgets.path_button_edit import Path_Button_Edit
 from nomad_camels.ui_widgets.warn_popup import WarnPopup
 from .andor_newton_config import Ui_andor_newton_config
-from .andor_newton_ophyd import Andor_Newton
+from .andor_newton_ophyd import Andor_Newton, get_cameras
 from PySide6.QtWidgets import QComboBox, QLabel
 from PySide6.QtCore import Qt, Signal
 
@@ -62,7 +62,10 @@ class subclass_config(device_class.Device_Config):
         self.comboBox_camera = QComboBox()
         self.update_dll()
         if "camera" in self.settings_dict:
-            self.comboBox_camera.setCurrentIndex(self.settings_dict["camera"])
+            if isinstance(self.settings_dict["camera"], int):
+                self.comboBox_camera.setCurrentIndex(self.settings_dict["camera"])
+            else:
+                self.comboBox_camera.setCurrentText(self.settings_dict["camera"])
         self.layout().addWidget(
             QLabel("Path to dll (atmcd64d_legacy.dll or atmcd64d.dll)"), 17, 0, 1, 5
         )
@@ -88,13 +91,7 @@ class subclass_config(device_class.Device_Config):
             from pylablib.devices import Andor
 
             try:
-                for i in range(Andor.get_cameras_number_SDK2()):
-                    cam = Andor.AndorSDK2Camera(idx=i)
-                    info = cam.get_device_info()
-                    cam_list.append(
-                        f"{info.controller_model}, {info.head_model}, {info.serial_number}"
-                    )
-                    cam.close()
+                cam_list = get_cameras()
             except Exception as e:
                 WarnPopup(self, f"Dll could not be loaded\n{e}", "dll not loaded")
         self.comboBox_camera.clear()
@@ -110,7 +107,7 @@ class subclass_config(device_class.Device_Config):
 
     def get_settings(self):
         self.settings_dict["dll_path"] = self.dll_path.get_path()
-        self.settings_dict["camera"] = self.comboBox_camera.currentIndex()
+        self.settings_dict["camera"] = self.comboBox_camera.currentText()
         return super().get_settings()
 
 

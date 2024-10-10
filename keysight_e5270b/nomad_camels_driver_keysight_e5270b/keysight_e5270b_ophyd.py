@@ -58,6 +58,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter1 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter1",
         kind="config",
     )
@@ -104,6 +105,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter2 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter2",
         kind="config",
     )
@@ -150,6 +152,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter3 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter3",
         kind="config",
     )
@@ -196,6 +199,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter4 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter4",
         kind="config",
     )
@@ -242,6 +246,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter5 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter5",
         kind="config",
     )
@@ -288,6 +293,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter6 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter6",
         kind="config",
     )
@@ -334,6 +340,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter7 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter7",
         kind="config",
     )
@@ -380,6 +387,7 @@ class Keysight_E5270B(VISA_Device):
     # sets filter mode: 0 for disconnect, 1 for connect of the filter
     outputFilter8 = Cpt(
         VISA_Signal,
+        value=False,
         name="outputFilter8",
         kind="config",
     )

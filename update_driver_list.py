@@ -1,33 +1,24 @@
 import os.path
 import pathlib
 import toml as tomllib
-import subprocess
 import sys
 
+import requests
 
-def get_latest_version(instr):
-    latest_version = str(
-        subprocess.run(
-            [
-                sys.executable,
-                "-m",
-                "pip",
-                "install",
-                f'nomad-camels-driver-{instr.replace("_", "-")}==random',
-            ],
-            capture_output=True,
-            text=True,
-        )
-    )
-    latest_version = latest_version[latest_version.find("(from versions:") + 15 :]
-    latest_version = latest_version[: latest_version.find(")")]
-    return latest_version.replace(" ", "").split(",")[-1]
+
+def get_latest_version(package_name):
+    name = f'nomad-camels-driver-{package_name.replace("_", "-")}'
+    response = requests.get(f"https://pypi.org/pypi/{name}/json")
+    if response.status_code != 200:
+        return "None"
+    return response.json()["info"]["version"]
+
 
 
 driver_list = []
 
 for f in pathlib.Path(os.path.dirname(__file__)).rglob("pyproject.toml"):
-    if ".desertenv" in str(f):
+    if ".desertenv" in str(f) or ".venv" in str(f):
         continue
     toml = tomllib.load(f)
     if "project" in toml:

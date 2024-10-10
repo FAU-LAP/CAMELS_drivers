@@ -184,14 +184,17 @@ class subclass_config(device_class.Simple_Config):
 
         settings["ip_address"] = self.widget_ip_address.text()
         settings["port"] = int(self.widget_port.text())
-        if settings["connection_type"] == "USB":
-            atc = Attocube.ANC300(f"COM{settings['com_port']}")
-            self.settings_dict["available_axis_numbers"] = atc.get_all_axes()
-        elif settings["connection_type"] == "Ethernet":
-            atc = Attocube.ANC300(
-                (self.settings_dict["ip_address"], int(self.settings_dict["port"]))
-            )
-            self.settings_dict["available_axis_numbers"] = atc.get_all_axes()
+        try:
+            if settings["connection_type"] == "USB" and settings["com_port"]:
+                atc = Attocube.ANC300(f"COM{settings['com_port']}")
+                self.settings_dict["available_axis_numbers"] = atc.get_all_axes()
+            elif settings["connection_type"] == "Ethernet" and settings["ip_address"] and settings["port"]:
+                atc = Attocube.ANC300(
+                    (self.settings_dict["ip_address"], int(self.settings_dict["port"]))
+                )
+                self.settings_dict["available_axis_numbers"] = atc.get_all_axes()
+        except:
+            raise Warning("Could not connect to the attocube ANC300, please check Port and connection.")
 
         return settings
 

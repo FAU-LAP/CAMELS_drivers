@@ -280,6 +280,7 @@ class Agilent_6000(VISA_Device):
     )
     waveform_meas_source_2 = Cpt(
         Custom_Function_Signal,
+        value=None,
         name="waveform_meas_source_2",
         kind="config",
         metadata={
@@ -786,6 +787,8 @@ class Agilent_6000(VISA_Device):
     def stop_continuous_acquisition(self):
         self.visa_instrument.write(":STOP;")
 
+    def finalize_steps(self):
+        self.enable_front_panel()
 
 def int_to_bools(n, lsb_first=True):
     binary = bin(n)[2:]
