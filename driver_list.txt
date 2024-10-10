@@ -1,3 +1,4 @@
+ADALM1000 = 0.1.0
 agilent_34401a==0.1.1
 andor_newton==0.1.0
 andor_shamrock_500==0.1.0
