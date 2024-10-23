@@ -8,7 +8,7 @@ The driver supports readout from 8 channels (only tested for single-ended voltag
 
 ## Important details
 
-X-418 must be set up according to the user manual before connecting to it via CAMELS. Check that X-418 can be accessed via browser (http://<ip-address>/setup.html#) before running the driver.
+X-418 must be set up according to the user manual before connecting to it via CAMELS. Check that X-418 can be accessed via browser (http://'ip-address'/setup.html#) before running the driver.
 
 If you only plan to read the values from X-418 and do not need to change range or resolution, "user" account of X-418 is sufficient and password does not have to be entered every time the protocol utilising X-418 is run. In this case uncheck "Use admin credentials (necessary for changing settings of X418)" field in "Configure Instruments". All changes to range and resolution will be ignored, including the values in "Configure Instruments" dialog, and X-418 will continue using the previously set parameters.
 
