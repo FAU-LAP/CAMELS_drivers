@@ -64,6 +64,8 @@ class Agilent_33220A(Device):
             self.offset.put_function = self.set_offset
             self.output.put_function = self.set_output
             self.waveform.put_function = self.set_waveform
+        self.force_sequential = True
+        self.currently_reading = False
 
     def error_query(self):
         self.visa_instrument.write(":SYST:ERR?")
@@ -110,10 +112,18 @@ class Agilent_33220A(Device):
         elif value == "triangle":
             self.visa_instrument.write("FUNC:SHAP TRI;")
         elif value.upper() == 'ARB' or value.upper() == 'ARBITRARY':
-            frequs = [float(f) for f in self.arb_wave_frequencies.get().split(",")]
-            amps = [float(a) for a in self.arb_wave_amplitudes.get().split(",")]
-            phases = [float(p) for p in self.arb_wave_phases.get().split(",")]
-            shapes = self.arb_wave_shapes.get().split(",")
+            frequs = self.arb_wave_frequencies.get()
+            if isinstance(frequs, str):
+                frequs = [float(f) for f in self.arb_wave_frequencies.get().split(",")]
+            amps = self.arb_wave_amplitudes.get()
+            if isinstance(amps, str):
+                amps = [float(a) for a in self.arb_wave_amplitudes.get().split(",")]
+            phases = self.arb_wave_phases.get()
+            if isinstance(phases, str):
+                phases = [float(p) for p in self.arb_wave_phases.get().split(",")]
+            shapes = self.arb_wave_shapes.get()
+            if isinstance(shapes, str):
+                shapes = self.arb_wave_shapes.get().split(",")
             sampling_rate = int(self.arb_wave_sampling_rate.get())
             num_samples = int(self.arb_wave_num_samples.get())
             signal_freq = float(self.arb_wave_signal_frequency.get())
@@ -125,6 +135,7 @@ class Agilent_33220A(Device):
                     {"frequency": frequs[i], "amplitude": amps[i], "phase": phases[i]}
                     for i in range(len(frequs))
                 ],
+                shapes=shapes,
                 noise_level=signal_noise_level,
                 offset=signal_offset,
                 sampling_rate=sampling_rate,
@@ -243,14 +254,15 @@ if __name__ == "__main__":
     res = rm.list_resources()
     print(res)
     fg = Agilent_33220A(name="fg", resource_name=res[0])
+    fg.output.put(False)
     wv = generate_waveform(
         [
             {"frequency": 100, "amplitude": 1, "phase": 0},
             {"frequency": 50, "amplitude": 1, "phase": 0},
         ],
-        sampling_rate=200000,
-        num_samples=20000,
+        sampling_rate=2000,
+        num_samples=200,
     )
     fg.configure_arbitrary_waveform(wv)
     fg.set_arbitrary_waveform(frequency=10, gain=0.1)
-    fg.output.put(1)
+    fg.output.put(True)
