@@ -7,6 +7,8 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
 
 from snAPI.Main import snAPI, LogLevel, MeasMode
 
+import numpy as np
+
 
 class Picoquant_TRPL(Device):
     histogram_data = Cpt(Custom_Function_SignalRO, name="histogram_data")
