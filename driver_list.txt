@@ -1,4 +1,4 @@
-ADALM1000 = 0.1.0
+ADALM1000==0.1.0
 agilent_34401a==0.1.1
 agilent_81101a_puls_generator==0.1.0
 andor_newton==0.1.2
