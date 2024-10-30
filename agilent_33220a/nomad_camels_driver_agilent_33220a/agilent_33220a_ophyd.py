@@ -76,6 +76,12 @@ class Agilent_33220A(Device):
     arb_wave_signal_noise_level = Cpt(
         Custom_Function_Signal, name="arb_wave_signal_noise_level", kind="config"
     )
+    user_arb_waveforms = Cpt(
+        Custom_Function_SignalRO, name="user_arb_waveforms", kind="config"
+    )
+    set_waveform_as_name = Cpt(
+        Custom_Function_Signal, name="set_waveform_as_name", kind="config"
+    )
 
     def __init__(
         self,
@@ -103,6 +109,10 @@ class Agilent_33220A(Device):
             self.offset.put_function = self.set_offset
             self.output.put_function = self.set_output
             self.waveform.put_function = self.set_waveform
+            self.amplitude_unit.put_function = self.set_amplitude_unit
+            self.output_impedance.put_function = self.set_output_impedance
+            self.error.read_function = self.error_query
+            self.user_arb_waveforms.read_function = self.get_user_arb_waveforms
         self.force_sequential = True
         self.currently_reading = False
 
@@ -150,38 +160,53 @@ class Agilent_33220A(Device):
             self.visa_instrument.write(f"FUNC:USER {value};:FUNC:SHAP USER;")
         elif value == "triangle":
             self.visa_instrument.write("FUNC:SHAP TRI;")
+        elif value.upper() in self.user_arb_waveforms.get():
+            self.set_arbitrary_waveform(name=value.upper())
         elif value.upper() == "ARB" or value.upper() == "ARBITRARY":
-            frequs = self.arb_wave_frequencies.get()
-            if isinstance(frequs, str):
-                frequs = [float(f) for f in self.arb_wave_frequencies.get().split(",")]
-            amps = self.arb_wave_amplitudes.get()
-            if isinstance(amps, str):
-                amps = [float(a) for a in self.arb_wave_amplitudes.get().split(",")]
-            phases = self.arb_wave_phases.get()
-            if isinstance(phases, str):
-                phases = [float(p) for p in self.arb_wave_phases.get().split(",")]
-            shapes = self.arb_wave_shapes.get()
-            if isinstance(shapes, str):
-                shapes = self.arb_wave_shapes.get().split(",")
-            sampling_rate = int(self.arb_wave_sampling_rate.get())
-            num_samples = int(self.arb_wave_num_samples.get())
-            signal_freq = float(self.arb_wave_signal_frequency.get())
-            signal_gain = float(self.arb_wave_signal_gain.get())
-            signal_offset = float(self.arb_wave_signal_offset.get())
-            signal_noise_level = float(self.arb_wave_signal_noise_level.get())
-            wv = generate_waveform(
-                [
-                    {"frequency": frequs[i], "amplitude": amps[i], "phase": phases[i]}
-                    for i in range(len(frequs))
-                ],
-                shapes=shapes,
-                noise_level=signal_noise_level,
-                offset=signal_offset,
-                sampling_rate=sampling_rate,
-                num_samples=num_samples,
-            )
-            self.configure_arbitrary_waveform(wv)
-            self.set_arbitrary_waveform(frequency=signal_freq, gain=signal_gain)
+            self.make_arbitrary_waveform()
+        else:
+            self.make_arbitrary_waveform(name=value.upper())
+
+    def make_arbitrary_waveform(self, name="ARB1"):
+        frequs = self.arb_wave_frequencies.get()
+        if isinstance(frequs, str):
+            frequs = [float(f) for f in self.arb_wave_frequencies.get().split(",")]
+        amps = self.arb_wave_amplitudes.get()
+        if isinstance(amps, str):
+            amps = [float(a) for a in self.arb_wave_amplitudes.get().split(",")]
+        phases = self.arb_wave_phases.get()
+        if isinstance(phases, str):
+            phases = [float(p) for p in self.arb_wave_phases.get().split(",")]
+        shapes = self.arb_wave_shapes.get()
+        if isinstance(shapes, str):
+            shapes = self.arb_wave_shapes.get().split(",")
+        sampling_rate = int(self.arb_wave_sampling_rate.get())
+        num_samples = int(self.arb_wave_num_samples.get())
+        signal_freq = float(self.arb_wave_signal_frequency.get())
+        signal_gain = float(self.arb_wave_signal_gain.get())
+        signal_offset = float(self.arb_wave_signal_offset.get())
+        signal_noise_level = float(self.arb_wave_signal_noise_level.get())
+        wv = generate_waveform(
+            [
+                {"frequency": frequs[i], "amplitude": amps[i], "phase": phases[i]}
+                for i in range(len(frequs))
+            ],
+            shapes=shapes,
+            noise_level=signal_noise_level,
+            offset=signal_offset,
+            sampling_rate=sampling_rate,
+            num_samples=num_samples,
+        )
+        self.configure_arbitrary_waveform(wv, name=name)
+        self.set_arbitrary_waveform(
+            frequency=signal_freq, gain=signal_gain, offset=self.offset.get(), name=name
+        )
+
+    def get_user_arb_waveforms(self):
+        waves = self.visa_instrument.adapter.connection.query(":DATA:CAT?")
+        waves = waves.replace('"', "").split(",")
+        waves = [w.upper() for w in waves]
+        return waves
 
     def set_amplitude_unit(self, value):
         self.visa_instrument.amplitude_unit = value.upper()
@@ -201,7 +226,7 @@ class Agilent_33220A(Device):
             offset = minval + scale
             data = (data - offset) / scale
         s = f":FORM:BORD NORM;:DATA VOLATILE, "
-        
+
         for d in data:
             s += f"{d}, "
         s = s[:-2]
@@ -303,5 +328,5 @@ if __name__ == "__main__":
     # fg.configure_arbitrary_waveform(wv)
     # fg.set_arbitrary_waveform(frequency=0.05, gain=1.9)
     # fg.output.put(True)
-    fg.visa_instrument.write(':DATA:CAT?')
+    fg.visa_instrument.write(":DATA:CAT?")
     print(fg.visa_instrument.read())
