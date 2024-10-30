@@ -64,23 +64,11 @@ class Agilent_33220A(Device):
     arb_wave_num_samples = Cpt(
         Custom_Function_Signal, name="arb_wave_num_samples", kind="config"
     )
-    arb_wave_signal_frequency = Cpt(
-        Custom_Function_Signal, name="arb_wave_signal_frequency", kind="config"
-    )
-    arb_wave_signal_gain = Cpt(
-        Custom_Function_Signal, name="arb_wave_signal_gain", kind="config"
-    )
-    arb_wave_signal_offset = Cpt(
-        Custom_Function_Signal, name="arb_wave_signal_offset", kind="config"
-    )
     arb_wave_signal_noise_level = Cpt(
         Custom_Function_Signal, name="arb_wave_signal_noise_level", kind="config"
     )
     user_arb_waveforms = Cpt(
         Custom_Function_SignalRO, name="user_arb_waveforms", kind="config"
-    )
-    set_waveform_as_name = Cpt(
-        Custom_Function_Signal, name="set_waveform_as_name", kind="config"
     )
 
     def __init__(
@@ -182,9 +170,6 @@ class Agilent_33220A(Device):
             shapes = self.arb_wave_shapes.get().split(",")
         sampling_rate = int(self.arb_wave_sampling_rate.get())
         num_samples = int(self.arb_wave_num_samples.get())
-        signal_freq = float(self.arb_wave_signal_frequency.get())
-        signal_gain = float(self.arb_wave_signal_gain.get())
-        signal_offset = float(self.arb_wave_signal_offset.get())
         signal_noise_level = float(self.arb_wave_signal_noise_level.get())
         wv = generate_waveform(
             [
@@ -193,14 +178,11 @@ class Agilent_33220A(Device):
             ],
             shapes=shapes,
             noise_level=signal_noise_level,
-            offset=signal_offset,
             sampling_rate=sampling_rate,
             num_samples=num_samples,
         )
         self.configure_arbitrary_waveform(wv, name=name)
-        self.set_arbitrary_waveform(
-            frequency=signal_freq, gain=signal_gain, offset=self.offset.get(), name=name
-        )
+        self.set_arbitrary_waveform(offset=self.offset.get(), name=name)
 
     def get_user_arb_waveforms(self):
         waves = self.visa_instrument.adapter.connection.query(":DATA:CAT?")
@@ -236,12 +218,8 @@ class Agilent_33220A(Device):
         self.visa_instrument.write(s)
         self.visa_instrument.adapter.connection.timeout = timeout
 
-    def set_arbitrary_waveform(
-        self, name="ARB1", gain=1.0, offset=0.0, frequency=1000.0
-    ):
-        self.visa_instrument.write(
-            f"FUNC:USER {name};:FUNC:SHAP USER;:VOLT {gain:g};:VOLT:OFFS {offset:g};:FREQ {frequency:g};"
-        )
+    def set_arbitrary_waveform(self, name="ARB1"):
+        self.visa_instrument.write(f"FUNC:USER {name};:FUNC:SHAP USER;")
 
 
 def generate_waveform(
