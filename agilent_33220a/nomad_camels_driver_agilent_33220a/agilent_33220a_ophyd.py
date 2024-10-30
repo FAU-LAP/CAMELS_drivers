@@ -201,10 +201,7 @@ class Agilent_33220A(Device):
             offset = minval + scale
             data = (data - offset) / scale
         s = f":FORM:BORD NORM;:DATA VOLATILE, "
-        import matplotlib.pyplot as plt
-
-        plt.plot(data)
-        plt.show()
+        
         for d in data:
             s += f"{d}, "
         s = s[:-2]
@@ -282,31 +279,29 @@ def generate_waveform(
 
     # Add DC offset
     waveform += offset
-    import matplotlib.pyplot as plt
-
-    plt.plot(waveform)
-    plt.show()
 
     return waveform
 
 
 if __name__ == "__main__":
-    from datetime import datetime as dt
+    # from datetime import datetime as dt
     import pyvisa
 
     rm = pyvisa.ResourceManager()
     res = rm.list_resources()
-    print(res)
     fg = Agilent_33220A(name="fg", resource_name=res[0])
-    wv = generate_waveform(
-        [
-            {"frequency": 0.05, "amplitude": 1.9, "phase": 0},
-            {"frequency": 51.2, "amplitude": 0.07, "phase": 0},
-        ],
-        sampling_rate=2000,
-        num_samples=200000,
-        shapes=["triangle", "sine"],
-    )
-    fg.configure_arbitrary_waveform(wv)
-    fg.set_arbitrary_waveform(frequency=10, gain=0.1)
-    fg.output.put(True)
+    # fg.output.put(False)
+    # wv = generate_waveform(
+    #     [
+    #         {"frequency": 0.05, "amplitude": 1.9, "phase": 0},
+    #         {"frequency": 51.2, "amplitude": 0.07, "phase": 0},
+    #     ],
+    #     sampling_rate=200,
+    #     num_samples=4000,
+    #     shapes=["triangle", "sine"],
+    # )
+    # fg.configure_arbitrary_waveform(wv)
+    # fg.set_arbitrary_waveform(frequency=0.05, gain=1.9)
+    # fg.output.put(True)
+    fg.visa_instrument.write(':DATA:CAT?')
+    print(fg.visa_instrument.read())
