@@ -1,7 +1,5 @@
 from ophyd import Component as Cpt
 
-import numpy as np
-
 from nomad_camels.bluesky_handling.visa_signal import VISA_Device
 
 from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal

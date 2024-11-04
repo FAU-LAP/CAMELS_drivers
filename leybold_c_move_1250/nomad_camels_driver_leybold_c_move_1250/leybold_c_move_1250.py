@@ -1,18 +1,17 @@
 from nomad_camels.main_classes import device_class
 
-from .voltcraft_psp_ophyd import Voltcraft_PSP
+from .leybold_c_move_1250_ophyd import Leybold_C_Move_1250
 
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="voltcraft_psp",
-            tags=["power supply", "voltage"],
-            ophyd_device=Voltcraft_PSP,
-            ophyd_class_name="Voltcraft_PSP",
+            name="leybold_c_move_1250",
+            tags=["valve", "flow"],
+            ophyd_device=Leybold_C_Move_1250,
+            ophyd_class_name="Leybold_C_Move_1250",
             **kwargs
         )
-        self.settings["model"] = "PSP 1803"
 
 
 class subclass_config(device_class.Simple_Config):
@@ -24,15 +23,13 @@ class subclass_config(device_class.Simple_Config):
         config_dict=None,
         additional_info=None,
     ):
-        comboboxes = {"model": ["PSP 1405", "PSP 12010", "PSP 1803"]}
         super().__init__(
             parent,
-            "Voltcraft PSP",
+            "Leybold C Move 1250",
             data,
             settings_dict,
             config_dict,
             additional_info,
-            comboBoxes=comboboxes,
         )
         self.comboBox_connection_type.addItem("Local VISA")
         self.load_settings()
