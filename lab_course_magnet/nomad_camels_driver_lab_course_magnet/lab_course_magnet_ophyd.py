@@ -1,16 +1,16 @@
 from ophyd import Component as Cpt
 
-from nomad_camels.bluesky_handling.visa_signal import VISA_Device, VISA_Signal_RO
+from nomad_camels.bluesky_handling.visa_signal import VISA_Device
 
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
-    Custom_Function_Signal_RO,
+    Custom_Function_SignalRO,
 )
 
 
 class Lab_Course_Magnet(VISA_Device):
     status = Cpt(
-        Custom_Function_Signal_RO,
+        Custom_Function_SignalRO,
         name="status",
         metadata={
             "description": "status of the magnet (idle / busy; protection contactor; current on/off; polarity)"
