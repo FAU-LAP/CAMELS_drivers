@@ -2,7 +2,7 @@ from ophyd import Component as Cpt
 
 from nomad_camels.bluesky_handling.visa_signal import VISA_Device
 
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal
+from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
 
 
 class Voltcraft_PSP(VISA_Device):
@@ -15,6 +15,11 @@ class Voltcraft_PSP(VISA_Device):
         Custom_Function_Signal,
         name="output_state",
         metadata={"description": "turns the output on or off"},
+    )
+
+    idn = Cpt(
+        Custom_Function_SignalRO,
+        name="idn",
     )
 
     voltage_limit = Cpt(
@@ -56,6 +61,14 @@ class Voltcraft_PSP(VISA_Device):
         self.output_state.put_function = self.set_output_state
         self.voltage_limit.put_function = self.set_voltage_limit
         self.current_limit.put_function = self.set_current_limit
+        self.idn.read_function = self.read_idn
+    
+    def read_idn(self):
+        a = None
+        for i in range(5):
+            a = self.visa_instrument.read_bytes(1)
+            print(a)
+        return a
 
     def set_voltage(self, val):
         if self.psp_model == "PSP 1405":
@@ -73,7 +86,9 @@ class Voltcraft_PSP(VISA_Device):
         val = int(val)
         b1 = bytes.fromhex("AA")
         b2 = val.to_bytes(2, "big")
-        self.visa_instrument.write(b1 + b2)
+        write_str = str(b1 + b2)
+        print(write_str)
+        self.visa_instrument.write(write_str)
 
     def set_voltage_limit(self, val):
         if self.psp_model == "PSP 1405":
@@ -91,7 +106,9 @@ class Voltcraft_PSP(VISA_Device):
         val = int(val)
         b1 = bytes.fromhex("AD")
         b2 = val.to_bytes(2, "big")
-        self.visa_instrument.write(b1 + b2)
+        write_str = str(b1 + b2)
+        print(write_str)
+        self.visa_instrument.write(write_str)
 
     def set_current_limit(self, val):
         if self.psp_model == "PSP 1405":
@@ -109,7 +126,9 @@ class Voltcraft_PSP(VISA_Device):
         val = int(val)
         b1 = bytes.fromhex("AC")
         b2 = val.to_bytes(2, "big")
-        self.visa_instrument.write(b1 + b2)
+        write_str = str(b1 + b2)
+        print(write_str)
+        self.visa_instrument.write(write_str)
 
     def set_output_state(self, val):
         if val:
@@ -120,4 +139,6 @@ class Voltcraft_PSP(VISA_Device):
         b += val.to_bytes(1, "big")
         v2 = 0
         b += v2.to_bytes(1, "big")
-        self.visa_instrument.write(b)
+        write_str = str(b)
+        print(write_str)
+        self.visa_instrument.write(write_str)

@@ -6,6 +6,8 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
 )
+import time
+from pyvisa import constants
 
 
 class Lab_Course_Magnet(VISA_Device):
@@ -58,6 +60,7 @@ class Lab_Course_Magnet(VISA_Device):
         self.turned_on = False
 
     def read_status(self):
+        self.visa_instrument.flush(192)
         stat = self.visa_instrument.query("s")
         if stat[:4] not in ["idle", "busy"]:
             raise ValueError(f"Unexpected magnet status: {stat}")
@@ -73,21 +76,52 @@ class Lab_Course_Magnet(VISA_Device):
         }
 
     def set_power_on(self, val):
+        self.visa_instrument.flush(192)
+        stat = self.read_status()
         if not val:
-            ret = self.visa_instrument.query("Off")
+            if stat['current'] == 'off':
+                return
+            self.visa_instrument.write("0\r\n")
+            time.sleep(0.5)
+            ret = self.visa_instrument.read()
             self.turned_on = False
         elif self.positive_polarity:
-            ret = self.visa_instrument.query("B positive")
+            if stat['current'] == 'on' and stat['polarity'] == 'negative':
+                self.visa_instrument.write('0\r\n')
+                time.sleep(20)
+                ret_mid = self.visa_instrument.read()
+                if ret_mid != 'OK':
+                    raise ValueError(f"Unexpected response: {ret_mid}")
+            elif stat['current'] == 'on' and stat['polarity'] == 'positive':
+                self.turned_on = True
+                return
+            self.visa_instrument.write("+\r\n")
+            time.sleep(0.5)
+            ret = self.visa_instrument.read()
             self.turned_on = True
         else:
-            ret = self.visa_instrument.query("B negative")
+            if stat['current'] == 'on' and stat['polarity'] == 'positive':
+                self.visa_instrument.write('0\r\n')
+                time.sleep(20)
+                ret_mid = self.visa_instrument.read()
+                if ret_mid != 'OK':
+                    raise ValueError(f"Unexpected response: {ret_mid}")
+            elif stat['current'] == 'on' and stat['polarity'] == 'negative':
+                self.turned_on = True
+                return
+            self.visa_instrument.write("-\r\n")
+            time.sleep(0.5)
+            ret = self.visa_instrument.read()
             self.turned_on = True
         if ret != "OK":
             raise ValueError(f"Unexpected response: {ret}")
 
     def set_polarity(self, val):
         if val:
-            self.positive_polarity = True
+            if isinstance(val, (float, int)) and val < 0:
+                self.positive_polarity = False
+            else:
+                self.positive_polarity = True
         else:
             self.positive_polarity = False
         self.set_power_on(self.turned_on)

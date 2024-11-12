@@ -164,7 +164,7 @@ class Agilent_34970(VISA_Device):
     measurement_channel = Cpt(
         Custom_Function_Signal,
         value="201",
-        name="measurement_channels",
+        name="measurement_channel",
         kind="config",
         metadata={
             "description": "Comma separated list of channels. Use call function to apply the other settings to these channels. You may later apply other settings to other channels."
@@ -192,17 +192,24 @@ class Agilent_34970(VISA_Device):
             **kwargs,
         )
         self.last_channel = None
+        self.read_DMM.read_function = self.read_from_DMM
+        self.activate_channels.put_function = self.set_active_channels
+        self.deactivate_channels.put_function = self.set_inactive_channels
 
     def set_active_channels(self, channels):
+        if not isinstance(channels, str):
+            channels = ",".join([str(int(x)) for x in channels])
         set_str = f"ROUT:CLOS (@{channels})"
         self.visa_instrument.write(set_str)
 
     def set_inactive_channels(self, channels):
+        if not isinstance(channels, str):
+            channels = ",".join([str(int(x)) for x in channels])
         set_str = f"ROUT:OPEN (@{channels})"
         self.visa_instrument.write(set_str)
 
     def read_from_DMM(self):
-        channel = self.measurement_channels.get()
+        channel = self.measurement_channel.get()
         if channel != self.last_channel:
             self.visa_instrument.write(f"ROUT:MON (@{channel})")
             self.visa_instrument.write("ROUT:MON:STAT ON")
@@ -254,11 +261,11 @@ class Agilent_34970(VISA_Device):
             elif self.transducer_type.get() == "4-Wire RTD":
                 config_string += "FRTD,"
                 config_string += self.RTD_type.get()
-                config_string += ", "
-                config_string += f" (@{self.measurement_channels.get()})"
-                config_string += f";:SENS:TEMP:TRAN:FRTD:RES:REF ;{self.RTD_reference_resistance.get():3.2e}"
+                config_string += ","
+                config_string += f" (@{self.measurement_channel.get()})"
+                config_string += f";:SENS:TEMP:TRAN:FRTD:RES:REF {float(self.RTD_reference_resistance.get()):3.2e}"
             config_string += ","
-        config_string += f"(@{self.measurement_channels.get()})"
+        config_string += f"(@{self.measurement_channel.get()})"
         config_string += f";:UNIT:TEMP {temp_unit_dict[self.temperature_unit.get()]}"
         self.visa_instrument.write(config_string)
 
