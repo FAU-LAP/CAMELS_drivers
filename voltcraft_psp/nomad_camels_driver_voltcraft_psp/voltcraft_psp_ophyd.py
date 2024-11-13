@@ -91,6 +91,7 @@ class Voltcraft_PSP(VISA_Device):
         self.visa_instrument.write(write_str)
 
     def set_voltage_limit(self, val):
+        return
         if self.psp_model == "PSP 1405":
             if not 0 <= val <= 40:
                 raise ValueError("Voltage out of range")
@@ -124,11 +125,11 @@ class Voltcraft_PSP(VISA_Device):
                 raise ValueError("Current out of range")
             val *= 200
         val = int(val)
-        b1 = bytes.fromhex("AC")
-        b2 = val.to_bytes(2, "big")
-        write_str = str(b1 + b2)
-        print(write_str)
-        self.visa_instrument.write(write_str)
+        command_id = 0xAC
+        command_bytes = command_id.to_bytes(1, byteorder='big')
+        val_bytes = val.to_bytes(2, byteorder='big')
+        msg = command_bytes + val_bytes
+        self.visa_instrument.write_raw(msg)
 
     def set_output_state(self, val):
         if val:

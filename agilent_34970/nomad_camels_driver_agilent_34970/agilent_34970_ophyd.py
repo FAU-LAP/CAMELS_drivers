@@ -170,6 +170,15 @@ class Agilent_34970(VISA_Device):
             "description": "Comma separated list of channels. Use call function to apply the other settings to these channels. You may later apply other settings to other channels."
         },
     )
+    display_on = Cpt(
+        Custom_Function_Signal,
+        value=True,
+        name="display_on",
+        kind="config",
+        metadata={
+            "description": "Turns the instrument's display on or off."
+        },
+    )
 
     def __init__(
         self,
@@ -195,6 +204,14 @@ class Agilent_34970(VISA_Device):
         self.read_DMM.read_function = self.read_from_DMM
         self.activate_channels.put_function = self.set_active_channels
         self.deactivate_channels.put_function = self.set_inactive_channels
+        self.display_on.put_function = self.set_display_on_off
+    
+    def set_display_on_off(self, value):
+        if value:
+            val = 'ON'
+        else:
+            val = 'OFF'
+        self.visa_instrument.write(f'DISP {val}')
 
     def set_active_channels(self, channels):
         if not isinstance(channels, str):

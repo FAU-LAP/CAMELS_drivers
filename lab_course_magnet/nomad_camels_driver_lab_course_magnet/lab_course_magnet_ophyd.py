@@ -81,13 +81,13 @@ class Lab_Course_Magnet(VISA_Device):
         if not val:
             if stat['current'] == 'off':
                 return
-            self.visa_instrument.write("0\r\n")
+            self.visa_instrument.write("0")
             time.sleep(0.5)
             ret = self.visa_instrument.read()
             self.turned_on = False
         elif self.positive_polarity:
             if stat['current'] == 'on' and stat['polarity'] == 'negative':
-                self.visa_instrument.write('0\r\n')
+                self.visa_instrument.write('0')
                 time.sleep(20)
                 ret_mid = self.visa_instrument.read()
                 if ret_mid != 'OK':
@@ -95,13 +95,13 @@ class Lab_Course_Magnet(VISA_Device):
             elif stat['current'] == 'on' and stat['polarity'] == 'positive':
                 self.turned_on = True
                 return
-            self.visa_instrument.write("+\r\n")
+            self.visa_instrument.write("+")
             time.sleep(0.5)
             ret = self.visa_instrument.read()
             self.turned_on = True
         else:
             if stat['current'] == 'on' and stat['polarity'] == 'positive':
-                self.visa_instrument.write('0\r\n')
+                self.visa_instrument.write('0')
                 time.sleep(20)
                 ret_mid = self.visa_instrument.read()
                 if ret_mid != 'OK':
@@ -109,7 +109,7 @@ class Lab_Course_Magnet(VISA_Device):
             elif stat['current'] == 'on' and stat['polarity'] == 'negative':
                 self.turned_on = True
                 return
-            self.visa_instrument.write("-\r\n")
+            self.visa_instrument.write("-")
             time.sleep(0.5)
             ret = self.visa_instrument.read()
             self.turned_on = True
