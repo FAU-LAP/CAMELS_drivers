@@ -2,7 +2,10 @@ from ophyd import Component as Cpt
 
 from nomad_camels.bluesky_handling.visa_signal import VISA_Device
 
-from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function_Signal, Custom_Function_SignalRO
+from nomad_camels.bluesky_handling.custom_function_signal import (
+    Custom_Function_Signal,
+    Custom_Function_SignalRO,
+)
 
 
 class Voltcraft_PSP(VISA_Device):
@@ -62,13 +65,26 @@ class Voltcraft_PSP(VISA_Device):
         self.voltage_limit.put_function = self.set_voltage_limit
         self.current_limit.put_function = self.set_current_limit
         self.idn.read_function = self.read_idn
-    
+
     def read_idn(self):
-        a = None
-        for i in range(5):
-            a = self.visa_instrument.read_bytes(1)
-            print(a)
-        return a
+        state_info = 0xB2.to_bytes(1, byteorder="big")
+        info = None
+        while info != state_info:
+            info = self.visa_instrument.read_bytes(1)
+        model_number = self.visa_instrument.read_bytes(1)
+        model_number_int = int.from_bytes(model_number, byteorder="big")
+        software_version = self.visa_instrument.read_bytes(1)
+        software_version_int = int.from_bytes(software_version, byteorder="big")
+        model = None
+        if model_number_int == 1:
+            model = "PSP 1405"
+        elif model_number_int == 2:
+            model = "PSP 12010"
+        elif model_number_int == 3:
+            model = "PSP 1803"
+        if model != self.psp_model:
+            raise ValueError("Model number does not match")
+        return f"{model} software version {software_version_int}"
 
     def set_voltage(self, val):
         if self.psp_model == "PSP 1405":
@@ -84,14 +100,13 @@ class Voltcraft_PSP(VISA_Device):
                 raise ValueError("Voltage out of range")
             val *= 50
         val = int(val)
-        b1 = bytes.fromhex("AA")
-        b2 = val.to_bytes(2, "big")
-        write_str = str(b1 + b2)
-        print(write_str)
-        self.visa_instrument.write(write_str)
+        command_id = 0xAA
+        command_bytes = command_id.to_bytes(1, byteorder="big")
+        val_bytes = val.to_bytes(2, byteorder="big")
+        msg = command_bytes + val_bytes
+        self.visa_instrument.write_raw(msg)
 
     def set_voltage_limit(self, val):
-        return
         if self.psp_model == "PSP 1405":
             if not 0 <= val <= 40:
                 raise ValueError("Voltage out of range")
@@ -105,11 +120,11 @@ class Voltcraft_PSP(VISA_Device):
                 raise ValueError("Voltage out of range")
             val *= 5
         val = int(val)
-        b1 = bytes.fromhex("AD")
-        b2 = val.to_bytes(2, "big")
-        write_str = str(b1 + b2)
-        print(write_str)
-        self.visa_instrument.write(write_str)
+        command_id = 0xAD
+        command_bytes = command_id.to_bytes(1, byteorder="big")
+        val_bytes = val.to_bytes(2, byteorder="big")
+        msg = command_bytes + val_bytes
+        self.visa_instrument.write_raw(msg)
 
     def set_current_limit(self, val):
         if self.psp_model == "PSP 1405":
@@ -126,8 +141,8 @@ class Voltcraft_PSP(VISA_Device):
             val *= 200
         val = int(val)
         command_id = 0xAC
-        command_bytes = command_id.to_bytes(1, byteorder='big')
-        val_bytes = val.to_bytes(2, byteorder='big')
+        command_bytes = command_id.to_bytes(1, byteorder="big")
+        val_bytes = val.to_bytes(2, byteorder="big")
         msg = command_bytes + val_bytes
         self.visa_instrument.write_raw(msg)
 
@@ -136,10 +151,10 @@ class Voltcraft_PSP(VISA_Device):
             val = 1
         else:
             val = 0
-        b = bytes.fromhex("AB")
-        b += val.to_bytes(1, "big")
-        v2 = 0
-        b += v2.to_bytes(1, "big")
-        write_str = str(b)
-        print(write_str)
-        self.visa_instrument.write(write_str)
+        command_id = 0xAB
+        command_bytes = command_id.to_bytes(1, byteorder="big")
+        val_bytes = val.to_bytes(1, byteorder="big")
+        add_byte = 0
+        add_byte = add_byte.to_bytes(1, byteorder="big")
+        msg = command_bytes + val_bytes + add_byte
+        self.visa_instrument.write_raw(msg)
