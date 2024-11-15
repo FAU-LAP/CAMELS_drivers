@@ -201,6 +201,8 @@ class Agilent_34970(VISA_Device):
             **kwargs,
         )
         self.last_channel = None
+        self.force_sequential = True
+        self.currently_reading = False
         self.read_DMM.read_function = self.read_from_DMM
         self.activate_channels.put_function = self.set_active_channels
         self.deactivate_channels.put_function = self.set_inactive_channels
