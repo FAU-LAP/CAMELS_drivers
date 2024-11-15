@@ -12,6 +12,7 @@ class subclass(device_class.Device):
             ophyd_class_name="Leybold_C_Move_1250",
             **kwargs
         )
+        self.settings["do_interpolation"] = False
 
 
 class subclass_config(device_class.Simple_Config):
