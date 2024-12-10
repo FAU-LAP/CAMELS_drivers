@@ -21,6 +21,7 @@ except_drivers = [
     "zaber_rst240b_e08",
     "lakeshore_f41",
     "attocube_anc300",
+    "ADALM1000",
 ]
 
 # drivers that run only on windows
