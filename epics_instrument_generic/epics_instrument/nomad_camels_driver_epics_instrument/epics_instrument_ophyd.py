@@ -5,7 +5,7 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_SignalRO,
 )
 from ophyd import Device
-from asyncua.sync import Client
+from epics import PV
 
 
 def make_ophyd_instance(
@@ -19,12 +19,10 @@ def make_ophyd_instance(
     # These are the arguments you want to pass to the ophyd class
     # These are the settings you defined in the .py file
     # We will pass the number of channels we selected in the drop down and are defined in the .py file
-    url=None,
-    namespace=None,
-    variables=None,
+    pvs=None,
     **kwargs,
 ):
-    ophyd_class = make_ophyd_class(variables)
+    ophyd_class = make_ophyd_class(pvs)
     return ophyd_class(
         prefix,
         *args,
@@ -36,15 +34,13 @@ def make_ophyd_instance(
         # These are the arguments you want to pass to the ophyd class
         # These are the settings you defined in the .py file
         # We will pass the number of channels we selected in the drop down and are defined in the .py file
-        url=url,
-        namespace=namespace,
-        variables=variables,
+        pvs=pvs,
         **kwargs,
     )
 
 
-def make_ophyd_class(variables):
-    def read_function_generator(name, path):
+def make_ophyd_class(pvs):
+    def read_function_generator(short_name, full_name):
         def read_function(_self_instance):
             """
             This function returns a lambda function that reads the specified channel.
@@ -58,11 +54,13 @@ def make_ophyd_class(variables):
             function: A lambda function that reads the power channel.
 
             """
-            return lambda: _self_instance.parent.read_opc_ua(name=name, path=path)
+            return lambda: _self_instance.parent.read_epics_pv(
+                short_name=short_name, full_name=full_name
+            )
 
         return read_function
 
-    def set_function_generator(name, path):
+    def set_function_generator(short_name, full_name):
         def set_function(_self_instance, value):
             """
             This function returns a lambda function that sets the opc ua variable.
@@ -78,48 +76,49 @@ def make_ophyd_class(variables):
 
             """
             # It is important to pass the value to the lambda function!
-            return lambda: _self_instance.parent.set_opc_ua(
-                name=name, path=path, value=value
+            return lambda: _self_instance.parent.set_epics_pv(
+                short_name=short_name, full_name=full_name, value=value
             )
 
         return set_function
 
     signal_dictionary = {}
-    variables_dict_list = [
-        dict(zip(variables.keys(), values)) for values in zip(*variables.values())
-    ]
-    for variable_dict in variables_dict_list:
+    pvs_dict_list = [dict(zip(pvs.keys(), values)) for values in zip(*pvs.values())]
+    for pv_dict in pvs_dict_list:
         # For each channel add read_power function
-        if variable_dict["variable-Type"] == "read-only":
-            signal_dictionary[f"read_opc_ua_{variable_dict['Name']}"] = Cpt(
+        if pv_dict["PV-Type"] == "read-only":
+            signal_dictionary[f"read_epics_pv_{pv_dict['PV Short Name']}"] = Cpt(
                 Custom_Function_SignalRO,
-                name=f"read_opc_ua_{variable_dict['Name']}",
+                name=f"read_epics_pv_{pv_dict['PV Short Name']}",
                 metadata={"units": "", "description": ""},
                 read_function=read_function_generator(
-                    name=variable_dict["Name"], path=variable_dict["Browse Path"]
+                    short_name=pv_dict["PV Short Name"],
+                    full_name=pv_dict["PV Full Name"],
                 ),
             )
-        elif variable_dict["variable-Type"] == "set":
-            signal_dictionary[f"set_opc_ua_{variable_dict['Name']}"] = Cpt(
+        elif pv_dict["PV-Type"] == "set":
+            signal_dictionary[f"set_epics_pv_{pv_dict['PV Short Name']}"] = Cpt(
                 Custom_Function_Signal,
-                name=f"set_opc_ua_{variable_dict['Name']}",
+                name=f"set_epics_pv_{pv_dict['PV Short Name']}",
                 metadata={"units": "", "description": ""},
                 put_function=set_function_generator(
-                    name=variable_dict["Name"], path=variable_dict["Browse Path"]
+                    short_name=pv_dict["PV Short Name"],
+                    full_name=pv_dict["PV Full Name"],
                 ),
                 read_function=read_function_generator(
-                    name=variable_dict["Name"], path=variable_dict["Browse Path"]
+                    short_name=pv_dict["PV Short Name"],
+                    full_name=pv_dict["PV Full Name"],
                 ),
             )
 
     return type(
-        f"OPC_UA_total_channels_{len(variables_dict_list)}",
-        (Opc_Ua_instrument,),
+        f"EPICS_PV_total_channels_{len(pvs_dict_list)}",
+        (Epics_Instrument,),
         {**signal_dictionary},
     )
 
 
-class Opc_Ua_instrument(Device):
+class Epics_Instrument(Device):
     def __init__(
         self,
         prefix="",
@@ -129,9 +128,7 @@ class Opc_Ua_instrument(Device):
         read_attrs=None,
         configuration_attrs=None,
         parent=None,
-        url=None,
-        namespace=None,
-        variables=None,
+        pvs=None,
         **kwargs,
     ):
         super().__init__(
@@ -143,51 +140,27 @@ class Opc_Ua_instrument(Device):
             parent=parent,
             **kwargs,
         )
-        self.url = url
-        self.namespace = namespace
-        self.variables = variables
+        self.pvs = pvs
 
-        # return when calling this during initialization of CAMELS at startup
-        if name == "test":
-            return
+    def read_epics_pv(self, short_name, full_name):
+        """
+        This function reads the specified channel.
 
-        self.client = Client(url=self.url)  # Instantiating the AsyncClient
-        # Run the async method to connect to the client
-        try:
-            self.client.connect()
-        except Exception as e:
-            print(f"Error connecting to OPC UA server: {e}")
+        Parameters:
+        short_name (str): The short name of the channel.
+        full_name (str): The full name of the channel.
 
-    def read_opc_ua(self, name, path):
+        Returns:
+        float: The value of the channel.
 
-        if path != "":
-            var = self.client.nodes.root.get_child(path)
+        """
+        pv = PV(full_name)
+        return pv.get()
 
-        else:
-            # Find the namespace index
-            nsidx = self.client.get_namespace_index(self.namespace)
-
-            # Get the variable node for read / write
-            var = self.client.nodes.root.get_child(
-                f"0:Objects/{nsidx}:MyObject/{nsidx}:{name}"
-            )
-        value = var.read_value()
-        return value
-
-    def set_opc_ua(self, name, path, value):
-        if path != "":
-            var = self.client.nodes.root.get_child(path)
-        else:
-            # Find the namespace index
-            nsidx = self.client.get_namespace_index(self.namespace)
-
-            # Get the variable node for read / write
-            var = self.client.nodes.root.get_child(
-                f"0:Objects/{nsidx}:MyObject/{nsidx}:{name}"
-            )
-        var.write_value(value)
-
-    def finalize_steps(self):
-        # Disconnect the client when done
-        print("Disconnecting...")
-        self.client.disconnect()
+    def set_epics_pv(self, short_name, full_name, value):
+        """
+        This function sets the specified channel.
+        """
+        pv = PV(full_name)
+        pv.put(value)
+        return pv.get()
