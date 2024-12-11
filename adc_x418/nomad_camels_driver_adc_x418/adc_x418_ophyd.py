@@ -12,7 +12,7 @@ import tkinter as tk
 from tkinter import simpledialog
 
 class Adc_X418(Device):
-	sleep_time = 0.05
+	sleep_time = 0.07
 
 	read_channel_1 = Cpt(
 		Custom_Function_SignalRO,
@@ -256,7 +256,7 @@ class Adc_X418(Device):
 		if response_match:
 			response_dict = json.loads(response_match.group(0))
 			reply = response_dict["analogInput"+str(channel_num)]
-			return reply
+			return float(reply)
 		else:
 			print(f"no json string received from X418")
 			if len(response_readable.split())>1:
