@@ -3,12 +3,12 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "nomad_camels_driver_adc_x418"
-version = "0.1.1"
+name = "nomad_camels_driver_epics_instrument"
+version = "0.1.0"
 authors = [
 	{name="enter your name here!", email="contact@email.com"}
 ]
-description = "Instrument driver for adc_x418 for NOMAD CAMELS"
+description = "Instrument driver for epics_instrument for NOMAD CAMELS"
 readme = "README.md"
 requires-python = ">=3.9.6"
 classifiers = [
