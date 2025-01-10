@@ -17,22 +17,6 @@ class subclass(device_class.Device):
             **kwargs
         )
 
-    def get_channels(self):
-        channels = copy.deepcopy(super().get_channels())
-        conf = self.get_config()
-        if "outputMode" in conf:
-            if conf["outputMode"] == "voltage" or conf["outputMode"] == 0:
-                for chan in channels:
-                    if chan.endswith("setP"):
-                        channels.pop(chan)
-                        break
-            else:
-                for chan in channels:
-                    if chan.endswith("setV"):
-                        channels.pop(chan)
-                        break
-        return channels
-
 
 class subclass_config(device_class.Device_Config):
     def __init__(
@@ -52,29 +36,14 @@ class subclass_config(device_class.Device_Config):
         self.labelR = QLabel("Resistance:")
         labelOutput = QLabel("Output mode:")
 
-        modes = ["voltage", "power"]
-        self.comboBox_output_mode = QComboBox()
-        self.comboBox_output_mode.addItems(modes)
-        if "outputMode" in config_dict and config_dict["outputMode"] in modes:
-            self.comboBox_output_mode.setCurrentText(config_dict["outputMode"])
-        self.comboBox_output_mode.currentTextChanged.connect(self.mode_change)
-
         self.layout().addWidget(labelOutput, 20, 0)
-        self.layout().addWidget(self.comboBox_output_mode, 20, 1)
         self.layout().addWidget(self.labelR, 20, 2)
         self.layout().addWidget(self.lineEdit_R, 20, 3, 1, 2)
 
-        self.mode_change()
         self.load_settings()
-
-    def mode_change(self):
-        power = self.comboBox_output_mode.currentText() == "power"
-        self.labelR.setEnabled(power)
-        self.lineEdit_R.setEnabled(power)
 
     def get_config(self):
         super().get_config()
-        self.config_dict["outputMode"] = self.comboBox_output_mode.currentText()
         r = self.lineEdit_R.text()
         self.config_dict["setR"] = float(r) if r else 0
         return self.config_dict
