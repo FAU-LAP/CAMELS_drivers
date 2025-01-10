@@ -1,4 +1,4 @@
-from .opc_ua_instrument_ophyd import make_ophyd_class
+from .opc_ua_instrument_generic_ophyd import make_ophyd_class
 
 from nomad_camels.main_classes import device_class
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
@@ -8,10 +8,10 @@ from PySide6.QtWidgets import QLabel, QLineEdit
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="opc_ua_instrument",
+            name="opc_ua_instrument_generic",
             virtual=False,
             tags=["opc", "ua"],
-            directory="opc_ua_instrument",
+            directory="opc_ua_instrument_generic",
             ophyd_device=None,
             ophyd_class_name="make_ophyd_instance",
             **kwargs,

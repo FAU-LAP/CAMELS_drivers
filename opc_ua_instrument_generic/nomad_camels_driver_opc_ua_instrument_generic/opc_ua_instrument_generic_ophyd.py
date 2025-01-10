@@ -3,6 +3,7 @@ from ophyd import Component as Cpt
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
+    Sequential_Device,
 )
 from ophyd import Device
 from asyncua.sync import Client
@@ -91,18 +92,18 @@ def make_ophyd_class(variables):
     for variable_dict in variables_dict_list:
         # For each channel add read_power function
         if variable_dict["variable-Type"] == "read-only":
-            signal_dictionary[f"read_opc_ua_{variable_dict['Name']}"] = Cpt(
+            signal_dictionary[variable_dict["Name"]] = Cpt(
                 Custom_Function_SignalRO,
-                name=f"read_opc_ua_{variable_dict['Name']}",
+                name=variable_dict["Name"],
                 metadata={"units": "", "description": ""},
                 read_function=read_function_generator(
                     name=variable_dict["Name"], path=variable_dict["Browse Path"]
                 ),
             )
         elif variable_dict["variable-Type"] == "set":
-            signal_dictionary[f"set_opc_ua_{variable_dict['Name']}"] = Cpt(
+            signal_dictionary[variable_dict["Name"]] = Cpt(
                 Custom_Function_Signal,
-                name=f"set_opc_ua_{variable_dict['Name']}",
+                name=variable_dict["Name"],
                 metadata={"units": "", "description": ""},
                 put_function=set_function_generator(
                     name=variable_dict["Name"], path=variable_dict["Browse Path"]
@@ -119,7 +120,7 @@ def make_ophyd_class(variables):
     )
 
 
-class Opc_Ua_instrument(Device):
+class Opc_Ua_instrument(Sequential_Device):
     def __init__(
         self,
         prefix="",
@@ -150,6 +151,10 @@ class Opc_Ua_instrument(Device):
         # return when calling this during initialization of CAMELS at startup
         if name == "test":
             return
+
+        # The following line forces the channels to wait for others to finish before setting and reading
+        # This is because Custom_Function_SignalRO and Custom_Function_Signal are typically run asynchronously
+        self.force_sequential = True
 
         self.client = Client(url=self.url)  # Instantiating the AsyncClient
         # Run the async method to connect to the client
