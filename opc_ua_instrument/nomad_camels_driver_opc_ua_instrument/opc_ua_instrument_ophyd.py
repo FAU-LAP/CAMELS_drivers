@@ -5,7 +5,6 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_SignalRO,
     Sequential_Device,
 )
-from ophyd import Device
 from asyncua.sync import Client
 
 
