@@ -18,10 +18,10 @@ keithley_6221==0.0.2
 keysight_b2912a==0.1.0
 keysight_e5270b==0.1.2
 lakeshore_f41==0.1.0
-leybold_c_move_1240==0.1.0
+leybold_c_move_1250==0.1.0
 mechonics_cu30cl==0.1.0
 ni_daq==0.1.1
-opc_ua_instrument==0.1.0
+opc_ua_instrument==0.1.1
 PID==0.1.9
 pi_stage_e709==0.1.1
 rhode_and_schwarz_smp_02==0.1.0
