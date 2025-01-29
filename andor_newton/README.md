@@ -11,6 +11,8 @@ For more information and documentation visit the [CAMELS documentation](https://
 
 
 ## Changelog
+### 0.1.4
+Now exposure times above 99 seconds are possible.
 
 ### 0.1.3
 Fix of reading which did end in an endless loop before
