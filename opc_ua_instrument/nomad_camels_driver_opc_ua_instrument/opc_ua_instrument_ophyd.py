@@ -6,6 +6,7 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
     Sequential_Device,
 )
 from asyncua.sync import Client
+from asyncua import ua
 
 
 def make_ophyd_instance(
@@ -189,7 +190,26 @@ class Opc_Ua_instrument(Sequential_Device):
             var = self.client.nodes.root.get_child(
                 f"0:Objects/{nsidx}:MyObject/{nsidx}:{name}"
             )
-        var.write_value(value)
+        # Get the expected data type for the node
+        expected_type = var.get_data_type_as_variant_type()
+        # Convert the incoming value (which is always a float) to the expected type.
+        # You can extend this mapping if needed.
+        if expected_type in (ua.VariantType.Int16, ua.VariantType.Int32, ua.VariantType.Int64,
+                            ua.VariantType.UInt16, ua.VariantType.UInt32, ua.VariantType.UInt64):
+            cast_value = int(value)
+        elif expected_type in (ua.VariantType.Float, ua.VariantType.Double):
+            cast_value = float(value)
+        elif expected_type == ua.VariantType.Boolean:
+            # Example conversion: if value is 0.0, then False, otherwise True.
+            cast_value = bool(value)
+        elif expected_type == ua.VariantType.String:
+            cast_value = str(value)
+        else:
+            # Fallback: if you don't have a conversion defined, just pass the value
+            cast_value = value
+
+        # Write the converted value to the OPC UA variable
+        var.write_value(cast_value)
 
     def finalize_steps(self):
         # Disconnect the client when done
