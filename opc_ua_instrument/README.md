@@ -25,6 +25,22 @@ The variable is accessed using its browse path and should look something like th
 0:Objects/2:MyObject/2:MyVariable
 ```
 
+## Changes
+
+### 0.1.2
+
+- When setting (writing) to variables the data-type of the variable is always checked and the value is cast to this data type before setting. Should make writing to variables much more stable.
+
+### 0.1.1
+
+- Added automatic variable adding. For this enter a RegEx pattern in the text field next to the `Fetch and Add` button. Then press the `Fetch and Add` button.
+This will go through the given server and try to match either the Node-ID or the Browse Path with the RegEx pattern given. Matches will be added with their Browse Path into the list below.
+
+   > [!WARNING]
+   > This can take quite some time if there are many nodes in the server!
+
+Make sure to give them custom names under `Name` before clicking "OK".
+
 ## Documentation
 
 For more information and instruments visit the [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
