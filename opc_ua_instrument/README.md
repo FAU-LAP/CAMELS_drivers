@@ -27,6 +27,10 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.3
+
+- Fixed broken dependencies.
+
 ### 0.1.2
 
 - When setting (writing) to variables the data-type of the variable is always checked and the value is cast to this data type before setting. Should make writing to variables much more stable.
