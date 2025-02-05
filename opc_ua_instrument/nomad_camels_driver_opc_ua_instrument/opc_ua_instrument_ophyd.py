@@ -209,7 +209,9 @@ class Opc_Ua_instrument(Sequential_Device):
             cast_value = value
 
         # Write the converted value to the OPC UA variable
-        var.write_value(cast_value)
+        data_value = ua.DataValue(ua.Variant(cast_value, expected_type))
+        var.write_value(data_value)
+
 
     def finalize_steps(self):
         # Disconnect the client when done
