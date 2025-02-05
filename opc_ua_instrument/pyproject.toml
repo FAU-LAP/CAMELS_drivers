@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nomad_camels_driver_opc_ua_instrument"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
 	{name="enter your name here!", email="contact@email.com"}
 ]

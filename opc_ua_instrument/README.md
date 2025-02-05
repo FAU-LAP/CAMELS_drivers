@@ -27,6 +27,10 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.4.
+
+- Fixed data writing to the variables to always use the correct `ua.DataType`
+
 ### 0.1.3
 
 - Fixed broken dependencies.
