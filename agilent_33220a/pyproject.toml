@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nomad_camels_driver_agilent_33220a"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
@@ -17,8 +17,8 @@ classifiers = [
 
 ]
 dependencies = [
-    "pyvisa",
-    "pyvisa-py"
+    "pymeasure",
+    "nomad-camels"
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
