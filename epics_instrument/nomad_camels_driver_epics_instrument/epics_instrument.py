@@ -1,4 +1,4 @@
-from .epics_instrument_generic_ophyd import make_ophyd_class
+from .epics_instrument_ophyd import make_ophyd_class
 
 from nomad_camels.main_classes import device_class
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
@@ -7,12 +7,12 @@ from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="epics_instrument_generic",
+            name="epics_instrument",
             virtual=False,
             tags=[
                 "epics",
             ],
-            directory="epics_instrument_generic",
+            directory="epics_instrument",
             ophyd_device=None,
             ophyd_class_name="make_ophyd_instance",
             **kwargs,

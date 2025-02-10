@@ -1,6 +1,6 @@
 # NOMAD Camels driver for epics_instrument
 
-Driver that allows you to easily implement EPICS PVs in [NOMAD Camels](https://fau-lap.github.io/NOMAD-CAMELS/).
+Generic driver that allows you to easily implement EPICS PVs in [NOMAD Camels](https://fau-lap.github.io/NOMAD-CAMELS/).
 
 You can add PVs by opening the `Manage Instruments` window and simply adding new PVs to the table. This allows you to quickly add or remove PVs from your EPICS instrument and is much easier than writing drivers for each EPICS instrument you want to use in CAMELS.
 
