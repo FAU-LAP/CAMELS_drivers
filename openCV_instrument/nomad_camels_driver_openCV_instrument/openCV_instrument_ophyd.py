@@ -1,14 +1,13 @@
 from ophyd import Component as Cpt
 
 from nomad_camels.bluesky_handling.custom_function_signal import (
-    Custom_Function_Signal,
     Custom_Function_SignalRO,
 )
 from ophyd import Device
 import cv2
 
 
-class Opencv_Generic(Device):
+class OpenCV_Instrument(Device):
     get_FOV = Cpt(
         Custom_Function_SignalRO,
         name="get_FOV",

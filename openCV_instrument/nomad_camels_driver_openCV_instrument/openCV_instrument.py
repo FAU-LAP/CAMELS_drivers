@@ -1,4 +1,4 @@
-from .openCV_generic_ophyd import Opencv_Generic
+from .openCV_instrument_ophyd import OpenCV_Instrument
 
 from nomad_camels.main_classes import device_class
 
@@ -6,12 +6,12 @@ from nomad_camels.main_classes import device_class
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="openCV_generic",
+            name="openCV_instrument",
             virtual=False,
             tags=[],
-            directory="openCV_generic",
-            ophyd_device=Opencv_Generic,
-            ophyd_class_name="Opencv_Generic",
+            directory="openCV_instrument",
+            ophyd_device=OpenCV_Instrument,
+            ophyd_class_name="OpenCV_Instrument",
             **kwargs,
         )
         self.settings["camera_index"] = 0
@@ -27,6 +27,6 @@ class subclass_config(device_class.Simple_Config):
         additional_info=None,
     ):
         super().__init__(
-            parent, "openCV_generic", data, settings_dict, config_dict, additional_info
+            parent, "openCV_instrument", data, settings_dict, config_dict, additional_info
         )
         self.load_settings()
