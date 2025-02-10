@@ -7,3 +7,11 @@ This PID is implemented as a pure software PID and can take any channel as input
 ## Documentation
 
 For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+## Changelog
+
+
+#### 0.1.10
+Fixes:
+- Output and single pid values should now be correctly recorded as float

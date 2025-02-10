@@ -11,15 +11,15 @@ from PySide6.QtWidgets import QComboBox
 from nomad_camels.utility import variables_handling
 
 default_pid_val_table = {
-    "setpoint": [0],
-    "kp": [1],
-    "ki": [1],
-    "kd": [1],
-    "max_value": [2],
-    "min_value": [-2],
-    "bias": [0],
+    "setpoint": [0.0],
+    "kp": [1.0],
+    "ki": [1.0],
+    "kd": [1.0],
+    "max_value": [2.0],
+    "min_value": [-2.0],
+    "bias": [0.0],
     "stability-delta": [0.5],
-    "stability-time": [10],
+    "stability-time": [10.0],
 }
 
 

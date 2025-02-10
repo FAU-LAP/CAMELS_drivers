@@ -48,21 +48,21 @@ def pt1000_inv(T):
 
 
 class PID_Controller(Device):
-    output_value = Cpt(Custom_Function_SignalRO, name="output_value")
-    current_value = Cpt(Custom_Function_SignalRO, name="current_value")
-    setpoint = Cpt(Custom_Function_Signal, name="setpoint")
-    pid_stable = Cpt(Custom_Function_SignalRO, name="pid_stable")
+    output_value = Cpt(Custom_Function_SignalRO, value=0.0, name="output_value")
+    current_value = Cpt(Custom_Function_SignalRO, value=0.0, name="current_value")
+    setpoint = Cpt(Custom_Function_Signal, value=0.0, name="setpoint")
+    pid_stable = Cpt(Custom_Function_SignalRO, value=0.0, name="pid_stable")
     pid_on = Cpt(Custom_Function_Signal, value=False, name="pid_on")
-    p_value = Cpt(Custom_Function_SignalRO, name="p_value")
-    i_value = Cpt(Custom_Function_SignalRO, name="i_value")
-    d_value = Cpt(Custom_Function_SignalRO, name="d_value")
+    p_value = Cpt(Custom_Function_SignalRO, value=0.0, name="p_value")
+    i_value = Cpt(Custom_Function_SignalRO, value=0.0, name="i_value")
+    d_value = Cpt(Custom_Function_SignalRO, value=0.0, name="d_value")
 
-    kp = Cpt(Custom_Function_Signal, name="kp", kind="config")
-    ki = Cpt(Custom_Function_Signal, name="ki", kind="config")
-    kd = Cpt(Custom_Function_Signal, name="kd", kind="config")
-    dt = Cpt(Custom_Function_Signal, name="dt", kind="config")
-    min_value = Cpt(Custom_Function_Signal, name="min_value", kind="config")
-    max_value = Cpt(Custom_Function_Signal, name="max_value", kind="config")
+    kp = Cpt(Custom_Function_Signal, value=0.0, name="kp", kind="config")
+    ki = Cpt(Custom_Function_Signal, value=0.0, name="ki", kind="config")
+    kd = Cpt(Custom_Function_Signal, value=0.0, name="kd", kind="config")
+    dt = Cpt(Custom_Function_Signal, value=0.0, name="dt", kind="config")
+    min_value = Cpt(Custom_Function_Signal, value=0.0, name="min_value", kind="config")
+    max_value = Cpt(Custom_Function_Signal, value=0.0, name="max_value", kind="config")
 
     def __init__(
         self,
@@ -133,7 +133,7 @@ class PID_Controller(Device):
             self.current_output = x
 
         self.set_function = set_function
-        self.current_output = 0
+        self.current_output = 0.0
 
         if bias_signal:
             self.bias_func = bias_signal.put
@@ -147,6 +147,11 @@ class PID_Controller(Device):
         self.ki.put_function = self.set_Ki
         self.kd.put_function = self.set_Kd
         self.dt.put_function = self.set_dt
+
+        self.p_value.read_function = self.read_p
+        self.i_value.read_function = self.read_i
+        self.d_value.read_function = self.read_d
+
         self.min_value.put_function = self.set_minval
         self.max_value.put_function = self.set_maxval
         self.pid_on.put_function = self.set_pid_on
@@ -155,15 +160,15 @@ class PID_Controller(Device):
         if pid_val_table is None:
             pid_val_table = pd.DataFrame(
                 {
-                    "setpoint": [0],
-                    "kp": [0],
-                    "ki": [0],
-                    "kd": [0],
+                    "setpoint": [0.0],
+                    "kp": [0.0],
+                    "ki": [0.0],
+                    "kd": [0.0],
                     "max_value": [np.inf],
                     "min_value": [-np.inf],
-                    "bias": [0],
-                    "stability-delta": [0],
-                    "stability-time": [0],
+                    "bias": [0.0],
+                    "stability-delta": [0.0],
+                    "stability-time": [0.0],
                 }
             )
         elif type(pid_val_table) is str:
@@ -173,7 +178,7 @@ class PID_Controller(Device):
         self.interpolate_auto = interpolate_auto
         self.pid_vals = None
         self.stability_time = np.inf
-        self.stability_delta = 0
+        self.stability_delta = 0.0
         if name != "test":
             self.pid_thread = PID_Thread(self)
             # if show_plot:
@@ -244,13 +249,13 @@ class PID_Controller(Device):
         self.pid_thread.pid.output_limits = (minval, value)
 
     def read_p(self):
-        return self.pid_thread.pid.components[0]
+        return float(self.pid_thread.pid.components[0])
 
     def read_i(self):
-        return self.pid_thread.pid.components[1]
+        return float(self.pid_thread.pid.components[1])
 
     def read_d(self):
-        return self.pid_thread.pid.components[2]
+        return float(self.pid_thread.pid.components[2])
 
     def set_pid_on(self, value):
         self.pid_thread.pid.set_auto_mode(value)
@@ -356,10 +361,10 @@ class PID_Thread(QThread):
         self.stability_delta = 0
         self.last = None
         self.starttime = 0
-        self.current_value = 0
+        self.current_value = 0.0
         self.still_running = True
-        self.last_I = 0
-        self.last_output = 0
+        self.last_I = 0.0
+        self.last_output = 0.0
 
     def update_pid(
         self,
@@ -391,7 +396,7 @@ class PID_Thread(QThread):
         if self.pid.auto_mode:
             new_output = self.pid(self.current_value)
         else:
-            new_output = 0
+            new_output = 0.0
         if new_output in self.pid.output_limits:
             self.pid._integral = self.last_I
         if np.isnan(new_output):
@@ -404,11 +409,11 @@ class PID_Thread(QThread):
         if np.abs(self.pid.setpoint - self.current_value) <= self.stability_delta:
             self.stable_time += dis
         else:
-            self.stable_time = 0
+            self.stable_time = 0.0
         self.new_data.emit(
             self.last - self.starttime,
             self.pid.setpoint,
             self.current_value,
-            new_output or 0,
+            new_output or 0.0,
             self.pid.components,
         )
