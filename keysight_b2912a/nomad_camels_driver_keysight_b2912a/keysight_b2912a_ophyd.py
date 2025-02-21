@@ -360,6 +360,7 @@ class Keysight_B2912(VISA_Device):
         read_termination="\r\n",
         write_termination="\r\n",
         baud_rate=9600,
+        has_second_channel=True,
         **kwargs,
     ):
         super().__init__(
