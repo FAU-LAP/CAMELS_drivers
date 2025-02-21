@@ -175,9 +175,7 @@ class Agilent_34970(VISA_Device):
         value=True,
         name="display_on",
         kind="config",
-        metadata={
-            "description": "Turns the instrument's display on or off."
-        },
+        metadata={"description": "Turns the instrument's display on or off."},
     )
 
     def __init__(
@@ -207,13 +205,19 @@ class Agilent_34970(VISA_Device):
         self.activate_channels.put_function = self.set_active_channels
         self.deactivate_channels.put_function = self.set_inactive_channels
         self.display_on.put_function = self.set_display_on_off
-    
+
+    def configure(self, d):
+        """Overwrite this function to call apply_configuration after setting all the values"""
+        old, new = super().configure(d)
+        self.apply_configuration()
+        return old, new
+
     def set_display_on_off(self, value):
         if value:
-            val = 'ON'
+            val = "ON"
         else:
-            val = 'OFF'
-        self.visa_instrument.write(f'DISP {val}')
+            val = "OFF"
+        self.visa_instrument.write(f"DISP {val}")
 
     def set_active_channels(self, channels):
         if not isinstance(channels, str):
@@ -225,6 +229,10 @@ class Agilent_34970(VISA_Device):
         if not isinstance(channels, str):
             channels = ",".join([str(int(x)) for x in channels])
         set_str = f"ROUT:OPEN (@{channels})"
+        self.visa_instrument.write(set_str)
+
+    def deactivate_all_channels_units_1_3(self):
+        set_str = f"ROUT:OPEN: (@111,112,113,114,115,116,121,122,123,124,125,126,311,312,313,314,315,316,321,322,323,324,325,326)"
         self.visa_instrument.write(set_str)
 
     def read_from_DMM(self):
