@@ -231,10 +231,6 @@ class Agilent_34970(VISA_Device):
         set_str = f"ROUT:OPEN (@{channels})"
         self.visa_instrument.write(set_str)
 
-    def deactivate_all_channels_units_1_3(self):
-        set_str = f"ROUT:OPEN: (@111,112,113,114,115,116,121,122,123,124,125,126,311,312,313,314,315,316,321,322,323,324,325,326)"
-        self.visa_instrument.write(set_str)
-
     def read_from_DMM(self):
         channel = self.measurement_channel.get()
         if channel != self.last_channel:
