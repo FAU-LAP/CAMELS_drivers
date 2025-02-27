@@ -17,7 +17,7 @@ keithley_2182a==0.0.2
 keithley_237==0.1.1
 keithley_2400==0.1.2
 keithley_6221==0.0.2
-keysight_b2912a==0.1.0
+keysight_b2912a==0.1.1
 keysight_e5270b==0.1.2
 lakeshore_f41==0.1.0
 leybold_c_move_1250==0.1.0
