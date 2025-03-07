@@ -19,7 +19,7 @@ class subclass(device_class.Device):
             tags=["opc", "ua"],
             directory="opc_ua_instrument",
             ophyd_device=None,
-            ophyd_class_name="make_ophyd_instance",
+            ophyd_class_name="make_ophyd_instance_opc_ua",
             **kwargs,
         )
 

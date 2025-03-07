@@ -14,7 +14,7 @@ class subclass(device_class.Device):
             ],
             directory="epics_instrument",
             ophyd_device=None,
-            ophyd_class_name="make_ophyd_instance",
+            ophyd_class_name="make_ophyd_instance_epics",
             **kwargs,
         )
 

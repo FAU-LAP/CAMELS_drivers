@@ -29,7 +29,7 @@ class subclass(device_class.Device):
             tags=["laser", "toptica", "ibeam"],
             directory="iBeam_smart",
             ophyd_device=None,
-            ophyd_class_name="make_ophyd_instance",
+            ophyd_class_name="make_ophyd_instance_iBeam",
             **kwargs,
         )
         self.config["use_FINE"] = False

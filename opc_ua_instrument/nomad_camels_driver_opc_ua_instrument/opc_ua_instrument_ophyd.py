@@ -9,7 +9,7 @@ from asyncua.sync import Client
 from asyncua import ua
 
 
-def make_ophyd_instance(
+def make_ophyd_instance_opc_ua(
     prefix="",
     *args,
     name,

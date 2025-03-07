@@ -27,6 +27,10 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.5
+
+- Fixed imports and class names: You can now combine multiple types of dynamically created instruments (like EPICS and OPC-UA instruments) in a single measurement.
+
 ### 0.1.4.
 
 - Fixed data writing to the variables to always use the correct `ua.DataType`
