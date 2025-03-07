@@ -9,9 +9,9 @@ cryovac_tic_500==0.1.0
 demo_digital_multimeter==0.1.3
 demo_instrument==0.1.1
 demo_source_measure_unit==0.1.6
-epics_instrument==0.1.0
+epics_instrument==0.1.1
 eurotherm_bisynch==0.1.0
-iBeam_smart==0.1.0
+iBeam_smart==0.1.1
 keithley_2000==0.1.0
 keithley_2182a==0.0.2
 keithley_237==0.1.1
@@ -23,7 +23,7 @@ lakeshore_f41==0.1.0
 leybold_c_move_1250==0.1.0
 mechonics_cu30cl==0.1.0
 ni_daq==0.1.1
-opc_ua_instrument==0.1.4
+opc_ua_instrument==0.1.5
 PID==0.1.10
 pi_stage_e709==0.1.1
 rhode_and_schwarz_smp_02==0.1.0
