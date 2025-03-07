@@ -98,32 +98,66 @@ def enable_func(inp, chan):
 
 class Keysight_B2912(VISA_Device):
     mesV1 = Cpt(
-        VISA_Signal_RO, name="mesV1", query="MEAS:VOLT? (@1)", metadata={"units": "V"}
+        VISA_Signal_RO,
+        name="mesV1",
+        query="MEAS:VOLT? (@1)",
+        metadata={"units": "V", "description": "Measured voltage of channel 1"},
     )
     mesI1 = Cpt(
-        VISA_Signal_RO, name="mesI1", query="MEAS:CURR? (@1)", metadata={"units": "A"}
+        VISA_Signal_RO,
+        name="mesI1",
+        query="MEAS:CURR? (@1)",
+        metadata={"units": "A", "description": "Measured current of channel 1"},
     )
     mesV2 = Cpt(
-        VISA_Signal_RO, name="mesV2", query="MEAS:VOLT? (@2)", metadata={"units": "V"}
+        VISA_Signal_RO,
+        name="mesV2",
+        query="MEAS:VOLT? (@2)",
+        metadata={"units": "V", "description": "Measured voltage of channel 2"},
     )
     mesI2 = Cpt(
-        VISA_Signal_RO, name="mesI2", query="MEAS:CURR? (@2)", metadata={"units": "A"}
+        VISA_Signal_RO,
+        name="mesI2",
+        query="MEAS:CURR? (@2)",
+        metadata={"units": "A", "description": "Measured current of channel 2"},
     )
     setV1 = Cpt(
-        VISA_Signal, name="setV1", write="SOUR1:VOLT {value}", metadata={"units": "V"}
+        VISA_Signal,
+        name="setV1",
+        write="SOUR1:VOLT {value}",
+        metadata={"units": "V", "description": "Set output voltage of channel 1"},
     )
     setI1 = Cpt(
-        VISA_Signal, name="setI1", write="SOUR1:CURR {value}", metadata={"units": "A"}
+        VISA_Signal,
+        name="setI1",
+        write="SOUR1:CURR {value}",
+        metadata={"units": "A", "description": "Set output current of channel 1"},
     )
     setV2 = Cpt(
-        VISA_Signal, name="setV2", write="SOUR2:VOLT {value}", metadata={"units": "V"}
+        VISA_Signal,
+        name="setV2",
+        write="SOUR2:VOLT {value}",
+        metadata={"units": "V", "description": "Set output voltage of channel 2"},
     )
     setI2 = Cpt(
-        VISA_Signal, name="setI2", write="SOUR2:CURR {value}", metadata={"units": "A"}
+        VISA_Signal,
+        name="setI2",
+        write="SOUR2:CURR {value}",
+        metadata={"units": "A", "description": "Set output current of channel 2"},
     )
 
-    enable1 = Cpt(VISA_Signal, name="enable1", write=lambda x: enable_func(x, 1))
-    enable2 = Cpt(VISA_Signal, name="enable2", write=lambda x: enable_func(x, 2))
+    enable1 = Cpt(
+        VISA_Signal,
+        name="enable1",
+        write=lambda x: enable_func(x, 1),
+        metadata={"description": "Turn on / off output of channel 1 (1 on / 0 off)"},
+    )
+    enable2 = Cpt(
+        VISA_Signal,
+        name="enable2",
+        write=lambda x: enable_func(x, 2),
+        metadata={"description": "Turn on / off output of channel 2 (1 on / 0 off)"},
+    )
 
     idn = Cpt(VISA_Signal_RO, name="idn", query="*IDN?", kind="config")
 
@@ -360,6 +394,7 @@ class Keysight_B2912(VISA_Device):
         read_termination="\r\n",
         write_termination="\r\n",
         baud_rate=9600,
+        has_second_channel=True,
         **kwargs,
     ):
         super().__init__(

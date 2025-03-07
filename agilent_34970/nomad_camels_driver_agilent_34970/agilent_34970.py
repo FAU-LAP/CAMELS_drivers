@@ -17,9 +17,6 @@ class subclass(device_class.Device):
             virtual=False,
             ophyd_device=Agilent_34970,
             ophyd_class_name="Agilent_34970",
-            non_channel_functions=[
-                "apply_configuration",
-            ],
             **kwargs
         )
 

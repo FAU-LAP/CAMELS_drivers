@@ -22,13 +22,15 @@ class Lab_Course_Magnet(VISA_Device):
     power_on = Cpt(
         Custom_Function_Signal,
         name="power_on",
-        metadata={"description": "turn the magnet on"},
+        metadata={"description": "turn the magnet on (1 on / 0 off)"},
     )
 
     polarity = Cpt(
         Custom_Function_Signal,
         name="polarity",
-        metadata={"description": "set the polarity of the magnet"},
+        metadata={
+            "description": "set the polarity of the magnet (1 positive / -1 negative)"
+        },
     )
 
     def __init__(
@@ -79,20 +81,20 @@ class Lab_Course_Magnet(VISA_Device):
         self.visa_instrument.flush(192)
         stat = self.read_status()
         if not val:
-            if stat['current'] == 'off':
+            if stat["current"] == "off":
                 return
             self.visa_instrument.write("0")
             time.sleep(0.5)
             ret = self.visa_instrument.read()
             self.turned_on = False
         elif self.positive_polarity:
-            if stat['current'] == 'on' and stat['polarity'] == 'negative':
-                self.visa_instrument.write('0')
+            if stat["current"] == "on" and stat["polarity"] == "negative":
+                self.visa_instrument.write("0")
                 time.sleep(20)
                 ret_mid = self.visa_instrument.read()
-                if ret_mid != 'OK':
+                if ret_mid != "OK":
                     raise ValueError(f"Unexpected response: {ret_mid}")
-            elif stat['current'] == 'on' and stat['polarity'] == 'positive':
+            elif stat["current"] == "on" and stat["polarity"] == "positive":
                 self.turned_on = True
                 return
             self.visa_instrument.write("+")
@@ -100,13 +102,13 @@ class Lab_Course_Magnet(VISA_Device):
             ret = self.visa_instrument.read()
             self.turned_on = True
         else:
-            if stat['current'] == 'on' and stat['polarity'] == 'positive':
-                self.visa_instrument.write('0')
+            if stat["current"] == "on" and stat["polarity"] == "positive":
+                self.visa_instrument.write("0")
                 time.sleep(20)
                 ret_mid = self.visa_instrument.read()
-                if ret_mid != 'OK':
+                if ret_mid != "OK":
                     raise ValueError(f"Unexpected response: {ret_mid}")
-            elif stat['current'] == 'on' and stat['polarity'] == 'negative':
+            elif stat["current"] == "on" and stat["polarity"] == "negative":
                 self.turned_on = True
                 return
             self.visa_instrument.write("-")
