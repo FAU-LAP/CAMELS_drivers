@@ -27,6 +27,10 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.6
+
+- Made setting and reading variables faster by saving variable instance to dict and reusing it. 
+
 ### 0.1.5
 
 - Fixed imports and class names: You can now combine multiple types of dynamically created instruments (like EPICS and OPC-UA instruments) in a single measurement.
