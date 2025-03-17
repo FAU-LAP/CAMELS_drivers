@@ -220,13 +220,17 @@ class Agilent_34970(VISA_Device):
         self.visa_instrument.write(f"DISP {val}")
 
     def set_active_channels(self, channels):
-        if not isinstance(channels, str):
+        if isinstance(channels, int):
+            channels = str(channels)
+        elif not isinstance(channels, str):
             channels = ",".join([str(int(x)) for x in channels])
         set_str = f"ROUT:CLOS (@{channels})"
         self.visa_instrument.write(set_str)
 
     def set_inactive_channels(self, channels):
-        if not isinstance(channels, str):
+        if isinstance(channels, int):
+            channels = str(channels)
+        elif not isinstance(channels, str):
             channels = ",".join([str(int(x)) for x in channels])
         set_str = f"ROUT:OPEN (@{channels})"
         self.visa_instrument.write(set_str)
