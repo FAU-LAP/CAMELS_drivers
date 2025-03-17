@@ -9,7 +9,7 @@ from asyncua.sync import Client
 from asyncua import ua
 
 
-def make_ophyd_instance(
+def make_ophyd_instance_opc_ua(
     prefix="",
     *args,
     name,
@@ -147,6 +147,7 @@ class Opc_Ua_instrument(Sequential_Device):
         self.url = url
         self.namespace = namespace
         self.variables = variables
+        self.variables_dict = {}
 
         # return when calling this during initialization of CAMELS at startup
         if name == "test":
@@ -164,10 +165,12 @@ class Opc_Ua_instrument(Sequential_Device):
             print(f"Error connecting to OPC UA server: {e}")
 
     def read_opc_ua(self, name, path):
-
-        if path != "":
+        # check to see if varaible already instanciated and existsd in the dictionary
+        if name in self.variables_dict:
+            var = self.variables_dict[name]
+        elif path != "":
             var = self.client.nodes.root.get_child(path)
-
+            self.variables_dict[name] = var
         else:
             # Find the namespace index
             nsidx = self.client.get_namespace_index(self.namespace)
@@ -176,11 +179,13 @@ class Opc_Ua_instrument(Sequential_Device):
             var = self.client.nodes.root.get_child(
                 f"0:Objects/{nsidx}:MyObject/{nsidx}:{name}"
             )
-        value = var.read_value()
-        return value
+            self.variables_dict[name] = var
+        return var.read_value()
 
     def set_opc_ua(self, name, path, value):
-        if path != "":
+        if name in self.variables_dict:
+            var = self.variables_dict[name]
+        elif path != "":
             var = self.client.nodes.root.get_child(path)
         else:
             # Find the namespace index
@@ -194,8 +199,14 @@ class Opc_Ua_instrument(Sequential_Device):
         expected_type = var.get_data_type_as_variant_type()
         # Convert the incoming value (which is always a float) to the expected type.
         # You can extend this mapping if needed.
-        if expected_type in (ua.VariantType.Int16, ua.VariantType.Int32, ua.VariantType.Int64,
-                            ua.VariantType.UInt16, ua.VariantType.UInt32, ua.VariantType.UInt64):
+        if expected_type in (
+            ua.VariantType.Int16,
+            ua.VariantType.Int32,
+            ua.VariantType.Int64,
+            ua.VariantType.UInt16,
+            ua.VariantType.UInt32,
+            ua.VariantType.UInt64,
+        ):
             cast_value = int(value)
         elif expected_type in (ua.VariantType.Float, ua.VariantType.Double):
             cast_value = float(value)
@@ -211,7 +222,6 @@ class Opc_Ua_instrument(Sequential_Device):
         # Write the converted value to the OPC UA variable
         data_value = ua.DataValue(ua.Variant(cast_value, expected_type))
         var.write_value(data_value)
-
 
     def finalize_steps(self):
         # Disconnect the client when done

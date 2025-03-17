@@ -8,7 +8,7 @@ from ophyd import Device
 from epics import PV
 
 
-def make_ophyd_instance(
+def make_ophyd_instance_epics(
     prefix="",
     *args,
     name,

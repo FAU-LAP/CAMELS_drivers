@@ -11,7 +11,7 @@ from pylablib.devices import Toptica
 import time
 
 
-def make_ophyd_instance(
+def make_ophyd_instance_iBeam(
     prefix="",
     *args,
     name,
