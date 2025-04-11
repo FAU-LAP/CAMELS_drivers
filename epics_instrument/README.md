@@ -13,6 +13,10 @@ You can add PVs by opening the `Manage Instruments` window and simply adding new
 
 ## Changes
 
+### 0.1.2
+
+- Increased speed by not creating every PV again for each read & write.
+
 ### 0.1.1
 
 - Fixed imports and class names: You can now combine multiple types of dynamically created instruments (like EPICS and OPC-UA instruments) in a single measurement.
