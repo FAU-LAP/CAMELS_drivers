@@ -141,26 +141,36 @@ class Epics_Instrument(Device):
             **kwargs,
         )
         self.pvs = pvs
+        self.pv_dict = {}
 
     def read_epics_pv(self, short_name, full_name):
         """
-        This function reads the specified channel.
+        Reads the specified channel. It caches the PV instance so that it is only
+        created once per full_name.
 
         Parameters:
-        short_name (str): The short name of the channel.
-        full_name (str): The full name of the channel.
+            short_name (str): The short name of the channel.
+            full_name (str): The full name of the channel.
 
         Returns:
-        float: The value of the channel.
-
+            float: The value of the channel.
         """
-        pv = PV(full_name)
+        if full_name not in self.pv_dict:
+            self.pv_dict[full_name] = PV(full_name)
+        pv = self.pv_dict[full_name]
         return pv.get()
 
     def set_epics_pv(self, short_name, full_name, value):
         """
-        This function sets the specified channel.
+        Sets the specified channel using a cached PV instance.
+
+        Parameters:
+            short_name (str): The short name of the channel.
+            full_name (str): The full name of the channel.
+            value (float): The value to set on the channel.
         """
-        pv = PV(full_name)
+        if full_name not in self.pv_dict:
+            self.pv_dict[full_name] = PV(full_name)
+        pv = self.pv_dict[full_name]
         pv.put(value)
         return pv.get()
