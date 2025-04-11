@@ -15,6 +15,7 @@ class subclass(device_class.Device):
             **kwargs,
         )
         self.settings["camera_index"] = 0
+        self.settings["display_image"] = True
 
 
 class subclass_config(device_class.Simple_Config):
