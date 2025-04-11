@@ -4,6 +4,10 @@ Generic driver for camera control using openCV written for the measurement softw
 
 ## Changes
 
+### 0.1.2
+
+- Added optional display of the recorded frame. In settings you can toggle to display or not display the frame that was recorded. Close the frame with "X" of the window or by pressing "q".
+
 ### 0.1.1
 
 - Fixed broken import paths
