@@ -13,6 +13,9 @@ You can add PVs by opening the `Manage Instruments` window and simply adding new
 
 ## Changes
 
+### 0.1.3
+- Fixed dependencies
+
 ### 0.1.2
 
 - Increased speed by not creating every PV again for each read & write.
