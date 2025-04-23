@@ -31,14 +31,10 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             self.checkBox_interpolate_auto.setChecked(
                 settings_dict.pop("interpolate_auto")
             )
-        if "val_choice" in config_dict and config_dict["val_choice"] in val_choice:
-            self.comboBox_pid_vals.setCurrentText(config_dict["val_choice"])
-        elif "val_choice" in settings_dict and settings_dict["val_choice"] in val_choice:
+        if "val_choice" in settings_dict and settings_dict["val_choice"] in val_choice:
             self.comboBox_pid_vals.setCurrentText(settings_dict.pop("val_choice"))
         self.file_box = Path_Button_Edit(self)
-        if "val_file" in config_dict:
-            self.file_box.set_path(config_dict["val_file"])
-        elif "val_file" in settings_dict:
+        if "val_file" in settings_dict:
             self.file_box.set_path(settings_dict.pop("val_file"))
         headerlabels = [
             "setpoint",
@@ -164,6 +160,8 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             print(e)
 
     def get_settings(self):
+        self.settings_dict["val_choice"] = self.comboBox_pid_vals.currentText()
+        self.settings_dict["val_file"] = self.file_box.get_path()
         bias_text = "None"
         if variables_handling.channels:
             inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
@@ -188,8 +186,6 @@ class subclass_config_sub(device_class.Device_Config_Sub):
 
     def get_config(self):
         self.config_dict["pid_val_table"] = self.val_table.update_table_data()
-        self.config_dict["val_choice"] = self.comboBox_pid_vals.currentText()
-        self.config_dict["val_file"] = self.file_box.get_path()
         self.config_dict["dt"] = float(self.lineEdit_time.text())
         self.config_dict["set_conversion_func"] = self.lineEdit_set_function.text()
         self.config_dict["read_conversion_func"] = self.lineEdit_read_function.text()

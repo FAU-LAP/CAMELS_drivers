@@ -11,6 +11,11 @@ For more information and documentation visit [this page](https://fau-lap.github.
 
 ## Changelog
 
+### 0.2.1
+Fixes:
+- settings got broken in last update, now fixed
+- progress bar of waiting step now works
+
 ## 0.2.0
 Changes:
 - many previous settings are now configs, allowing for better access to the PID while running
