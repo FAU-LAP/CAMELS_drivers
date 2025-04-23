@@ -40,7 +40,9 @@ jobs:
       - uses: tlambert03/setup-qt-libs@v1
       - name: Install dependencies
         run: |
+          sudo apt-get update
           sudo apt install libgl1 libglx-mesa0 libegl1 libopengl0 libpulse0
+          sudo apt-get install -y mono-complete
           python -m pip install --upgrade pip
           pip install nomad-camels ruff pytest pytest-qt pytest-xvfb pytest-timeout
           export QT_DEBUG_PLUGINS=1
