@@ -11,7 +11,13 @@ For more information and documentation visit [this page](https://fau-lap.github.
 
 ## Changelog
 
+## 0.2.0
+Changes:
+- many previous settings are now configs, allowing for better access to the PID while running
 
-#### 0.1.10
+Fixes:
+- NaN values are now handled by turning off the PID for the moment, instead of crashing
+
+### 0.1.10
 Fixes:
 - Output and single pid values should now be correctly recorded as float

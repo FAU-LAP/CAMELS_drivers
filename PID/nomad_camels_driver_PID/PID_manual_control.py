@@ -52,6 +52,7 @@ class PID_manual_control(Manual_Control):
         self.settings_widge.read_label.setHidden(True)
         self.settings_widge.lineEdit_set_function.setHidden(True)
         self.settings_widge.set_label.setHidden(True)
+        self.settings_widge.checkBox_plot.setHidden(True)
 
         label_state = QLabel("current state:")
         self.on_off_box = QCheckBox("Off")
@@ -100,6 +101,7 @@ class PID_manual_control(Manual_Control):
         self.layout().addItem(spacer, 20, 0)
 
         self.settings_widge.setHidden(True)
+        self.pushButton_update_settings.setHidden(True)
 
         self.on_off_box.clicked.connect(self.change_state)
         self.pushButton_settings.clicked.connect(self.show_settings)
@@ -122,15 +124,19 @@ class PID_manual_control(Manual_Control):
 
     def change_show_plot(self):
         showing = self.ophyd_device.plot.livePlot.show_plot
-        self.ophyd_device.change_show_plot(not showing)
+        self.ophyd_device.show_plot.put(not showing)
         if showing:
             self.pushButton_plot.setText("show plot")
         else:
             self.pushButton_plot.setText("hide plot")
 
     def update_settings(self):
-        settings = self.settings_widge.get_settings()
-        self.ophyd_device.update_pid_settings(settings)
+        table = self.settings_widge.val_table.update_table_data()
+        self.ophyd_device.pid_val_table.put(table)
+        self.ophyd_device.interpolate_auto.put(
+            self.settings_widge.checkBox_interpolate_auto.isChecked()
+        )
+        self.ophyd_device.update_pid_settings()
 
     def data_update(self, setp, pid_val, output, on):
         self.lineEdit_setpoint_show.setText(f"{setp:.3e}")
@@ -167,6 +173,7 @@ class PID_manual_control(Manual_Control):
     def show_settings(self):
         hidden = self.settings_widge.isHidden()
         self.settings_widge.setHidden(not hidden)
+        self.pushButton_update_settings.setHidden(not hidden)
         if hidden:
             self.pushButton_settings.setText("Hide Settings")
         else:

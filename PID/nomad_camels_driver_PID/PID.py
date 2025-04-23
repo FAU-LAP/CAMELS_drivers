@@ -33,9 +33,9 @@ class subclass(device_class.Device):
             ophyd_class_name="PID_Controller",
             **kwargs,
         )
-        self.settings["pid_val_table"] = default_pid_val_table
+        self.config["pid_val_table"] = default_pid_val_table
         self.settings["auto_pid"] = True
-        self.settings["show_plot"] = True
+        self.config["show_plot"] = True
         self.config["dt"] = 0.5
         self.main_thread_only = True
 

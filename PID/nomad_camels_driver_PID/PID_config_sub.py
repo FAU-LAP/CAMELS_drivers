@@ -25,15 +25,21 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.comboBox_pid_vals = QComboBox()
         val_choice = ["Table", "File"]
         self.comboBox_pid_vals.addItems(val_choice)
-        if "interpolate_auto" in settings_dict:
-            self.checkBox_interpolate_auto.setChecked(settings_dict["interpolate_auto"])
-        # if 'auto_pid' in settings_dict:
-        #     self.checkBox_auto_select_values.setChecked(settings_dict['auto_pid'])
-        if "val_choice" in settings_dict and settings_dict["val_choice"] in val_choice:
-            self.comboBox_pid_vals.setCurrentText(settings_dict["val_choice"])
+        if "interpolate_auto" in config_dict:
+            self.checkBox_interpolate_auto.setChecked(config_dict["interpolate_auto"])
+        elif "interpolate_auto" in settings_dict:
+            self.checkBox_interpolate_auto.setChecked(
+                settings_dict.pop("interpolate_auto")
+            )
+        if "val_choice" in config_dict and config_dict["val_choice"] in val_choice:
+            self.comboBox_pid_vals.setCurrentText(config_dict["val_choice"])
+        elif "val_choice" in settings_dict and settings_dict["val_choice"] in val_choice:
+            self.comboBox_pid_vals.setCurrentText(settings_dict.pop("val_choice"))
         self.file_box = Path_Button_Edit(self)
-        if "val_file" in settings_dict:
-            self.file_box.set_path(settings_dict["val_file"])
+        if "val_file" in config_dict:
+            self.file_box.set_path(config_dict["val_file"])
+        elif "val_file" in settings_dict:
+            self.file_box.set_path(settings_dict.pop("val_file"))
         headerlabels = [
             "setpoint",
             "kp",
@@ -46,8 +52,10 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             "stability-time",
         ]
         tableData = None
-        if "pid_val_table" in settings_dict:
-            tableData = settings_dict["pid_val_table"]
+        if "pid_val_table" in config_dict:
+            tableData = config_dict["pid_val_table"]
+        elif "pid_val_table" in settings_dict:
+            tableData = settings_dict.pop("pid_val_table")
         self.val_table = AddRemoveTable(
             editables=range(len(headerlabels)),
             headerLabels=headerlabels,
@@ -97,17 +105,23 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.read_label = QLabel("Conversion function for reading:")
         self.set_label = QLabel("Conversion function for setting:")
         read_conv = ""
-        if "read_conv_func" in settings_dict:
-            read_conv = str(settings_dict["read_conv_func"]) or ""
+        if "read_conversion_func" in config_dict:
+            read_conv = str(config_dict["read_conversion_func"]) or ""
+        elif "read_conv_func" in settings_dict:
+            read_conv = str(settings_dict.pop("read_conv_func")) or ""
         set_conv = ""
-        if "set_conv_func" in settings_dict:
-            set_conv = str(settings_dict["set_conv_func"]) or ""
+        if "set_conversion_func" in config_dict:
+            set_conv = str(config_dict["set_conversion_func"]) or ""
+        elif "set_conv_func" in settings_dict:
+            set_conv = str(settings_dict.pop("set_conv_func")) or ""
         self.lineEdit_read_function = QLineEdit(read_conv)
         self.lineEdit_set_function = QLineEdit(set_conv)
 
         self.checkBox_plot = QCheckBox("Plot PID values?")
-        if "show_plot" in settings_dict:
-            self.checkBox_plot.setChecked(settings_dict["show_plot"])
+        if "show_plot" in config_dict:
+            self.checkBox_plot.setChecked(config_dict["show_plot"])
+        elif "show_plot" in settings_dict:
+            self.checkBox_plot.setChecked(settings_dict.pop("show_plot"))
 
         layout.addWidget(self.checkBox_plot, 0, 0, 1, 2)
         layout.addWidget(self.input_label, 1, 0)
@@ -141,10 +155,6 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         self.file_box.setEnabled(not table)
         self.val_table.setEnabled(table)
 
-    # def auto_selection_switch(self):
-    #     sel_on = self.checkBox_auto_select_values.isChecked()
-    #     self.checkBox_interpolate_auto.setEnabled(sel_on)
-
     def file_changed(self):
         try:
             df = pd.read_csv(self.file_box.get_path(), delimiter="\t")
@@ -154,16 +164,6 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             print(e)
 
     def get_settings(self):
-        # self.settings_dict['auto_pid'] = self.checkBox_auto_select_values.isChecked()
-        self.settings_dict["interpolate_auto"] = (
-            self.checkBox_interpolate_auto.isChecked()
-        )
-        self.val_table.update_table_data()
-        self.settings_dict["pid_val_table"] = self.val_table.tableData
-        self.settings_dict["val_choice"] = self.comboBox_pid_vals.currentText()
-        self.settings_dict["val_file"] = self.file_box.get_path()
-        self.settings_dict["read_conv_func"] = self.lineEdit_read_function.text()
-        self.settings_dict["set_conv_func"] = self.lineEdit_set_function.text()
         bias_text = "None"
         if variables_handling.channels:
             inp_chan = variables_handling.channels[self.comboBox_input.currentText()]
@@ -184,9 +184,25 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             self.settings_dict["bias_signal_name"] = None
         else:
             self.settings_dict["bias_signal_name"] = bias_text
-        self.settings_dict["show_plot"] = self.checkBox_plot.isChecked()
         return self.settings_dict
 
     def get_config(self):
+        self.config_dict["pid_val_table"] = self.val_table.update_table_data()
+        self.config_dict["val_choice"] = self.comboBox_pid_vals.currentText()
+        self.config_dict["val_file"] = self.file_box.get_path()
         self.config_dict["dt"] = float(self.lineEdit_time.text())
+        self.config_dict["set_conversion_func"] = self.lineEdit_set_function.text()
+        self.config_dict["read_conversion_func"] = self.lineEdit_read_function.text()
+        self.config_dict["interpolate_auto"] = (
+            self.checkBox_interpolate_auto.isChecked()
+        )
+        self.config_dict["show_plot"] = self.checkBox_plot.isChecked()
         return self.config_dict
+
+    def hide_settings(self):
+        self.comboBox_bias.hide()
+        self.bias_label.hide()
+        self.comboBox_input.hide()
+        self.input_label.hide()
+        self.comboBox_output.hide()
+        self.output_label.hide()
