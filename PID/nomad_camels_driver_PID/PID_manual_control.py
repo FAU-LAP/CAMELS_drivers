@@ -31,6 +31,7 @@ class PID_manual_control(Manual_Control):
             name = "PID manual control"
         super().__init__(parent=parent, title=name)
         self.setLayout(QGridLayout())
+        self.update_thread = None
         self.start_device(control_data["pid_name"])
 
     def device_ready(self):
@@ -40,18 +41,7 @@ class PID_manual_control(Manual_Control):
             config_dict=self.device.config,
             parent=self,
         )
-        self.settings_widge.input_label.setHidden(True)
-        self.settings_widge.comboBox_input.setHidden(True)
-        self.settings_widge.output_label.setHidden(True)
-        self.settings_widge.comboBox_output.setHidden(True)
-        self.settings_widge.bias_label.setHidden(True)
-        self.settings_widge.comboBox_bias.setHidden(True)
-        self.settings_widge.lineEdit_time.setHidden(True)
-        self.settings_widge.timer_label.setHidden(True)
-        self.settings_widge.lineEdit_read_function.setHidden(True)
-        self.settings_widge.read_label.setHidden(True)
-        self.settings_widge.lineEdit_set_function.setHidden(True)
-        self.settings_widge.set_label.setHidden(True)
+        self.settings_widge.hide_settings()
         self.settings_widge.checkBox_plot.setHidden(True)
 
         label_state = QLabel("current state:")
@@ -133,9 +123,31 @@ class PID_manual_control(Manual_Control):
     def update_settings(self):
         table = self.settings_widge.val_table.update_table_data()
         self.ophyd_device.pid_val_table.put(table)
+        self.ophyd_device._configuring = True
         self.ophyd_device.interpolate_auto.put(
             self.settings_widge.checkBox_interpolate_auto.isChecked()
         )
+        self.ophyd_device.read_conversion_func.put(
+            self.settings_widge.comboBox_read_function.currentText()
+        )
+        self.ophyd_device.set_conversion_func.put(
+            self.settings_widge.comboBox_set_function.currentText()
+        )
+        self.ophyd_device.custom_read_conv.put(
+            self.settings_widge.lineEdit_read_function.text()
+        )
+        self.ophyd_device.custom_set_conv.put(
+            self.settings_widge.lineEdit_set_function.text()
+        )
+        self.ophyd_device.set_conv_file.put(
+            self.settings_widge.functions_set_file.get_path()
+        )
+        self.ophyd_device.read_conv_file.put(
+            self.settings_widge.functions_read_file.get_path()
+        )
+        self.ophyd_device._configuring = False
+        self.ophyd_device.update_read_conv_func()
+        self.ophyd_device.update_set_conv_func()
         self.ophyd_device.update_pid_settings()
 
     def data_update(self, setp, pid_val, output, on):
@@ -181,11 +193,13 @@ class PID_manual_control(Manual_Control):
         self.adjustSize()
 
     def close(self) -> bool:
-        self.update_thread.still_running = False
+        if self.update_thread is not None:
+            self.update_thread.still_running = False
         return super().close()
 
     def closeEvent(self, a0) -> None:
-        self.update_thread.still_running = False
+        if self.update_thread is not None:
+            self.update_thread.still_running = False
         return super().closeEvent(a0)
 
 

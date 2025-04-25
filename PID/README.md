@@ -11,6 +11,14 @@ For more information and documentation visit [this page](https://fau-lap.github.
 
 ## Changelog
 
+### 0.2.2
+Improvements:
+- Now allowing for custom conversion functions and from user-defined python files
+- Added descriptions for PID-channels and configs
+
+Fixes:
+- When startup of manual control breaks, no additional error is raised on closing anymore
+
 ### 0.2.1
 Fixes:
 - settings got broken in last update, now fixed

@@ -56,27 +56,153 @@ def pt100_inv(T):
 
 
 class PID_Controller(Device):
-    output_value = Cpt(Custom_Function_SignalRO, value=0.0, name="output_value")
-    current_value = Cpt(Custom_Function_SignalRO, value=0.0, name="current_value")
-    setpoint = Cpt(Custom_Function_Signal, value=0.0, name="setpoint")
-    pid_stable = Cpt(Custom_Function_SignalRO, value=0.0, name="pid_stable")
-    pid_on = Cpt(Custom_Function_Signal, value=False, name="pid_on")
-    p_value = Cpt(Custom_Function_SignalRO, value=0.0, name="p_value")
-    i_value = Cpt(Custom_Function_SignalRO, value=0.0, name="i_value")
-    d_value = Cpt(Custom_Function_SignalRO, value=0.0, name="d_value")
+    output_value = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="output_value",
+        metadata={"description": "Output value of the PID controller"},
+    )
+    current_value = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="current_value",
+        metadata={"description": "The momentary input value of the PID controller"},
+    )
+    setpoint = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="setpoint",
+        metadata={"description": "The setpoint of the PID controller"},
+    )
+    pid_stable = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="pid_stable",
+        metadata={"description": "Whether the satbility criteria has been reached"},
+    )
+    pid_on = Cpt(
+        Custom_Function_Signal,
+        value=False,
+        name="pid_on",
+        metadata={"description": "Whether the PID control is currently on"},
+    )
+    p_value = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="p_value",
+        metadata={"description": "The proportional value of the PID controller"},
+    )
+    i_value = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="i_value",
+        metadata={"description": "The integral value of the PID controller"},
+    )
+    d_value = Cpt(
+        Custom_Function_SignalRO,
+        value=0.0,
+        name="d_value",
+        metadata={"description": "The derivative value of the PID controller"},
+    )
 
-    kp = Cpt(Custom_Function_Signal, value=0.0, name="kp", kind="config")
-    ki = Cpt(Custom_Function_Signal, value=0.0, name="ki", kind="config")
-    kd = Cpt(Custom_Function_Signal, value=0.0, name="kd", kind="config")
-    dt = Cpt(Custom_Function_Signal, value=0.0, name="dt", kind="config")
-    min_value = Cpt(Custom_Function_Signal, value=0.0, name="min_value", kind="config")
-    max_value = Cpt(Custom_Function_Signal, value=0.0, name="max_value", kind="config")
+    kp = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="kp",
+        kind="config",
+        metadata={"description": "The proportional gain of the PID controller"},
+    )
+    ki = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="ki",
+        kind="config",
+        metadata={"description": "The integral gain of the PID controller"},
+    )
+    kd = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="kd",
+        kind="config",
+        metadata={"description": "The derivative gain of the PID controller"},
+    )
+    dt = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="dt",
+        kind="config",
+        metadata={
+            "description": "The sample time (i.e. time between two readings) of the PID controller"
+        },
+    )
+    min_value = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="min_value",
+        kind="config",
+        metadata={"description": "The minimum output value of the PID controller"},
+    )
+    max_value = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="max_value",
+        kind="config",
+        metadata={"description": "The maximum output value of the PID controller"},
+    )
 
     set_conversion_func = Cpt(
-        Custom_Function_Signal, value="", name="set_conversion_func", kind="config"
+        Custom_Function_Signal,
+        value="",
+        name="set_conversion_func",
+        kind="config",
+        metadata={
+            "description": "Function used to convert the output value before handing it to the output channel"
+        },
     )
     read_conversion_func = Cpt(
-        Custom_Function_Signal, value="", name="read_conversion_func", kind="config"
+        Custom_Function_Signal,
+        value="",
+        name="read_conversion_func",
+        kind="config",
+        metadata={
+            "description": "Function used to convert the raw input value before handling"
+        },
+    )
+    custom_read_conv = Cpt(
+        Custom_Function_Signal,
+        value="",
+        name="custom_read_conv",
+        kind="config",
+        metadata={
+            "description": "If read_conversion_func is custom, this is evaluated, if it is from file, it is the function name"
+        },
+    )
+    custom_set_conv = Cpt(
+        Custom_Function_Signal,
+        value="",
+        name="custom_set_conv",
+        kind="config",
+        metadata={
+            "description": "If set_conversion_func is custom, this is evaluated, if it is from file, it is the function name"
+        },
+    )
+    set_conv_file = Cpt(
+        Custom_Function_Signal,
+        value="",
+        name="set_conv_file",
+        kind="config",
+        metadata={
+            "description": "If set_conversion_func is from file, this is the file path"
+        },
+    )
+    read_conv_file = Cpt(
+        Custom_Function_Signal,
+        value="",
+        name="read_conv_file",
+        kind="config",
+        metadata={
+            "description": "If read_conversion_func is from file, this is the file path"
+        },
     )
     show_plot = Cpt(Custom_Function_Signal, value=True, name="show_plot", kind="config")
     interpolate_auto = Cpt(
@@ -99,7 +225,7 @@ class PID_Controller(Device):
         bias_signal=None,
         set_signal=None,
         read_signal=None,
-        **kwargs
+        **kwargs,
     ):
         pops = [
             "val_choice",
@@ -118,7 +244,7 @@ class PID_Controller(Device):
             read_attrs=read_attrs,
             configuration_attrs=configuration_attrs,
             parent=parent,
-            **kwargs
+            **kwargs,
         )
         if isinstance(read_signal, str):
             read_signal = device_handling.get_channel_from_string(read_signal)
@@ -133,9 +259,20 @@ class PID_Controller(Device):
 
         self.show_plot.put_function = self.change_show_plot
 
-        self.read_conversion_func.put_function = self.update_read_conv_func
-
-        self.set_conversion_func.put_function = self.update_set_conv_func
+        self.read_conversion_func.put_function = lambda x: self.update_read_conv_func(
+            func=x
+        )
+        self.set_conversion_func.put_function = lambda x: self.update_set_conv_func(
+            func=x
+        )
+        self.custom_read_conv.put_function = lambda x: self.update_read_conv_func(
+            custom_func=x
+        )
+        self.custom_set_conv.put_function = lambda x: self.update_set_conv_func(
+            custom_func=x
+        )
+        self.read_conv_file.put_function = lambda x: self.update_read_conv_func(file=x)
+        self.set_conv_file.put_function = lambda x: self.update_set_conv_func(file=x)
 
         self.current_output = 0.0
 
@@ -165,6 +302,7 @@ class PID_Controller(Device):
         self.pid_vals = None
         self.stability_time = np.inf
         self.stability_delta = 0.0
+        self._configuring = False
         if name != "test":
             self.pid_thread = PID_Thread(self)
             from nomad_camels.main_classes.plot_pyqtgraph import PlotWidget
@@ -183,8 +321,8 @@ class PID_Controller(Device):
             )
             # for y in y_axes:
             #     self.plot.plot.current_lines[y].setLinestyle('None')
-            self.update_read_conv_func(None)
-            self.update_set_conv_func(None)
+            self.update_read_conv_func("No conversion")
+            self.update_set_conv_func("No conversion")
             self.pid_thread.new_data.connect(self.data_update)
             self.pid_thread.finished.connect(self.plot.close)
 
@@ -209,17 +347,51 @@ class PID_Controller(Device):
         return pid_val_table
 
     def configure(self, d):
+        self._configuring = True
         ret = super().configure(d)
+        self._configuring = False
+        self.update_read_conv_func()
+        self.update_set_conv_func()
         if not self.pid_thread.isRunning():
             self.pid_thread.start()
         self.update_PID_vals(self.pid_thread.pid.setpoint)
         return ret
 
-    def update_read_conv_func(self, func):
-        if not func:
+    def update_read_conv_func(self, func=None, custom_func=None, file=None):
+        if self._configuring:
+            return
+        if func is None:
+            func = self.read_conversion_func.value
+        if custom_func is None:
+            custom_func = self.custom_read_conv.value
+        if file is None:
+            file = self.read_conv_file.value
+        if func == "No conversion":
             func = lambda x: x
-        elif isinstance(func, str):
-            func = globals()[func]
+        elif func == "Pt1000":
+            func = pt1000
+        elif func == "Pt100":
+            func = pt100
+        elif func == "Custom":
+            func = lambda x: eval(custom_func)
+        elif func == "From file":
+            import importlib.util
+            import os
+
+            # import the function from the file
+            name = os.path.basename(file)[:-3]
+            spec = importlib.util.spec_from_file_location(name, file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            func = getattr(module, custom_func)
+        else:
+            raise ValueError(f"Unknown conversion function: {func}.")
+        try:
+            func(1)
+        except Exception as e:
+            raise Exception(
+                f"Error in conversion function: {func}. Please check the function. Error: {e}"
+            )
 
         def read_function():
             x = self.read_signal.get()
@@ -227,11 +399,41 @@ class PID_Controller(Device):
 
         self.read_function = read_function
 
-    def update_set_conv_func(self, func):
-        if not func:
+    def update_set_conv_func(self, func=None, custom_func=None, file=None):
+        if self._configuring:
+            return
+        if func is None:
+            func = self.set_conversion_func.value
+        if custom_func is None:
+            custom_func = self.custom_set_conv.value
+        if file is None:
+            file = self.set_conv_file.value
+        if func == "No conversion":
             func = lambda x: x
-        elif isinstance(func, str):
-            func = globals()[func]
+        elif func == "Pt1000":
+            func = pt1000_inv
+        elif func == "Pt100":
+            func = pt100_inv
+        elif func == "Custom":
+            func = lambda x: eval(custom_func)
+        elif func == "From file":
+            import importlib.util
+            import os
+
+            # import the function from the file
+            name = os.path.basename(file)[:-3]
+            spec = importlib.util.spec_from_file_location(name, file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            func = getattr(module, name)
+        else:
+            raise ValueError(f"Unknown conversion function: {func}.")
+        try:
+            func(1)
+        except Exception as e:
+            raise Exception(
+                f"Error in conversion function: {func}. Please check the function. Error: {e}"
+            )
 
         def set_function(x):
             x = func(x)
@@ -376,7 +578,7 @@ class PID_Thread(QThread):
         auto_mode=False,
         proportional_on_measurement=False,
         error_map=None,
-        **kwargs
+        **kwargs,
     ):
         super().__init__()
         self.pid = simple_pid.PID(

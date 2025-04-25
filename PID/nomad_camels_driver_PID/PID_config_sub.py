@@ -110,8 +110,47 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             set_conv = str(config_dict["set_conversion_func"]) or ""
         elif "set_conv_func" in settings_dict:
             set_conv = str(settings_dict.pop("set_conv_func")) or ""
-        self.lineEdit_read_function = QLineEdit(read_conv)
-        self.lineEdit_set_function = QLineEdit(set_conv)
+
+        conversion_items = ["No conversion", "Pt1000", "Pt100", "Custom", "From file"]
+
+        custom_read_conv = ""
+        if "custom_read_conv" in config_dict:
+            custom_read_conv = config_dict["custom_read_conv"]
+        custom_set_conv = ""
+        if "custom_set_conv" in config_dict:
+            custom_set_conv = config_dict["custom_set_conv"]
+        read_conv_file = ""
+        if "read_conv_file" in config_dict:
+            read_conv_file = config_dict["read_conv_file"]
+        set_conv_file = ""
+        if "set_conv_file" in config_dict:
+            set_conv_file = config_dict["set_conv_file"]
+
+        self.lineEdit_read_function = QLineEdit(custom_read_conv)
+        self.lineEdit_read_function.setToolTip(
+            'Custom function evaluates for "x"\nIf "From file" is selected, give the name of the function here'
+        )
+        self.functions_read_file = Path_Button_Edit(self, path=read_conv_file)
+        self.comboBox_read_function = QComboBox()
+        self.comboBox_read_function.addItems(conversion_items)
+        self.comboBox_read_function.currentTextChanged.connect(
+            self.read_function_changed
+        )
+        if read_conv in conversion_items:
+            self.comboBox_read_function.setCurrentText(read_conv)
+        self.read_function_changed()
+
+        self.lineEdit_set_function = QLineEdit(custom_set_conv)
+        self.lineEdit_set_function.setToolTip(
+            'Custom function evaluates for "x"\nIf "From file" is selected, give the name of the function here'
+        )
+        self.functions_set_file = Path_Button_Edit(self, path=set_conv_file)
+        self.comboBox_set_function = QComboBox()
+        self.comboBox_set_function.addItems(conversion_items)
+        self.comboBox_set_function.currentTextChanged.connect(self.set_function_changed)
+        if set_conv in conversion_items:
+            self.comboBox_set_function.setCurrentText(set_conv)
+        self.set_function_changed()
 
         self.checkBox_plot = QCheckBox("Plot PID values?")
         if "show_plot" in config_dict:
@@ -126,23 +165,54 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         layout.addWidget(self.comboBox_output, 2, 1)
         layout.addWidget(self.bias_label, 3, 0)
         layout.addWidget(self.comboBox_bias, 3, 1)
+
         layout.addWidget(self.read_label, 4, 0)
-        layout.addWidget(self.lineEdit_read_function, 4, 1)
-        layout.addWidget(self.set_label, 5, 0)
-        layout.addWidget(self.lineEdit_set_function, 5, 1)
-        layout.addWidget(self.timer_label, 6, 0)
-        layout.addWidget(self.lineEdit_time, 6, 1)
+        layout.addWidget(self.comboBox_read_function, 4, 1)
+        layout.addWidget(self.lineEdit_read_function, 5, 0)
+        layout.addWidget(self.functions_read_file, 5, 1)
+
+        layout.addWidget(self.set_label, 6, 0)
+        layout.addWidget(self.comboBox_set_function, 6, 1)
+        layout.addWidget(self.lineEdit_set_function, 7, 0)
+        layout.addWidget(self.functions_set_file, 7, 1)
+
+        layout.addWidget(self.timer_label, 10, 0)
+        layout.addWidget(self.lineEdit_time, 10, 1)
         # layout.addWidget(self.checkBox_auto_select_values, 7, 0)
-        layout.addWidget(self.checkBox_interpolate_auto, 7, 0, 1, 2)
-        layout.addWidget(self.comboBox_pid_vals, 8, 0)
-        layout.addWidget(self.file_box, 8, 1)
-        layout.addWidget(self.val_table, 9, 0, 1, 2)
+        layout.addWidget(self.checkBox_interpolate_auto, 11, 0, 1, 2)
+        layout.addWidget(self.comboBox_pid_vals, 12, 0)
+        layout.addWidget(self.file_box, 12, 1)
+        layout.addWidget(self.val_table, 13, 0, 1, 2)
 
         # self.checkBox_auto_select_values.stateChanged.connect(self.auto_selection_switch)
         self.comboBox_pid_vals.currentTextChanged.connect(self.val_choice_switch)
         self.val_choice_switch()
         # self.auto_selection_switch()
         self.file_box.path_changed.connect(self.file_changed)
+
+    def read_function_changed(self):
+        text = self.comboBox_read_function.currentText()
+        if text == "From file":
+            self.functions_read_file.setHidden(False)
+            self.lineEdit_read_function.setHidden(False)
+        elif text == "Custom":
+            self.functions_read_file.setHidden(True)
+            self.lineEdit_read_function.setHidden(False)
+        else:
+            self.functions_read_file.setHidden(True)
+            self.lineEdit_read_function.setHidden(True)
+
+    def set_function_changed(self):
+        text = self.comboBox_set_function.currentText()
+        if text == "From file":
+            self.functions_set_file.setHidden(False)
+            self.lineEdit_set_function.setHidden(False)
+        elif text == "Custom":
+            self.functions_set_file.setHidden(True)
+            self.lineEdit_set_function.setHidden(False)
+        else:
+            self.functions_set_file.setHidden(True)
+            self.lineEdit_set_function.setHidden(True)
 
     def val_choice_switch(self):
         table = self.comboBox_pid_vals.currentText() == "Table"
@@ -187,8 +257,16 @@ class subclass_config_sub(device_class.Device_Config_Sub):
     def get_config(self):
         self.config_dict["pid_val_table"] = self.val_table.update_table_data()
         self.config_dict["dt"] = float(self.lineEdit_time.text())
-        self.config_dict["set_conversion_func"] = self.lineEdit_set_function.text()
-        self.config_dict["read_conversion_func"] = self.lineEdit_read_function.text()
+        self.config_dict["set_conversion_func"] = (
+            self.comboBox_set_function.currentText()
+        )
+        self.config_dict["read_conversion_func"] = (
+            self.comboBox_read_function.currentText()
+        )
+        self.config_dict["custom_set_conv"] = self.lineEdit_set_function.text()
+        self.config_dict["custom_read_conv"] = self.lineEdit_read_function.text()
+        self.config_dict["set_conv_file"] = self.functions_set_file.get_path()
+        self.config_dict["read_conv_file"] = self.functions_read_file.get_path()
         self.config_dict["interpolate_auto"] = (
             self.checkBox_interpolate_auto.isChecked()
         )
