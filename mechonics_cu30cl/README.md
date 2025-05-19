@@ -13,3 +13,10 @@ The stage-control of NOMAD-CAMELS is fully supported.
 ## Documentation
 
 For more information and documentation visit the NOMAD-CAMELS [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+## Changelog
+
+#### 0.1.1
+- now more stable
+
