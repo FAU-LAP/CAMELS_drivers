@@ -106,7 +106,7 @@ class subclass_config(device_class.Device_Config):
         )
 
         # Add button and texteditfield. When button is pressed all opc ua variables matching the text of the texteditfield are added to the table
-        self.search_label = QLabel("Search fro variables:")
+        self.search_label = QLabel("Search for variables:")
         self.search_line_edit = QLineEdit()
         self.search_line_edit.setToolTip(
             "Enter a regex pattern to search for variables. Variables that match the pattern will be added to the table below."

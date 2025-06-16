@@ -27,6 +27,9 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.7
+- fixed typo in config window
+
 ### 0.1.6
 
 - Made setting and reading variables faster by saving variable instance to dict and reusing it. 
