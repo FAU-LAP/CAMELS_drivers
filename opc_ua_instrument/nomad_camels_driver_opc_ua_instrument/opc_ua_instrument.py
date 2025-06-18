@@ -2,7 +2,7 @@ from .opc_ua_instrument_ophyd import make_ophyd_class
 
 from nomad_camels.main_classes import device_class
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
-from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox
+from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QApplication
 from PySide6.QtCore import Qt
 
 # For variable node discovery
@@ -200,7 +200,8 @@ class subclass_config(device_class.Device_Config):
             QMessageBox.warning(self, "No Search Text", "Please enter text to search.")
             return
         self.setEnabled(False)
-        self.setCursor(Qt.WaitCursor)
+        app = QApplication.instance()
+        app.processEvents()  # Allow the UI to update while processing
         try:
             opc_url = self.url_line_edit.text().strip()
             # Connect to the OPC UA server
