@@ -3,6 +3,7 @@ from .opc_ua_instrument_ophyd import make_ophyd_class
 from nomad_camels.main_classes import device_class
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
 from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox
+from PySide6.QtCore import Qt
 
 # For variable node discovery
 import re
@@ -198,28 +199,35 @@ class subclass_config(device_class.Device_Config):
         if not search_text:
             QMessageBox.warning(self, "No Search Text", "Please enter text to search.")
             return
+        self.setEnabled(False)
+        self.setCursor(Qt.WaitCursor)
+        try:
+            opc_url = self.url_line_edit.text().strip()
+            # Connect to the OPC UA server
+            client = Client(url=opc_url)
+            client.connect()
 
-        opc_url = self.url_line_edit.text().strip()
-        # Connect to the OPC UA server
-        client = Client(url=opc_url)
-        client.connect()
-
-        found_variables = self.discover_opc_variables(
-            node=client.nodes.objects, client=client, regex_pattern=search_text
-        )
-
-        if not found_variables:
-            QMessageBox.information(
-                self,
-                "No Matches",
-                "No variables found. Make sure your pattern is correct.",
+            found_variables = self.discover_opc_variables(
+                node=client.nodes.objects, client=client, regex_pattern=search_text
             )
-            return
 
-        # Add found variables to the table
-        for var in found_variables:
-            # var is with its key being the browse path and the value being the node id. We want to add the browse path to the table.
-            self.variable_table.add(["", "read-only", var, "", ""])
+            if not found_variables:
+                QMessageBox.information(
+                    self,
+                    "No Matches",
+                    "No variables found. Make sure your pattern is correct.",
+                )
+                return
+
+            # Add found variables to the table
+            for var in found_variables:
+                # var is with its key being the browse path and the value being the node id. We want to add the browse path to the table.
+                self.variable_table.add(["", "read-only", var, "", ""])
+        except Exception as e:
+            raise e
+        finally:
+            self.setEnabled(True)
+            self.setCursor(Qt.ArrowCursor)
 
 
 def get_configs_from_ophyd(ophyd_instance):
