@@ -200,6 +200,7 @@ class subclass_config(device_class.Device_Config):
             QMessageBox.warning(self, "No Search Text", "Please enter text to search.")
             return
         self.setEnabled(False)
+        self.search_button.setText("Searching...")
         app = QApplication.instance()
         app.processEvents()  # Allow the UI to update while processing
         try:
@@ -228,7 +229,7 @@ class subclass_config(device_class.Device_Config):
             raise e
         finally:
             self.setEnabled(True)
-            self.setCursor(Qt.ArrowCursor)
+            self.search_button.setText("Fetch and Add")
 
 
 def get_configs_from_ophyd(ophyd_instance):

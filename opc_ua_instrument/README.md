@@ -27,6 +27,9 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.8
+- improved visual user-feedback while searching for variables
+
 ### 0.1.7
 - fixed typo in config window
 
