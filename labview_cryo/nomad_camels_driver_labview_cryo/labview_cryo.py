@@ -19,6 +19,7 @@ class subclass(device_class.Device):
             ophyd_class_name="make_ophyd_instance_labview_cryo",
             **kwargs,
         )
+        self.main_thread_only = True
 
     def update_driver(self):
         if "variables" not in self.settings or not self.settings["variables"]:
@@ -27,7 +28,7 @@ class subclass(device_class.Device):
         variables = self.settings["variables"]
         self.ophyd_class = make_ophyd_class(variables)
         self.ophyd_instance = self.ophyd_class(
-            variables,
+            # variables,
             name="test",
         )
 

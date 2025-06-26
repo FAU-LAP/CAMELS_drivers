@@ -47,18 +47,12 @@ def read_function_generator(index):
     return read_function
 
 
-def _trigger_function(_self_instance):
-    return lambda: _self_instance._read_file()
-
-
 def make_ophyd_class(variables):
     signal_dict = {}
     for i, variable in enumerate(variables):
         signal_dict[variable] = Cpt(
             Custom_Function_SignalRO,
             name=variable,
-            read_function=read_function_generator(i),
-            trigger_function=_trigger_function,
         )
     return type("Labview_Cryo_Ophyd", (Labview_Cryo,), {**signal_dict})
 
@@ -83,6 +77,10 @@ class Labview_Cryo(Sequential_Device):
         n_variables=0,
         **kwargs,
     ):
+        if "variables" in kwargs:
+            variables = kwargs.pop("variables")
+            if n_variables == 0 and variables:
+                n_variables = len(variables)
         super().__init__(
             prefix=prefix,
             name=name,
@@ -98,6 +96,12 @@ class Labview_Cryo(Sequential_Device):
         self._was_triggered = False
         self.n_variables = n_variables
         self.newest_data = [np.nan] * n_variables
+
+        # go through all signals and set their read function
+        for i, variable in enumerate(self.read_attrs):
+            signal = getattr(self, variable)
+            signal.read_function = lambda x=i: self.get_data(x)
+            signal.trigger_function = self._read_file
 
     def _read_file(self):
         """
