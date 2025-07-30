@@ -81,6 +81,18 @@ class Keithley_2400(VISA_Device):
         kind="config",
         metadata={"units": "V", "description": "Sets voltage sensing range. 210V max"},
     )  # Value is used but the actual channel does not set anything
+    disable_output = Cpt(
+        VISA_Signal,
+        write="OUTP 0",
+        name="disable_output",
+        metadata={"description": "Turns off the output. Enter any value to disable."},
+    )
+    enable_output = Cpt(
+        VISA_Signal,
+        write="OUTP 1",
+        name="enable_output",
+        metadata={"description": "Turns on the output. Enter any value to enable."},
+    )
     device_id = Cpt(
         VISA_Signal_RO,
         name="device_id",
@@ -148,6 +160,8 @@ class Keithley_2400(VISA_Device):
         self.set_current_range_source = (
             None  # None if nothing was set and True if it was set
         )
+        # Set the data format to ASCII
+        self.visa_instrument.write(":FORM:DATA ASC")
 
     def measure_voltage_query_function(self):
         # check if the voltage sensing range was set and if not set it
@@ -290,5 +304,6 @@ class Keithley_2400(VISA_Device):
     # def voltage_range_sense_write_function(self, value):
     # 	return f':VOLT:RANG {value}'
 
-    def finalize_steps(self):
-        self.visa_instrument.write("OUTP 0")
+    # def finalize_steps(self):
+    #     pass
+    #     self.visa_instrument.write("OUTP 0")
