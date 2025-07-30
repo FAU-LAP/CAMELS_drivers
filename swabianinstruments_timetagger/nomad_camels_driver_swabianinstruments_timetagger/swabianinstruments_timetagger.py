@@ -139,7 +139,12 @@ class subclass_config(device_class.Simple_Config):
                 not negatives and i >= int(len(self.channels) / 2)
             ):
                 continue
-            sets, sets_fall = self.tabs[i].get_settings()
+            if negatives:
+                sets, sets_fall = self.tabs[
+                    i - int(len(self.channels) / 2)
+                ].get_settings()
+            else:
+                sets, sets_fall = self.tabs[i].get_settings()
             settings["channels"][str(channel)] = sets
             f_channel = (
                 -1 * channel if negatives else int(channel + len(self.channels) / 2)

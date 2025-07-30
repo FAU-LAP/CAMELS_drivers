@@ -31,8 +31,7 @@ class Cam_Control_Pylablib(Device):
         Custom_Function_SignalRO,
         name="frame_average",
         metadata={
-            "description": "Calculates the frame average of the latest frame. "
-            "Works only after using get_single_frame."
+            "description": "This gets a frame and calculates the frame average of that frame"
         },
     )
     get_single_frame = Cpt(
@@ -40,6 +39,13 @@ class Cam_Control_Pylablib(Device):
         name="get_single_frame",
         metadata={
             "description": "Get data of single frame with parameters of the GUI."
+        },
+    )
+    set_background = Cpt(
+        Custom_Function_Signal,
+        name="set_background",
+        metadata={
+            "description": "Sets the background frame with the current frame. Equivalent to pressing the 'Grab background' button of the GUI"
         },
     )
     get_background_frame = Cpt(
@@ -93,6 +99,7 @@ class Cam_Control_Pylablib(Device):
             exposure_time=x
         )
         self.get_single_frame.read_function = self.get_single_frame_function
+        self.set_background.put_function = self.grab_background
         self.get_background_frame.read_function = self.get_background_frame_function
         self.frame_average.read_function = self.frame_average_function
         self.complete_settings.read_function = self.complete_settings_function
@@ -309,9 +316,7 @@ class Cam_Control_Pylablib(Device):
         )
         self.sock.recv(self.byte_length)
 
-    def grab_background(
-        self,
-    ):
+    def grab_background(self, value):
         self.sock.sendall(
             bytes(
                 r'{    "id": 0,    "purpose": "request",    "parameters": {"name": "gui/set/value", "args": {"name": "proc/grab_background", "value": "True"}}}',

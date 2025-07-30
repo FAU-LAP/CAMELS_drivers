@@ -1,3 +1,7 @@
+# Unwanted drivers
+fabry_perot_calculator/
+mechonics_cu30cl/nomad_camels_driver_mechonics_cu30cl/Servo3AxUSB2_x64.dll
+mechonics_cu30cl/nomad_camels_driver_mechonics_cu30cl/Servo3AxWrap.dll
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

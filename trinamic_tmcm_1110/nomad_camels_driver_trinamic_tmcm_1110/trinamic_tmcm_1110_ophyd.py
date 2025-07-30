@@ -43,6 +43,7 @@ class TMCM_1110(Device):
 
     set_position = Cpt(Custom_Function_Signal, name="set_position")
     get_position = Cpt(Custom_Function_SignalRO, name="get_position")
+    stop_motor = Cpt(Custom_Function_Signal, name="stop_motor")
 
     ref_search_mode = Cpt(Custom_Function_Signal, name="ref_search_mode", kind="config")
     right_lim_switch_disable = Cpt(
@@ -175,6 +176,7 @@ class TMCM_1110(Device):
 
         self.set_position.put_function = self.move_position
         self.get_position.read_function = self.motor.get_actual_position
+        self.stop_motor.put_function = self.stop_motor_function
 
     def set_parameter(self, value, name):
         if name == "ref_search_mode":
@@ -204,6 +206,9 @@ class TMCM_1110(Device):
         while not self.motor.get_position_reached():
             time.sleep(0.1)
             print()
+
+    def stop_motor_function(self):
+        self.module.stop(self.motor_number)
 
     def finalize_steps(self):
         self.interface.close()

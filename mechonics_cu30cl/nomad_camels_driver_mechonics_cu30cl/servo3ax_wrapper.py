@@ -260,7 +260,7 @@ class Servo3AxUSB2Wrapper:
 
         self.positionerProperties = self._get_positioner_properties()
 
-        self.EEPROM_data = self._get_EEPROM_info()
+        # self.EEPROM_data = self._get_EEPROM_info()
 
         indices = indices or [1, 1, 1]
         self._set_index(*indices)
@@ -655,7 +655,7 @@ if __name__ == "__main__":
     # print(wrap.get_position())
     # set_vals = [1000, 1000, 0]
     # wrap.set_position(set_vals, wait=False)
-    print(wrap._get_EEPROM_info())
+    # print(wrap._get_EEPROM_info())
     wrap.findReference(force=True, axes=[1, 2])
     print(wrap._get_positioner_properties())
     print(wrap._getTimeConstant())

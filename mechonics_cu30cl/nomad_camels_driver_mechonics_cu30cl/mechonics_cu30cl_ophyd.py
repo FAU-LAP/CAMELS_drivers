@@ -214,7 +214,7 @@ if __name__ == "__main__":
     }
     # print(mechonics_cu30cl.configure(config))
     # print(mechonics_cu30cl.read_configuration())
-    print(mechonics_cu30cl.eeprom_data.get())
+    # print(mechonics_cu30cl.eeprom_data.get())
     mechonics_cu30cl.timeconstant.put(200)
     mechonics_cu30cl.resolution_x.put(0.05)
     mechonics_cu30cl.resolution_y.put(0.05)
@@ -223,22 +223,22 @@ if __name__ == "__main__":
     mechonics_cu30cl.speed_x.put(100)
     mechonics_cu30cl.speed_y.put(100)
     mechonics_cu30cl.find_reference()
-    print(mechonics_cu30cl.stage._get_positioner_properties())
-    print(mechonics_cu30cl.stage._getTimeConstant())
-    print(mechonics_cu30cl.stage._read_pick_encoder())
-    print(mechonics_cu30cl.stage.get_position())
-    print(mechonics_cu30cl.x_get_position.get(), mechonics_cu30cl.y_get_position.get())
-    mechonics_cu30cl.x_set_position.put(2000)
-    import time
+    # print(mechonics_cu30cl.stage._get_positioner_properties())
+    # print(mechonics_cu30cl.stage._getTimeConstant())
+    # print(mechonics_cu30cl.stage._read_pick_encoder())
+    # print(mechonics_cu30cl.stage.get_position())
+    # print(mechonics_cu30cl.x_get_position.get(), mechonics_cu30cl.y_get_position.get())
+    # mechonics_cu30cl.x_set_position.put(2000)
+    # import time
 
-    for i in range(7):
-        time.sleep(1)
-        print(mechonics_cu30cl.x_get_position.get())
-    mechonics_cu30cl.x_set_position.put(0)
-    mechonics_cu30cl.y_set_position.put(2000)
-    for i in range(7):
-        time.sleep(1)
-        print(
-            mechonics_cu30cl.x_get_position.get(), mechonics_cu30cl.y_get_position.get()
-        )
+    # for i in range(7):
+    #     time.sleep(1)
+    #     print(mechonics_cu30cl.x_get_position.get())
+    # mechonics_cu30cl.x_set_position.put(0)
+    # mechonics_cu30cl.y_set_position.put(2000)
+    # for i in range(7):
+    #     time.sleep(1)
+    #     print(
+    #         mechonics_cu30cl.x_get_position.get(), mechonics_cu30cl.y_get_position.get()
+    #     )
     mechonics_cu30cl.finalize_steps()
