@@ -13,7 +13,8 @@ cryovac_tic_500==0.1.0
 demo_digital_multimeter==0.1.3
 demo_instrument==0.1.1
 demo_source_measure_unit==0.1.6
-epics_instrument==0.1.1
+derived_channels==0.1.0
+epics_instrument==0.1.3
 eurotherm_bisynch==0.1.0
 iBeam_smart==0.1.1
 keithley_2000==0.1.0
@@ -26,10 +27,13 @@ keysight_e5270b==0.1.2
 korad_3005p==0.1.0
 lakeshore_f41==0.1.0
 leybold_c_move_1250==0.1.0
-mechonics_cu30cl==0.1.0
+mechonics_cu30cl==0.1.1
+mks_dualMag_972B==0.1.0
+mks_g_series==0.1.0
 ni_daq==0.1.1
-opc_ua_instrument==0.1.6
-PID==0.1.10
+opc_ua_instrument==0.1.8
+openCV_instrument==0.1.2
+PID==0.2.2
 pi_stage_e709==0.1.1
 rhode_and_schwarz_smp_02==0.1.0
 swabianinstruments_timetagger==0.1.1
