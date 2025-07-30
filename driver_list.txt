@@ -9,6 +9,7 @@ cryovac_tic_500==0.1.0
 demo_digital_multimeter==0.1.3
 demo_instrument==0.1.1
 demo_source_measure_unit==0.1.6
+derived_channels==0.1.0
 epics_instrument==0.1.3
 eurotherm_bisynch==0.1.0
 iBeam_smart==0.1.1
