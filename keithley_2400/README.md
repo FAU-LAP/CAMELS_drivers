@@ -8,6 +8,10 @@ Currently supported are basic voltage and current setting and reading.
 
 ## Changes
 
+### 0.1.3
+
+- Now does not turn off the output when a protocol ends that uses the Keithley 2400.
+
 ### 0.1.2
 
 - Fixed bug when the instruments data format was not set to ASCII. Caused errors when reading data ("ascii codec can't decode byte 0x...").
