@@ -40,9 +40,32 @@ class TimeTagger(Device):
     cbm_begin_channel = Cpt(
         Custom_Function_Signal, name="cbm_begin_channel", kind="config"
     )
-    cbm_end_channel = Cpt(Custom_Function_Signal, name="cbm_end_channel", kind="config")
-    cbm_n_values = Cpt(Custom_Function_Signal, name="cbm_n_values", kind="config")
-    cbm_meas_time = Cpt(Custom_Function_Signal, name="cbm_meas_time", kind="config")
+    cbm_end_channel = Cpt(
+        Custom_Function_Signal,
+        name="cbm_end_channel",
+        kind="config",
+    )
+    cbm_n_values = Cpt(
+        Custom_Function_Signal,
+        name="cbm_n_values",
+        kind="config",
+    )
+    cbm_meas_time = Cpt(
+        Custom_Function_Signal,
+        name="cbm_meas_time",
+        kind="config",
+    )
+
+    set_channel_1_delay = Cpt(
+        Custom_Function_Signal,
+        name="set_channel_1_delay",
+        metadata={"units": "ps", "description": "Sets the delay of channel 1 in ps"},
+    )
+    set_channel_2_delay = Cpt(
+        Custom_Function_Signal,
+        name="set_channel_2_delay",
+        metadata={"units": "ps", "description": "Sets the delay of channel 2 in ps"},
+    )
 
     def __init__(
         self,
@@ -70,7 +93,7 @@ class TimeTagger(Device):
         if name == "test":
             return
         self.tagger = TT.createTimeTagger(serial=serial_number)
-        self.tt_countrate = TT.Countrate(tagger=self.tagger, channels=[0, 1])
+        self.tt_countrate = TT.Countrate(tagger=self.tagger, channels=[1])
         self.tt_countrate.stop()
         self.tt_correlation = None
         self.correlation_config_change = True
@@ -88,14 +111,14 @@ class TimeTagger(Device):
         self.countrate.read_function = self.read_countrate
         self.countrate.trigger_function = self.start_countrate
 
-        self._countrate_avg_time = 1e12
+        self._countrate_avg_time = int(1e12)
         self.countrate_time.put_function = self._set_countrate_time
         self.countrate_channels.put_function = self._update_countrate_channels
 
         self.correlation.trigger_function = self.start_correlation
         self.correlation.read_function = self.read_correlation
 
-        self._correlation_meas_time = 1e12
+        self._correlation_meas_time = int(1e12)
         self.correlation_bins.put_function = self._set_correlation_config
         self.correlation_binwidth.put_function = self._set_correlation_config
         self.correlation_channel_1.put_function = self._set_correlation_config
@@ -105,12 +128,15 @@ class TimeTagger(Device):
         self.count_between_markers.trigger_function = self.start_cbm
         self.count_between_markers.read_function = self.read_cbm
 
-        self._cbm_meas_time = 1e12
+        self._cbm_meas_time = int(1e12)
         self.cbm_n_values.put_function = self._set_cbm_config
         self.cbm_click_channel.put_function = self._set_cbm_config
         self.cbm_begin_channel.put_function = self._set_cbm_config
         self.cbm_end_channel.put_function = self._set_cbm_config
         self.cbm_meas_time.put_function = self._set_cbm_meas_time
+
+        self.set_channel_1_delay.put_function = self._set_channel_1_delay
+        self.set_channel_2_delay.put_function = self._set_channel_2_delay
 
     def _update_countrate_channels(self, channels):
         if not channels:
@@ -132,19 +158,19 @@ class TimeTagger(Device):
         self.tt_countrate.stop()
 
     def _set_countrate_time(self, value):
-        self._countrate_avg_time = value * 1e12
+        self._countrate_avg_time = int(value * 1e12)
 
     def _set_correlation_config(self, value):
         self.correlation_config_change = True
 
     def _set_correlation_meas_time(self, value):
-        self._correlation_meas_time = value * 1e12
+        self._correlation_meas_time = int(value * 1e12)
 
     def _set_cbm_config(self, value):
         self.cbm_config_change = True
 
     def _set_cbm_meas_time(self, value):
-        self._cbm_meas_time = value * 1e12
+        self._cbm_meas_time = int(value * 1e12)
 
     def start_correlation(self):
         if self.correlation_config_change:
@@ -196,6 +222,11 @@ class TimeTagger(Device):
         data = self.tt_countrate.getData()
         return data
 
+    def _set_channel_1_delay(self, value):
+        self.tagger.setInputDelay(1, int(value))
+
+    def _set_channel_2_delay(self, value):
+        self.tagger.setInputDelay(2, int(value))
+
     def finalize_steps(self):
         TT.freeTimeTagger(self.tagger)
-
