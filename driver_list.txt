@@ -26,7 +26,7 @@ leybold_c_move_1250==0.1.0
 mechonics_cu30cl==0.1.1
 ni_daq==0.1.1
 opc_ua_instrument==0.1.8
-openCV_instrument==0.1.0
+openCV_instrument==0.1.2
 PID==0.2.2
 pi_stage_e709==0.1.1
 rhode_and_schwarz_smp_02==0.1.0
