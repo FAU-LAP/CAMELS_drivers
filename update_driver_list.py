@@ -31,6 +31,8 @@ for f in pathlib.Path(os.path.dirname(__file__)).rglob("pyproject.toml"):
         if name and version:
             driver_list.append(f"{name}=={version}\n")
 
+driver_list.sort()
+
 print(driver_list)
 with open("driver_list.txt", "w") as f:
     f.writelines(driver_list)
