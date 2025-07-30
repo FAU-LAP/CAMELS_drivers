@@ -293,4 +293,4 @@ class Keithley_2400(VISA_Device):
     # 	return f':VOLT:RANG {value}'
 
     def finalize_steps(self):
-        self.visa_instrument.write("OUTP 0")
+        pass
