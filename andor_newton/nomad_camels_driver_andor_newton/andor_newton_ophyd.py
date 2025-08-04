@@ -35,31 +35,109 @@ class Andor_Newton(Sequential_Device):
     """
 
     read_camera = Cpt(
-        Custom_Function_SignalRO, name="read_camera", metadata={"units": "intensity"}
+        Custom_Function_SignalRO,
+        name="read_camera",
+        metadata={
+            "description": "Reads the data from the camera, returns an image or array of bins, depending on the readout mode."
+        },
     )
 
     get_temperature = Cpt(
-        Custom_Function_SignalRO, name="get_temperature", kind="config"
+        Custom_Function_SignalRO,
+        name="get_temperature",
+        kind="config",
+        metadata={
+            "description": "The current temperature of the camera.",
+            "unit": "°C",
+        },
     )
     temperature_status = Cpt(
-        Custom_Function_SignalRO, name="temperature_status", kind="config"
+        Custom_Function_SignalRO,
+        name="temperature_status",
+        kind="config",
+        metadata={
+            "description": 'The status of the temperature control.\nCan be "off" (cooler off), "not_reached" (cooling in progress), "not_stabilized" (reached but not stabilized yet), "stabilized" (completely stabilized) or "drifted".',
+        },
     )
 
     # Configuration settings
-    set_temperature = Cpt(Custom_Function_Signal, name="set_temperature", kind="config")
-    shutter_mode = Cpt(Custom_Function_Signal, name="shutter_mode", kind="config")
-    exposure_time = Cpt(Custom_Function_Signal, name="exposure_time", kind="config")
-    readout_mode = Cpt(Custom_Function_Signal, name="readout_mode", kind="config")
-    preamp_gain = Cpt(Custom_Function_Signal, name="preamp_gain", kind="config")
-    horizontal_binning = Cpt(
-        Custom_Function_Signal, name="horizontal_binning", kind="config"
+    set_temperature = Cpt(
+        Custom_Function_Signal,
+        name="set_temperature",
+        kind="config",
+        metadata={
+            "description": "The desired temperature of the camera. The cooler is enabled automatically.",
+            "unit": "°C",
+        },
     )
-    hs_speed = Cpt(Custom_Function_Signal, name="hs_speed", kind="config")
-    vs_speed = Cpt(Custom_Function_Signal, name="vs_speed", kind="config")
+    shutter_mode = Cpt(
+        Custom_Function_Signal,
+        name="shutter_mode",
+        kind="config",
+        metadata={
+            "description": 'The shutter mode. Possible values are "open", "closed", or "auto" to automatically open for exposure.',
+        },
+    )
+    # shutter_ttl_setting = 0  # 0 for low, 1 for high
+    exposure_time = Cpt(
+        Custom_Function_Signal,
+        name="exposure_time",
+        kind="config",
+        metadata={
+            "description": "The exposure time of the camera.",
+            "unit": "s",
+        },
+    )
+    readout_mode = Cpt(
+        Custom_Function_Signal,
+        name="readout_mode",
+        kind="config",
+        metadata={
+            "description": "The readout mode of the camera. Can be 'image', 'FVB - full vertical binning', 'multi track', or 'random track'.",
+        },
+    )
+    preamp_gain = Cpt(
+        Custom_Function_Signal,
+        name="preamp_gain",
+        kind="config",
+        metadata={
+            "description": "The preamplifier gain setting.",
+        },
+    )
+    horizontal_binning = Cpt(
+        Custom_Function_Signal,
+        name="horizontal_binning",
+        kind="config",
+        metadata={
+            "description": "The horizontal binning is the number of pixels to bin horizontally.",
+            "unit": "pixels",
+        },
+    )
+    hs_speed = Cpt(
+        Custom_Function_Signal,
+        name="hs_speed",
+        kind="config",
+        metadata={
+            "description": "The horizontal scan speed.",
+        },
+    )
+    vs_speed = Cpt(
+        Custom_Function_Signal,
+        name="vs_speed",
+        kind="config",
+        metadata={
+            "description": "The vertical scan speed.",
+        },
+    )
     multi_tracks = Cpt(Custom_Function_Signal, name="multi_tracks", kind="config")
     # read_settings = Cpt(Custom_Function_SignalRO, name='read_settings', kind='config')
     shutter_ttl_open = Cpt(
-        Custom_Function_Signal, name="shutter_ttl_open", kind="config"
+        Custom_Function_Signal,
+        name="shutter_ttl_open",
+        kind="config",
+        metadata={
+            "description": 'If "high", the shutter opens at a high TTL level.',
+        },
     )
 
     def __init__(
