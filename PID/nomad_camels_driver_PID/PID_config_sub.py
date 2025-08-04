@@ -1,6 +1,13 @@
 import pandas as pd
 
-from PySide6.QtWidgets import QGridLayout, QCheckBox, QComboBox, QLabel, QLineEdit
+from PySide6.QtWidgets import (
+    QGridLayout,
+    QCheckBox,
+    QComboBox,
+    QLabel,
+    QLineEdit,
+    QHBoxLayout,
+)
 
 from nomad_camels.main_classes import device_class
 
@@ -126,11 +133,16 @@ class subclass_config_sub(device_class.Device_Config_Sub):
         if "set_conv_file" in config_dict:
             set_conv_file = config_dict["set_conv_file"]
 
+        read_layout = QHBoxLayout()
+        read_layout.setContentsMargins(0, 0, 0, 0)
+
         self.lineEdit_read_function = QLineEdit(custom_read_conv)
         self.lineEdit_read_function.setToolTip(
             'Custom function evaluates for "x"\nIf "From file" is selected, give the name of the function here'
         )
         self.functions_read_file = Path_Button_Edit(self, path=read_conv_file)
+        read_layout.addWidget(self.lineEdit_read_function)
+        read_layout.addWidget(self.functions_read_file)
         self.comboBox_read_function = QComboBox()
         self.comboBox_read_function.addItems(conversion_items)
         self.comboBox_read_function.currentTextChanged.connect(
@@ -140,11 +152,16 @@ class subclass_config_sub(device_class.Device_Config_Sub):
             self.comboBox_read_function.setCurrentText(read_conv)
         self.read_function_changed()
 
+        set_layout = QHBoxLayout()
+        set_layout.setContentsMargins(0, 0, 0, 0)
+
         self.lineEdit_set_function = QLineEdit(custom_set_conv)
         self.lineEdit_set_function.setToolTip(
             'Custom function evaluates for "x"\nIf "From file" is selected, give the name of the function here'
         )
         self.functions_set_file = Path_Button_Edit(self, path=set_conv_file)
+        set_layout.addWidget(self.lineEdit_set_function)
+        set_layout.addWidget(self.functions_set_file)
         self.comboBox_set_function = QComboBox()
         self.comboBox_set_function.addItems(conversion_items)
         self.comboBox_set_function.currentTextChanged.connect(self.set_function_changed)
@@ -168,13 +185,11 @@ class subclass_config_sub(device_class.Device_Config_Sub):
 
         layout.addWidget(self.read_label, 4, 0)
         layout.addWidget(self.comboBox_read_function, 4, 1)
-        layout.addWidget(self.lineEdit_read_function, 5, 0)
-        layout.addWidget(self.functions_read_file, 5, 1)
+        layout.addLayout(read_layout, 5, 0, 1, 2)
 
         layout.addWidget(self.set_label, 6, 0)
         layout.addWidget(self.comboBox_set_function, 6, 1)
-        layout.addWidget(self.lineEdit_set_function, 7, 0)
-        layout.addWidget(self.functions_set_file, 7, 1)
+        layout.addLayout(set_layout, 7, 0, 1, 2)
 
         layout.addWidget(self.timer_label, 10, 0)
         layout.addWidget(self.lineEdit_time, 10, 1)
