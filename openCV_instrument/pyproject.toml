@@ -17,7 +17,8 @@ classifiers = [
 ]
 
 dependencies = [
-	"nomad-camels"
+	"nomad-camels",
+	"opencv-python",
 ]
 
 [project.urls]
