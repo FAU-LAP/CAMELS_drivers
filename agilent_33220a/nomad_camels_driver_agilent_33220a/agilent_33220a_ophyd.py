@@ -10,17 +10,64 @@ from nomad_camels.bluesky_handling.custom_function_signal import (
 
 
 class Agilent_33220A(Device):
-    frequency = Cpt(Custom_Function_Signal, value=1000, name="frequency")
-    amplitude = Cpt(Custom_Function_Signal, value=1, name="amplitude")
-    offset = Cpt(Custom_Function_Signal, value=0, name="offset")
-    output = Cpt(Custom_Function_Signal, value=False, name="output")
-    error = Cpt(Custom_Function_SignalRO)
+    frequency = Cpt(
+        Custom_Function_Signal,
+        value=1000,
+        name="frequency",
+        metadata={
+            "description": "Frequency of the output signal.",
+            "unit": "Hz",
+        },
+    )
+    amplitude = Cpt(
+        Custom_Function_Signal,
+        value=1,
+        name="amplitude",
+        metadata={
+            "description": "Amplitude of the output signal.",
+            "unit": "see amplitude_unit",
+        },
+    )
+    offset = Cpt(
+        Custom_Function_Signal,
+        value=0,
+        name="offset",
+        metadata={
+            "description": "DC offset of the output signal.",
+            "unit": "V",
+        },
+    )
+    output = Cpt(
+        Custom_Function_Signal,
+        value=False,
+        name="output",
+        metadata={
+            "description": "Output state of the signal generator.",
+        },
+    )
+    error = Cpt(
+        Custom_Function_SignalRO,
+        name="error",
+        metadata={
+            "description": "Error message from the signal generator.",
+        },
+    )
 
     amplitude_unit = Cpt(
-        Custom_Function_Signal, value="VPP", name="amplitude_unit", kind="config"
+        Custom_Function_Signal,
+        value="VPP",
+        name="amplitude_unit",
+        kind="config",
+        metadata={
+            "description": 'Unit of the amplitude. Possible values are "VPP" (Volts peak-to-peak), "VRMS" (Volts root mean square), and "DBM" (decibel-milliwatts).'
+        },
     )
     waveform = Cpt(
-        Custom_Function_Signal, value="sinusoid", name="waveform", kind="config"
+        Custom_Function_Signal,
+        value="sinusoid",
+        name="waveform",
+        kind="config",
+        metadata={"description": "Defines the shape of the waveform."},
     )
     output_impedance = Cpt(
         Custom_Function_Signal, value="50", name="output_impedance", kind="config"

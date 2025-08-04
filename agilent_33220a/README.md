@@ -2,7 +2,10 @@
 
 Driver of the Agilent 33220A function generator written for the measurement software [NOMAD-CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
 
+## Features
+The driver provides the ability to set frequency, amplitude, offset and the waveform.
 
+Additionally, it is possible to define arbitrary waveforms made up of several frequencies and amplitudes of sine- or triangle-waves.
 
 
 ## Documentation
