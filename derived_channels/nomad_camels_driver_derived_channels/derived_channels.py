@@ -9,6 +9,7 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QComboBox,
     QSpacerItem,
+    QSplitter,
     QSizePolicy,
 )
 
@@ -79,6 +80,7 @@ class subclass_config(device_class.Device_Config):
         self.sub_widget = subclass_config_sub(
             settings_dict=settings_dict, parent=self, config_dict=config_dict
         )
+        self.sub_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout().addWidget(self.sub_widget, 5, 0, 1, 5)
         self.load_settings()
 
@@ -89,12 +91,9 @@ class subclass_config(device_class.Device_Config):
         return self.sub_widget.get_config()
 
 
-class subclass_config_sub(QWidget):
+class subclass_config_sub(QSplitter):
     def __init__(self, settings_dict=None, parent=None, config_dict=None):
         super().__init__(parent)
-        layout = QGridLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(layout)
 
         self.signal_info = settings_dict.get("signal_info", {})
         table_data = {"Channel Name": list(self.signal_info.keys())}
@@ -106,8 +105,8 @@ class subclass_config_sub(QWidget):
 
         self.signal_tabs = QTabWidget(self)
 
-        layout.addWidget(self.signal_table, 0, 0)
-        layout.addWidget(self.signal_tabs, 1, 0)
+        self.addWidget(self.signal_table)
+        self.addWidget(self.signal_tabs)
         self.build_tabs()
         self.last_signal_names = list(self.signal_info.keys())
 
