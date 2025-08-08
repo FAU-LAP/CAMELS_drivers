@@ -42,6 +42,8 @@ def make_ophyd_class(signal_info):
                 write_access=value.get("write_access", False),
                 read_formula=value.get("read_formula"),
                 write_formula=value.get("write_formula"),
+                conversion_type=value.get("conversion_type", "Simple Function"),
+                conversion_file=value.get("conversion_file", ""),
                 metadata={
                     "description": value.get("description", ""),
                     "unit": value.get("unit", ""),
@@ -53,6 +55,8 @@ def make_ophyd_class(signal_info):
                 name=key,
                 derived_from=value.get("derived_from", []),
                 read_formula=value.get("read_formula"),
+                conversion_type=value.get("conversion_type", "Simple Function"),
+                conversion_file=value.get("conversion_file", ""),
                 metadata={
                     "description": value.get("description", ""),
                     "unit": value.get("unit", ""),
