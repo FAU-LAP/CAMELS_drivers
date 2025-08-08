@@ -34,5 +34,8 @@ For more information on NOMAD CAMELS and instruments visit the [documentation](h
 
 ## Changelog
 
+### 0.1.3
+Made custom python functions more robust when the file is removed
+
 ### 0.1.2
 Added functionality to use custom python functions.

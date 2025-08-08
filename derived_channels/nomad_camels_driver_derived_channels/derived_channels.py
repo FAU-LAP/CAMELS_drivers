@@ -268,7 +268,10 @@ class ConversionFunctionWidget(QWidget):
         self.read_formula = Variable_Box()
         self.read_formula.setText(signal_info.get("read_formula", ""))
         self.write_formula = QLineEdit()
-        self.write_formula.setText(signal_info.get("write_formula", ""))
+        if not self._writable and signal_info.get("conversion_type", "") == "From File":
+            self.write_formula.setText(signal_info.get("read_formula", ""))
+        else:
+            self.write_formula.setText(signal_info.get("write_formula", ""))
         self.write_formula.setToolTip(
             'Calculation of the output value. Use "x" for the input value.\nExample: "x * 2" will double the input value.'
         )

@@ -42,6 +42,12 @@ class MultiDerivedSignal(Signal):
         self._conversion_type = conversion_type
         self._conversion_file = conversion_file
         self._conversion_function = None
+        try:
+            self._set_conversion_function()
+        except Exception as e:
+            print(e)
+
+    def _set_conversion_function(self):
         if self._conversion_type == "From File":
             if not self._conversion_file:
                 raise ValueError("No conversion file provided conversion with file.")
@@ -53,7 +59,7 @@ class MultiDerivedSignal(Signal):
             spec = importlib.util.spec_from_file_location(name, self._conversion_file)
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
-            if write_access:
+            if self.write_access:
                 self._conversion_function = getattr(module, self._write_formula)
             else:
                 self._conversion_function = getattr(module, self._read_formula)
@@ -120,6 +126,8 @@ class MultiDerivedSignal(Signal):
             except Exception as e:
                 raise ValueError(f"Error evaluating calculation formula: {e}")
         else:
+            if not self._conversion_function:
+                self._set_conversion_function()
             return self._conversion_function(**values)
 
     def forward(self, value):
@@ -133,6 +141,8 @@ class MultiDerivedSignal(Signal):
             except Exception as e:
                 raise ValueError(f"Error evaluating calculation formula: {e}")
         else:
+            if not self._conversion_function:
+                self._set_conversion_function()
             return self._conversion_function(value)
 
     @property
