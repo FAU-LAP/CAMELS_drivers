@@ -8,16 +8,38 @@ from pylablib.devices.Thorlabs import KinesisMotor
 
 
 class Thorlabs_K10CR1(Device):
-    get_position = Cpt(Custom_Function_SignalRO, name="get_position", retry_on_error=2)
+    get_position = Cpt(
+        Custom_Function_SignalRO,
+        name="get_position",
+        retry_on_error=2,
+        metadata={"description": "Read the position of the motor.", "unit": "degree"},
+    )
     set_position = Cpt(
-        Custom_Function_Signal, name="set_relative_position", retry_on_error=2
+        Custom_Function_Signal,
+        name="set_position",
+        retry_on_error=2,
+        metadata={"description": "Set the position of the motor.", "unit": "degree"},
     )
 
     acceleration = Cpt(
-        Custom_Function_Signal, name="acceleration", kind="config", retry_on_error=2
+        Custom_Function_Signal,
+        name="acceleration",
+        kind="config",
+        retry_on_error=2,
+        metadata={
+            "description": "Set the acceleration of the motor.",
+            "unit": "degree/s^2",
+        },
     )
     max_velocity = Cpt(
-        Custom_Function_Signal, name="max_velocity", kind="config", retry_on_error=2
+        Custom_Function_Signal,
+        name="max_velocity",
+        kind="config",
+        retry_on_error=2,
+        metadata={
+            "description": "Set the maximum velocity of the motor.",
+            "unit": "degree/s",
+        },
     )
 
     def __init__(

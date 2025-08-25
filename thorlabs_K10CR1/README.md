@@ -4,7 +4,7 @@ Driver for the Thorlabs K10CR1 motorized rotation mount written for the measurem
 
 
 ## Features
-The position can be set and read, and the transition time configured.
+The position can be set and read, together with acceleration and maximum velocity.
 
 
 ## Documentation
