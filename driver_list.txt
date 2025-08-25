@@ -36,9 +36,9 @@ thorlabs_ddr_25==0.0.2
 thorlabs_K10CR1==0.1.1
 thorlabs_MFF==0.1.0
 thorlabs_TLPM==0.1.0
-trinamic_tmcm_1110==0.1.0
-voltcraft_pps==0.1.2
-voltcraft_psp==0.1.0
+trinamic_tmcm_1110==0.1.1
+voltcraft_pps==0.1.3
+voltcraft_psp==0.1.1
 zaber_rst240b_e08==0.1.0
 zurichinstruments_uhfli_600==0.1.0
 zurich_instruments_mfli==0.1.0
