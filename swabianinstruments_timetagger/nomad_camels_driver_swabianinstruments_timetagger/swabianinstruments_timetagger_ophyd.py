@@ -9,40 +9,135 @@ import TimeTagger as TT
 
 
 class TimeTagger(Device):
-    countrate = Cpt(Custom_Function_SignalRO, name="countrate")
-    correlation = Cpt(Custom_Function_SignalRO, name="correlation")
-    count_between_markers = Cpt(Custom_Function_SignalRO, name="count_between_markers")
+    countrate = Cpt(
+        Custom_Function_SignalRO,
+        name="countrate",
+        metadata={
+            "unit": "counts/s",
+            "description": "Countrate measurement with specified config",
+        },
+    )
+    correlation = Cpt(
+        Custom_Function_SignalRO,
+        name="correlation",
+        metadata={
+            "description": "Correlation measurement with specified config",
+            "unit": "counts",
+        },
+    )
+    count_between_markers = Cpt(
+        Custom_Function_SignalRO,
+        name="count_between_markers",
+        metadata={
+            "description": "Count between markers with specified config",
+            "unit": "counts",
+        },
+    )
 
-    countrate_time = Cpt(Custom_Function_Signal, name="countrate_time", kind="config")
+    countrate_time = Cpt(
+        Custom_Function_Signal,
+        name="countrate_time",
+        kind="config",
+        metadata={
+            "description": "How long the countrate measurement runs",
+            "unit": "s",
+        },
+    )
     countrate_channels = Cpt(
-        Custom_Function_Signal, name="countrate_channels", kind="config"
+        Custom_Function_Signal,
+        name="countrate_channels",
+        kind="config",
+        metadata={
+            "description": "Channels used for countrate measurement.\n"
+            "List them e.g. like `0, 1`",
+        },
     )
 
     correlation_channel_1 = Cpt(
-        Custom_Function_Signal, name="correlation_channel_1", kind="config"
+        Custom_Function_Signal,
+        name="correlation_channel_1",
+        kind="config",
+        metadata={
+            "description": "First channel used for correlation measurement.",
+        },
     )
     correlation_channel_2 = Cpt(
-        Custom_Function_Signal, name="correlation_channel_2", kind="config"
+        Custom_Function_Signal,
+        name="correlation_channel_2",
+        kind="config",
+        metadata={
+            "description": "Second channel used for correlation measurement.",
+        },
     )
     correlation_binwidth = Cpt(
-        Custom_Function_Signal, name="correlation_binwidth", kind="config"
+        Custom_Function_Signal,
+        name="correlation_binwidth",
+        kind="config",
+        metadata={
+            "description": "Bin width used for correlation measurement.",
+            "unit": "ps",
+        },
     )
     correlation_bins = Cpt(
-        Custom_Function_Signal, name="correlation_bins", kind="config"
+        Custom_Function_Signal,
+        name="correlation_bins",
+        kind="config",
+        metadata={
+            "description": "Number of bins used for correlation measurement.",
+        },
     )
     correlation_meas_time = Cpt(
-        Custom_Function_Signal, name="correlation_meas_time", kind="config"
+        Custom_Function_Signal,
+        name="correlation_meas_time",
+        kind="config",
+        metadata={
+            "description": "How long to run a correlation measurement.",
+            "unit": "s",
+        },
     )
 
     cbm_click_channel = Cpt(
-        Custom_Function_Signal, name="cbm_click_channel", kind="config"
+        Custom_Function_Signal,
+        name="cbm_click_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for counting in `count_between_markers`.",
+        },
     )
     cbm_begin_channel = Cpt(
-        Custom_Function_Signal, name="cbm_begin_channel", kind="config"
+        Custom_Function_Signal,
+        name="cbm_begin_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for beginning the count in `count_between_markers`.",
+        },
     )
-    cbm_end_channel = Cpt(Custom_Function_Signal, name="cbm_end_channel", kind="config")
-    cbm_n_values = Cpt(Custom_Function_Signal, name="cbm_n_values", kind="config")
-    cbm_meas_time = Cpt(Custom_Function_Signal, name="cbm_meas_time", kind="config")
+    cbm_end_channel = Cpt(
+        Custom_Function_Signal,
+        name="cbm_end_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for ending the count in `count_between_markers`.",
+        },
+    )
+    cbm_n_values = Cpt(
+        Custom_Function_Signal,
+        name="cbm_n_values",
+        kind="config",
+        metadata={
+            "description": "Number of values stored for `count_between_markers` in buffer.\n"
+            "One value is the number of counts for a trigger.",
+        },
+    )
+    cbm_meas_time = Cpt(
+        Custom_Function_Signal,
+        name="cbm_meas_time",
+        kind="config",
+        metadata={
+            "description": "Measurement time for `count_between_markers`.",
+            "unit": "s",
+        },
+    )
 
     def __init__(
         self,
@@ -198,4 +293,3 @@ class TimeTagger(Device):
 
     def finalize_steps(self):
         TT.freeTimeTagger(self.tagger)
-
