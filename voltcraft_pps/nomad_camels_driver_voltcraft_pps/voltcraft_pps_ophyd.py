@@ -8,10 +8,33 @@ from nomad_camels.bluesky_handling.custom_function_signal import Custom_Function
 
 
 class Voltcraft_PPS(VISA_Device):
-    setV = Cpt(Custom_Function_Signal, name="setV")
-    setI = Cpt(Custom_Function_Signal, name="setI")
-    setP = Cpt(Custom_Function_Signal, name="setP")
-    setR = Cpt(Custom_Function_Signal, name="setR", kind="config")
+    setV = Cpt(
+        Custom_Function_Signal,
+        name="setV",
+        metadata={"description": "Set the output voltage.", "unit": "V"},
+    )
+    setI = Cpt(
+        Custom_Function_Signal,
+        name="setI",
+        metadata={"description": "Set the output current.", "unit": "A"},
+    )
+    setP = Cpt(
+        Custom_Function_Signal,
+        name="setP",
+        metadata={
+            "description": "Set the output power (actually sets voltage, calculated with configured resistance).",
+            "unit": "W",
+        },
+    )
+    setR = Cpt(
+        Custom_Function_Signal,
+        name="setR",
+        kind="config",
+        metadata={
+            "description": "Set a resistance for calculation of output power.",
+            "unit": "Ohm",
+        },
+    )
 
     def __init__(
         self,
