@@ -35,7 +35,7 @@ SweepMe_device==0.2.0
 thorlabs_ddr_25==0.0.2
 thorlabs_K10CR1==0.1.1
 thorlabs_MFF==0.1.0
-thorlabs_TLPM==0.1.0
+thorlabs_TLPM==0.1.1
 trinamic_tmcm_1110==0.1.1
 voltcraft_pps==0.1.3
 voltcraft_psp==0.1.1
