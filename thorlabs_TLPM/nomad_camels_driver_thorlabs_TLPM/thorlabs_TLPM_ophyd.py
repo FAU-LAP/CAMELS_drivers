@@ -29,10 +29,31 @@ from ctypes import (
 
 
 class Thorlabs_TLPM(Device):
-    power = Cpt(Custom_Function_SignalRO, name="power")
-    wavelength = Cpt(Custom_Function_Signal, name="wavelength", kind="config")
+    power = Cpt(
+        Custom_Function_SignalRO,
+        name="power",
+        metadata={
+            "description": "Reads the power from the power meter.\n"
+            "The configured wavelength is used.",
+            "unit": "W",
+        },
+    )
+    wavelength = Cpt(
+        Custom_Function_Signal,
+        name="wavelength",
+        kind="config",
+        metadata={
+            "description": "Set the wavelength at which is measured.",
+            "unit": "nm",
+        },
+    )
     calibration_msg = Cpt(
-        Custom_Function_SignalRO, name="calibration_msg", kind="config"
+        Custom_Function_SignalRO,
+        name="calibration_msg",
+        kind="config",
+        metadata={
+            "description": "Reads the calibration message from the power meter.",
+        },
     )
 
     def __init__(
