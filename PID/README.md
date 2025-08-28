@@ -25,6 +25,11 @@ Example: When you provide `kp=1` for the setpoint `0.0` and `kp=2` for the setpo
 
 The instruments comes with a custom step used in protocols: "**PID wait for stable**". This step provides a convenience function to wait until the stability criteria of the PID are fulfilled.
 
+#### Ramping
+When turning on the ramping function, the PID will use the values `ramp_to` and `ramp_speed` to change the setpoint with each PID step according to the `ramp_speed` until the setpoint reaches the value of `ramp_to`.
+
+The ramp will start at the setpoint that is set when the ramping starts. When stopped before reaching the desired value, it will stay at the current setpoint.
+
 
 ## Documentation
 
@@ -32,6 +37,9 @@ For more information and documentation visit [this page](https://fau-lap.github.
 
 
 ## Changelog
+
+### 0.3.0
+Added functionality to ramp the PID setpoint.
 
 ### 0.2.3
 Improvements:

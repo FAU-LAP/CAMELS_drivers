@@ -55,6 +55,31 @@ def pt100_inv(T):
     return ptX_inv(T, rX=100)
 
 
+def get_pid_vals_from_setpoint(setpoint, pid_val_table, interpolate_auto=False):
+    setpoints = pid_val_table["setpoint"]
+    if setpoint >= max(setpoints):
+        pid_vals = pid_val_table[setpoints == max(setpoints)].to_dict(orient="list")
+    elif setpoint <= min(setpoints):
+        pid_vals = pid_val_table[setpoints == min(setpoints)].to_dict(orient="list")
+    elif not interpolate_auto:
+        next_lo = max(setpoints[setpoints <= setpoint])
+        pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
+    else:
+        next_lo = max(setpoints[setpoints <= setpoint])
+        next_hi = min(setpoints[setpoints > setpoint])
+        lo_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
+        hi_vals = pid_val_table[setpoints == next_hi].to_dict(orient="list")
+        pid_vals = {}
+        for key, lo_val in lo_vals.items():
+            pid_vals[key] = [
+                lo_val[0]
+                + (hi_vals[key][0] - lo_val[0])
+                * (setpoint - next_lo)
+                / (next_hi - next_lo)
+            ]
+    return pid_vals
+
+
 class PID_Controller(Device):
     output_value = Cpt(
         Custom_Function_SignalRO,
@@ -135,6 +160,26 @@ class PID_Controller(Device):
             "description": "The sample time (i.e. time between two readings) of the PID controller"
         },
     )
+
+    ramp_on = Cpt(
+        Custom_Function_Signal,
+        value=False,
+        name="ramp_on",
+        metadata={"description": "If True, the ramp is running"},
+    )
+    ramp_to = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="ramp_to",
+        metadata={"description": "The target value of the ramp"},
+    )
+    ramp_speed = Cpt(
+        Custom_Function_Signal,
+        value=0.0,
+        name="ramp_speed",
+        metadata={"description": "The speed of the ramp", "unit": "1/s"},
+    )
+
     min_value = Cpt(
         Custom_Function_Signal,
         value=0.0,
@@ -298,6 +343,10 @@ class PID_Controller(Device):
         self.pid_on.put_function = self.set_pid_on
         self.setpoint.put_function = self.update_PID_vals
 
+        self.ramp_on.put_function = self.set_ramp_on
+        self.ramp_to.put_function = self.update_ramp_to
+        self.ramp_speed.put_function = self.update_ramp_speed
+
         self.auto_pid = auto_pid
         self.pid_vals = None
         self.stability_time = np.inf
@@ -318,6 +367,7 @@ class PID_Controller(Device):
                 first_hidden=list(y_axes.keys()),
                 show_plot=False,
                 use_bluesky=False,
+                maxlen=1000,
             )
             # for y in y_axes:
             #     self.plot.plot.current_lines[y].setLinestyle('None')
@@ -325,6 +375,7 @@ class PID_Controller(Device):
             self.update_set_conv_func("No conversion")
             self.pid_thread.new_data.connect(self.data_update)
             self.pid_thread.finished.connect(self.plot.close)
+            self.pid_thread.new_ramp_data.connect(self.ramp_update)
 
     def get_pid_val_table(self):
         pid_val_table = self.pid_val_table.get()
@@ -460,6 +511,16 @@ class PID_Controller(Device):
         }
         self.plot.livePlot.add_data(timestamp, ys)
 
+    def ramp_update(self, data):
+        self.setpoint._readback = data["setpoint"][0]
+        self.kp._readback = data["kp"][0]
+        self.ki._readback = data["ki"][0]
+        self.kd._readback = data["kd"][0]
+        self.min_value._readback = data["min_value"][0]
+        self.max_value._readback = data["max_value"][0]
+        self.stability_time = data["stability-time"][0]
+        self.stability_delta = data["stability-delta"][0]
+
     def stable_check(self):
         return self.pid_thread.stable_time >= self.stability_time
 
@@ -505,6 +566,15 @@ class PID_Controller(Device):
         self.pid_thread.still_running = False
         # self.plot.close()
 
+    def update_ramp_to(self, value):
+        self.pid_thread.ramp_to = value
+
+    def update_ramp_speed(self, value):
+        self.pid_thread.ramp_speed = value
+
+    def set_ramp_on(self, value):
+        self.pid_thread.ramp_on = value
+
     def update_PID_vals(self, setpoint, force=False):
         if not self.auto_pid:
             if self.bias_func is not None:
@@ -513,31 +583,10 @@ class PID_Controller(Device):
             return
         old_vals = copy.deepcopy(self.pid_vals)
         pid_val_table = pd.DataFrame(self.get_pid_val_table())
-        setpoints = pid_val_table["setpoint"]
-        if setpoint >= max(setpoints):
-            self.pid_vals = pid_val_table[setpoints == max(setpoints)].to_dict(
-                orient="list"
-            )
-        elif setpoint <= min(setpoints):
-            self.pid_vals = pid_val_table[setpoints == min(setpoints)].to_dict(
-                orient="list"
-            )
-        elif not self.interpolate_auto.get():
-            next_lo = max(setpoints[setpoints <= setpoint])
-            self.pid_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
-        else:
-            next_lo = max(setpoints[setpoints <= setpoint])
-            next_hi = min(setpoints[setpoints > setpoint])
-            lo_vals = pid_val_table[setpoints == next_lo].to_dict(orient="list")
-            hi_vals = pid_val_table[setpoints == next_hi].to_dict(orient="list")
-            self.pid_vals = {}
-            for key, lo_val in lo_vals.items():
-                self.pid_vals[key] = [
-                    lo_val[0]
-                    + (hi_vals[key][0] - lo_val[0])
-                    * (setpoint - next_lo)
-                    / (next_hi - next_lo)
-                ]
+        interpolate_auto = self.interpolate_auto.get()
+        self.pid_vals = get_pid_vals_from_setpoint(
+            setpoint, pid_val_table, interpolate_auto=interpolate_auto
+        )
         if old_vals != self.pid_vals or force:
             for key in self.pid_vals:
                 if key in ["setpoint", "stability-time", "stability-delta"] or (
@@ -549,6 +598,8 @@ class PID_Controller(Device):
                 else:
                     att = getattr(self, key)
                     att.put(self.pid_vals[key][0])
+        self.pid_thread.pid_val_table = pid_val_table
+        self.pid_thread.interpolate_auto = interpolate_auto
         self.stability_time = self.pid_vals["stability-time"][0]
         self.stability_delta = self.pid_vals["stability-delta"][0]
         self.update_vals_to_thread(setpoint)
@@ -559,12 +610,10 @@ class PID_Controller(Device):
         self.pid_thread.pid.setpoint = setpoint
         self.pid_thread.stable_time = 0
 
-    def update_pid_settings(self):
-        self.update_PID_vals(self.pid_thread.pid.setpoint)
-
 
 class PID_Thread(QThread):
     new_data = Signal(float, float, float, float, tuple)
+    new_ramp_data = Signal(dict)
 
     def __init__(
         self,
@@ -602,6 +651,11 @@ class PID_Thread(QThread):
         self.still_running = True
         self.last_I = 0.0
         self.last_output = 0.0
+        self.ramp_on = False
+        self.ramp_to = 0.0
+        self.ramp_speed = 0.0
+        self.pid_val_table = None
+        self.interpolate_auto = False
 
     def run(self):
         self.starttime = time.monotonic()
@@ -615,6 +669,7 @@ class PID_Thread(QThread):
         if dis < self.sample_time:
             time.sleep(self.sample_time - dis)
             return
+        self.update_ramp(time_diff=dis)
         self.current_value = self.device.read_function()
         if np.isnan(self.current_value):
             new_output = 0.0
@@ -642,3 +697,28 @@ class PID_Thread(QThread):
             new_output or 0.0,
             self.pid.components,
         )
+
+    def update_ramp(self, time_diff=0.0):
+        if self.ramp_on:
+            self.pid.differential_on_measurement = False
+            setpoint = self.pid.setpoint
+            if setpoint < self.ramp_to:
+                setpoint = min(setpoint + self.ramp_speed * time_diff, self.ramp_to)
+            elif setpoint > self.ramp_to:
+                setpoint = max(setpoint - self.ramp_speed * time_diff, self.ramp_to)
+            pid_vals = get_pid_vals_from_setpoint(
+                setpoint, self.pid_val_table, interpolate_auto=self.interpolate_auto
+            )
+            pid_vals["setpoint"] = [setpoint]
+            self.pid.setpoint = setpoint
+            self.pid.Kp = pid_vals["kp"][0]
+            self.pid.Ki = pid_vals["ki"][0]
+            self.pid.Kd = pid_vals["kd"][0]
+            self.pid.output_limits = (
+                pid_vals["min_value"][0],
+                pid_vals["max_value"][0],
+            )
+            self.stability_delta = pid_vals["stability-delta"][0]
+            self.new_ramp_data.emit(pid_vals)
+        else:
+            self.pid.differential_on_measurement = True
