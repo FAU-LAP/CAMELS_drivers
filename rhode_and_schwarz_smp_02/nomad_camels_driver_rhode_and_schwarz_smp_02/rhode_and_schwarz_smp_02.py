@@ -24,7 +24,7 @@ from nomad_camels.main_classes import device_class
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="Rhode_and_Schwarz_SMP_02",
+            name="rhode_and_schwarz_smp_02",
             virtual=False,
             tags=["microwave_generator"],
             ophyd_device=Rhode_and_Schwarz_SMP_02,

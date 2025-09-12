@@ -60,6 +60,18 @@ class PID_manual_control(Manual_Control):
         label_update = QLabel("Update speed:")
         self.lineEdit_update = QLineEdit(str(self.ophyd_device.dt.get()))
 
+        self.ramp_box = QCheckBox("Use Ramp?")
+        label_ramp_to = QLabel("Ramp to:")
+        self.lineEdit_ramp_to = QLineEdit(str(self.ophyd_device.ramp_to.get()))
+        self.lineEdit_ramp_to_show = QLineEdit(str(self.ophyd_device.ramp_to.get()))
+        self.lineEdit_ramp_to_show.setEnabled(False)
+        label_ramp_speed = QLabel("Ramp speed (1/s):")
+        self.lineEdit_ramp_speed = QLineEdit(str(self.ophyd_device.ramp_speed.get()))
+        self.lineEdit_ramp_speed_show = QLineEdit(
+            str(self.ophyd_device.ramp_speed.get())
+        )
+        self.lineEdit_ramp_speed_show.setEnabled(False)
+
         self.pushButton_plot = QPushButton("Show Plot")
         self.pushButton_settings = QPushButton("Show Settings")
         self.pushButton_update_settings = QPushButton("Update Settings")
@@ -67,6 +79,9 @@ class PID_manual_control(Manual_Control):
         line = QFrame(self)
         line.setFrameShape(QFrame.HLine)
         line.setFrameShadow(QFrame.Sunken)
+        line2 = QFrame(self)
+        line2.setFrameShape(QFrame.HLine)
+        line2.setFrameShadow(QFrame.Sunken)
 
         spacer = QSpacerItem(0, 0, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
@@ -81,11 +96,19 @@ class PID_manual_control(Manual_Control):
         self.layout().addWidget(self.lineEdit_output, 1, 3, 2, 1)
         self.layout().addWidget(label_update, 0, 4)
         self.layout().addWidget(self.lineEdit_update, 1, 4, 2, 1)
-        self.layout().addWidget(self.pushButton_plot, 3, 0, 1, 2)
-        self.layout().addWidget(self.pushButton_settings, 3, 2, 1, 3)
 
         self.layout().addWidget(line, 5, 0, 1, 5)
+        self.layout().addWidget(self.ramp_box, 6, 0, 2, 1)
+        self.layout().addWidget(label_ramp_to, 6, 1, 1, 2)
+        self.layout().addWidget(self.lineEdit_ramp_to, 7, 1)
+        self.layout().addWidget(self.lineEdit_ramp_to_show, 7, 2)
+        self.layout().addWidget(label_ramp_speed, 6, 3, 1, 2)
+        self.layout().addWidget(self.lineEdit_ramp_speed, 7, 3)
+        self.layout().addWidget(self.lineEdit_ramp_speed_show, 7, 4)
+        self.layout().addWidget(line2, 8, 0, 1, 5)
 
+        self.layout().addWidget(self.pushButton_plot, 9, 0, 1, 2)
+        self.layout().addWidget(self.pushButton_settings, 9, 2, 1, 3)
         self.layout().addWidget(self.settings_widge, 10, 0, 1, 5)
         self.layout().addWidget(self.pushButton_update_settings, 11, 3, 1, 2)
         self.layout().addItem(spacer, 20, 0)
@@ -99,6 +122,18 @@ class PID_manual_control(Manual_Control):
         self.lineEdit_update.returnPressed.connect(self.change_update_time)
         self.lineEdit_setpoint.returnPressed.connect(self.change_setpoint)
         self.pushButton_plot.clicked.connect(self.change_show_plot)
+        self.ramp_box.clicked.connect(self.change_ramp_state)
+        self.lineEdit_ramp_speed.returnPressed.connect(self.change_ramp_speed)
+        self.lineEdit_ramp_to.returnPressed.connect(self.change_ramp_to)
+
+        return_tooltip = (
+            "Attention!\nYou need to press Enter in order for changes to take effect."
+        )
+        self.lineEdit_setpoint.setToolTip(return_tooltip)
+        self.lineEdit_update.setToolTip(return_tooltip)
+        self.lineEdit_ramp_to.setToolTip(return_tooltip)
+        self.lineEdit_ramp_speed.setToolTip(return_tooltip)
+
         self.change_show_plot()
         self.change_show_plot()
 
@@ -150,10 +185,13 @@ class PID_manual_control(Manual_Control):
         self.ophyd_device.update_set_conv_func()
         self.ophyd_device.update_pid_settings()
 
-    def data_update(self, setp, pid_val, output, on):
+    def data_update(self, setp, pid_val, output, on, ramp_on, ramp_to, ramp_speed):
         self.lineEdit_setpoint_show.setText(f"{setp:.3e}")
         self.lineEdit_pid_val.setText(f"{pid_val:.3e}")
         self.lineEdit_output.setText(f"{output:.3e}")
+        self.lineEdit_ramp_to_show.setText(f"{ramp_to:.3e}")
+        self.lineEdit_ramp_speed_show.setText(f"{ramp_speed:.3e}")
+        self.ramp_box.setChecked(ramp_on)
         self.change_on_state(on)
 
     def change_setpoint(self):
@@ -167,9 +205,19 @@ class PID_manual_control(Manual_Control):
 
     def change_on_state(self, on):
         self.on_off_box.setChecked(on)
-        col = variables_handling.get_color("green" if on else "red", True)
+        col = variables_handling.get_color("dark_green" if on else "strong_red", True)
         self.on_off_box.setText("On" if on else "Off")
         self.on_off_box.setStyleSheet(f"color: rgb{col}")
+
+    def change_ramp_state(self):
+        ramp_on = self.ramp_box.isChecked()
+        self.ophyd_device.ramp_on.put(ramp_on)
+
+    def change_ramp_speed(self):
+        self.ophyd_device.ramp_speed.put(float(self.lineEdit_ramp_speed.text()))
+
+    def change_ramp_to(self):
+        self.ophyd_device.ramp_to.put(float(self.lineEdit_ramp_to.text()))
 
     def change_state(self):
         on = self.on_off_box.isChecked()
@@ -177,7 +225,7 @@ class PID_manual_control(Manual_Control):
             for dev in self.sub_devices:
                 if hasattr(dev, "turn_on_output") and callable(dev.turn_on_output):
                     dev.turn_on_output()
-        col = variables_handling.get_color("green" if on else "red", True)
+        col = variables_handling.get_color("dark_green" if on else "strong_red", True)
         self.on_off_box.setText("On" if on else "Off")
         self.on_off_box.setStyleSheet(f"color: rgb{col}")
         self.ophyd_device.pid_on.put(on)
@@ -231,7 +279,7 @@ class PID_Manual_Control_Config(Manual_Control_Config):
 
 
 class PID_update_thread(QThread):
-    data_sig = Signal(float, float, float, bool)
+    data_sig = Signal(float, float, float, bool, bool, float, float)
 
     def __init__(self, parent=None, device=None):
         super().__init__(parent=parent)
@@ -256,4 +304,7 @@ class PID_update_thread(QThread):
         pid_val = self.device.current_value.get()
         output = self.device.output_value.get()
         on = bool(self.device.pid_on.get())
-        self.data_sig.emit(setp, pid_val, output, on)
+        ramp_on = bool(self.device.ramp_on.get())
+        ramp_to = self.device.ramp_to.get()
+        ramp_speed = self.device.ramp_speed.get()
+        self.data_sig.emit(setp, pid_val, output, on, ramp_on, ramp_to, ramp_speed)

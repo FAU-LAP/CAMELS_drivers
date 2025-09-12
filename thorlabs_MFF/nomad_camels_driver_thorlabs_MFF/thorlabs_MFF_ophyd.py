@@ -8,14 +8,22 @@ from pylablib.devices.Thorlabs import MFF
 
 
 class Thorlabs_MFF(Device):
-    get_position = Cpt(Custom_Function_SignalRO, name="get_position")
-    set_position = Cpt(Custom_Function_Signal, name="set_relative_position")
+    get_position = Cpt(
+        Custom_Function_SignalRO,
+        name="get_position",
+        metadata={"description": "Read the position of the mirror (0 or 1)."},
+    )
+    set_position = Cpt(
+        Custom_Function_Signal,
+        name="set_position",
+        metadata={"description": "Set the position of the mirror (0 or 1)."},
+    )
 
     transit_time = Cpt(
         Custom_Function_Signal,
         name="transit_time",
         kind="config",
-        metadata={"unit": "s", "description": "between 0.3 and 2.8"},
+        metadata={"unit": "s", "description": "How fast to move; between 0.3 and 2.8"},
     )
 
     def __init__(

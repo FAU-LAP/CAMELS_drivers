@@ -9,7 +9,10 @@ from PySide6.QtWidgets import (
     QLineEdit,
     QComboBox,
     QSpacerItem,
+    QSplitter,
     QSizePolicy,
+    QHBoxLayout,
+    QVBoxLayout,
 )
 
 from nomad_camels.main_classes import device_class
@@ -17,6 +20,7 @@ from nomad_camels.utility import variables_handling
 from nomad_camels.ui_widgets.channels_check_table import Channels_Check_Table
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
 from nomad_camels.ui_widgets.variable_tool_tip_box import Variable_Box
+from nomad_camels.ui_widgets.path_button_edit import Path_Button_Edit
 
 
 class subclass(device_class.Device):
@@ -79,6 +83,7 @@ class subclass_config(device_class.Device_Config):
         self.sub_widget = subclass_config_sub(
             settings_dict=settings_dict, parent=self, config_dict=config_dict
         )
+        self.sub_widget.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
         self.layout().addWidget(self.sub_widget, 5, 0, 1, 5)
         self.load_settings()
 
@@ -89,12 +94,9 @@ class subclass_config(device_class.Device_Config):
         return self.sub_widget.get_config()
 
 
-class subclass_config_sub(QWidget):
+class subclass_config_sub(QSplitter):
     def __init__(self, settings_dict=None, parent=None, config_dict=None):
         super().__init__(parent)
-        layout = QGridLayout(self)
-        layout.setContentsMargins(0, 0, 0, 0)
-        self.setLayout(layout)
 
         self.signal_info = settings_dict.get("signal_info", {})
         table_data = {"Channel Name": list(self.signal_info.keys())}
@@ -106,8 +108,8 @@ class subclass_config_sub(QWidget):
 
         self.signal_tabs = QTabWidget(self)
 
-        layout.addWidget(self.signal_table, 0, 0)
-        layout.addWidget(self.signal_tabs, 1, 0)
+        self.addWidget(self.signal_table)
+        self.addWidget(self.signal_tabs)
         self.build_tabs()
         self.last_signal_names = list(self.signal_info.keys())
 
@@ -165,16 +167,10 @@ class Signal_Tab(QWidget):
         self.check_writable = QCheckBox("Writeable")
         self.check_writable.setChecked(signal_info.get("write_access", False))
         self.check_writable.stateChanged.connect(self.read_write_changed)
-        self.label_read_formula = QLabel("Calculation Formula:")
-        self.label_write_formula = QLabel("Calculation Formula:")
         self.label_description = QLabel("Description:")
         self.label_unit = QLabel("Unit:")
         self.label_write_channel = QLabel("Write Channel:")
 
-        self.read_formula = Variable_Box()
-        self.read_formula.setText(signal_info.get("read_formula", ""))
-        self.write_formula = QLineEdit()
-        self.write_formula.setText(signal_info.get("write_formula", ""))
         self.description = QLineEdit(signal_info.get("description", ""))
         self.unit = QLineEdit(signal_info.get("unit", ""))
 
@@ -185,8 +181,10 @@ class Signal_Tab(QWidget):
         write_tooltip = "The calculated value will be written to this channel."
         self.label_write_channel.setToolTip(write_tooltip)
         self.write_channel_combo.setToolTip(write_tooltip)
-        self.write_formula.setToolTip(
-            'How to calculate the output value. Use "x" for the input value.\nExample: "x * 2" will double the input value.'
+
+        self.conversion_function = ConversionFunctionWidget(
+            parent=self,
+            signal_info=signal_info,
         )
 
         channels = signal_info.get("derived_from", [])
@@ -207,10 +205,7 @@ class Signal_Tab(QWidget):
         self.read_write_changed()
 
         layout.addWidget(self.check_writable, 0, 0, 1, 2)
-        layout.addWidget(self.label_read_formula, 1, 0)
-        layout.addWidget(self.read_formula, 1, 1)
-        layout.addWidget(self.label_write_formula, 2, 0)
-        layout.addWidget(self.write_formula, 2, 1)
+        layout.addWidget(self.conversion_function, 1, 0, 1, 2)
         layout.addWidget(self.label_description, 3, 0)
         layout.addWidget(self.description, 3, 1)
         layout.addWidget(self.label_unit, 4, 0)
@@ -222,10 +217,7 @@ class Signal_Tab(QWidget):
 
     def read_write_changed(self):
         writable = self.check_writable.isChecked()
-        self.read_formula.setHidden(writable)
-        self.label_read_formula.setHidden(writable)
-        self.write_formula.setHidden(not writable)
-        self.label_write_formula.setHidden(not writable)
+        self.conversion_function.set_read_write(writable)
         self.channel_table.setHidden(writable)
         self.write_channel_combo.setHidden(not writable)
         self.label_write_channel.setHidden(not writable)
@@ -237,15 +229,98 @@ class Signal_Tab(QWidget):
         writable = self.check_writable.isChecked()
         info = {
             "write_access": writable,
-            "read_formula": self.read_formula.text(),
-            "write_formula": self.write_formula.text(),
             "description": self.description.text(),
             "unit": self.unit.text(),
         }
+        info.update(self.conversion_function.get_info())
         if not writable:
             info["derived_from"] = self.channel_table.get_info()["channel"]
         else:
             info["derived_from"] = [self.write_channel_combo.currentText()]
+        return info
+
+
+class ConversionFunctionWidget(QWidget):
+    def __init__(self, parent=None, signal_info=None):
+        super().__init__(parent)
+        layout = QVBoxLayout()
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout_top = QHBoxLayout()
+        layout_top.setContentsMargins(0, 0, 0, 0)
+        layout_bottom = QHBoxLayout()
+        layout_bottom.setContentsMargins(0, 0, 0, 0)
+        layout.addLayout(layout_top)
+        layout.addLayout(layout_bottom)
+        self.setLayout(layout)
+
+        self.label = QLabel("Conversion Function:")
+        self.combo = QComboBox()
+        self.combo.addItems(["Simple Function", "From File"])
+        self.combo.setCurrentText(signal_info.get("conversion_type", "Simple Function"))
+        self.combo.currentTextChanged.connect(self.change_conversion_type)
+        layout_top.addWidget(self.label)
+        layout_top.addWidget(self.combo)
+
+        signal_info = signal_info or {}
+
+        self._writable = signal_info.get("write_access", False)
+
+        self.read_formula = Variable_Box()
+        self.read_formula.setText(signal_info.get("read_formula", ""))
+        self.write_formula = QLineEdit()
+        if not self._writable and signal_info.get("conversion_type", "") == "From File":
+            self.write_formula.setText(signal_info.get("read_formula", ""))
+        else:
+            self.write_formula.setText(signal_info.get("write_formula", ""))
+        self.write_formula.setToolTip(
+            'Calculation of the output value. Use "x" for the input value.\nExample: "x * 2" will double the input value.'
+        )
+
+        self.file_box = Path_Button_Edit(
+            path=signal_info.get("conversion_file", ""),
+        )
+        self.file_box.setToolTip("The Python file containing the conversion function.")
+        layout_bottom.addWidget(self.read_formula)
+        layout_bottom.addWidget(self.write_formula)
+        layout_bottom.addWidget(self.file_box)
+
+        self.set_read_write(writeable=signal_info.get("write_access", False))
+        self.change_conversion_type()
+
+    def set_read_write(self, writeable):
+        self._writable = writeable
+        self.change_conversion_type()
+
+    def change_conversion_type(self):
+        from_file = self.combo.currentText() == "From File"
+        self.file_box.setHidden(not from_file)
+        self.write_formula.setToolTip(
+            "The name of the function to be used for conversion."
+            if from_file
+            else 'Calculation of the output value. Use "x" for the input value.\nExample: "x * 2" will double the input value.'
+        )
+        self.read_formula.setHidden(from_file or self._writable)
+        self.write_formula.setHidden(not from_file and not self._writable)
+
+    def get_info(self):
+        """
+        Collects the information from the widget and returns it as a dictionary.
+        """
+        conversion_type = self.combo.currentText()
+        info = {
+            "conversion_type": conversion_type,
+            "conversion_file": self.file_box.get_path(),
+        }
+        if conversion_type == "Simple Function":
+            info["read_formula"] = self.read_formula.text()
+            info["write_formula"] = self.write_formula.text()
+        else:
+            if self._writable:
+                info["write_formula"] = self.write_formula.text()
+                info["read_formula"] = ""
+            else:
+                info["read_formula"] = self.write_formula.text()
+                info["write_formula"] = ""
         return info
 
 

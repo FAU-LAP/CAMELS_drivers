@@ -1,68 +1,41 @@
-# NOMAD Camels driver for opc_ua_instrument
+# NOMAD Camels driver for derived hannels
 
-Driver for opc_ua_instrument written for the measurement software [NOMAD Camels](https://fau-lap.github.io/NOMAD-CAMELS/).
+This is a special driver for [NOMAD CAMELS](https://fau-lap.github.io/NOMAD-CAMELS/).
+It can be used to directly calculate values from other channels inside CAMELS.
 
-Allows you to add OPC UA variables that already exist.
 
-Add the URL of the server hosting your variables. Similar to 
+## How to use
 
+You may add an arbitrary number of channels to each instance of this instrument.
+Each channel can be configured either as readable or writable.
+
+When you make the channel readable, you need to select which channels it depends on. The calculation formula should then depend on these channels.
+
+A writable channel may only write to a single channel. The calculation formula is then, how the output is scaled. In that case, use `x` for the value written to the newly defined channel. For example when you want to define a new channel `scaled` that writes to the channel `channel1` of some instrument, you can write `x * 5` so when `scaled` is set to `2`, `channel1` will be set to `10`.
+
+Alternatively, you can define a python function inside any file and select "From File" for the conversion (either read or write). Then select the file and set the name of the function that should be used for the conversion.
+- For writing: The function may take only one argument (which will be the set value) and should return one value.
+- For reading: Make sure that the function takes the read channels as arguments, for example:
+```python
+def read_conversion(read_channel_1, read_channel_2):
+    return read_channel_1 + read_channel_2
 ```
-opc.tcp://localhost:4840/freeopcua/server/
+or
+```python
+def read_conversion(**values):
+    return values['read_channel_1'] + values['read_channel_2']
 ```
 
-Add the namespace URL. For example
-
-```
-http://examples.freeopcua.github.io
-```
-You can now add any number of variables by clicking the green `+` symbol. 
-
-Select if you want to be able to change (`set`) them or if you only want to read (`read-only`) the variables with the drop-down menu.
-
-The variable is accessed using its browse path and should look something like this:
-
-```
-0:Objects/2:MyObject/2:MyVariable
-```
-
-## Changes
-
-### 0.1.8
-- improved visual user-feedback while searching for variables
-
-### 0.1.7
-- fixed typo in config window
-
-### 0.1.6
-
-- Made setting and reading variables faster by saving variable instance to dict and reusing it. 
-
-### 0.1.5
-
-- Fixed imports and class names: You can now combine multiple types of dynamically created instruments (like EPICS and OPC-UA instruments) in a single measurement.
-
-### 0.1.4.
-
-- Fixed data writing to the variables to always use the correct `ua.DataType`
-
-### 0.1.3
-
-- Fixed broken dependencies.
-
-### 0.1.2
-
-- When setting (writing) to variables the data-type of the variable is always checked and the value is cast to this data type before setting. Should make writing to variables much more stable.
-
-### 0.1.1
-
-- Added automatic variable adding. For this enter a RegEx pattern in the text field next to the `Fetch and Add` button. Then press the `Fetch and Add` button.
-This will go through the given server and try to match either the Node-ID or the Browse Path with the RegEx pattern given. Matches will be added with their Browse Path into the list below.
-
-   > [!WARNING]
-   > This can take quite some time if there are many nodes in the server!
-
-Make sure to give them custom names under `Name` before clicking "OK".
 
 ## Documentation
 
-For more information and instruments visit the [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+For more information on NOMAD CAMELS and instruments visit the [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+## Changelog
+
+### 0.1.3
+Made custom python functions more robust when the file is removed
+
+### 0.1.2
+Added functionality to use custom python functions.

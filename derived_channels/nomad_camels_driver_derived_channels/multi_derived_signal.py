@@ -19,6 +19,8 @@ class MultiDerivedSignal(Signal):
         parent=None,
         read_formula=None,
         write_formula=None,
+        conversion_type="Simple Function",
+        conversion_file="",
         **kwargs,
     ):
         if not isinstance(derived_from, list):
@@ -37,6 +39,30 @@ class MultiDerivedSignal(Signal):
         self.eva = Evaluator()
         self._read_formula = read_formula
         self._write_formula = write_formula
+        self._conversion_type = conversion_type
+        self._conversion_file = conversion_file
+        self._conversion_function = None
+        try:
+            self._set_conversion_function()
+        except Exception as e:
+            print(e)
+
+    def _set_conversion_function(self):
+        if self._conversion_type == "From File":
+            if not self._conversion_file:
+                raise ValueError("No conversion file provided conversion with file.")
+            import importlib.util
+            import os
+
+            # import the function from the file
+            name = os.path.basename(self._conversion_file)[:-3]
+            spec = importlib.util.spec_from_file_location(name, self._conversion_file)
+            module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(module)
+            if self.write_access:
+                self._conversion_function = getattr(module, self._write_formula)
+            else:
+                self._conversion_function = getattr(module, self._read_formula)
 
     def _connect(self):
         for i, signal in enumerate(self.derived_from):
@@ -93,21 +119,31 @@ class MultiDerivedSignal(Signal):
     def inverse(self, **values):
         if not self._read_formula:
             raise ValueError("No calculation formula provided for inverse operation.")
-        self.eva.namespace.update(values)
-        try:
-            return self.eva.eval(self._read_formula)
-        except Exception as e:
-            raise ValueError(f"Error evaluating calculation formula: {e}")
+        if self._conversion_type == "Simple Function":
+            self.eva.namespace.update(values)
+            try:
+                return self.eva.eval(self._read_formula)
+            except Exception as e:
+                raise ValueError(f"Error evaluating calculation formula: {e}")
+        else:
+            if not self._conversion_function:
+                self._set_conversion_function()
+            return self._conversion_function(**values)
 
     def forward(self, value):
         if not self._write_formula:
             raise ValueError("No calculation formula provided for forward operation.")
-        self.eva.namespace[self.name] = value
-        self.eva.namespace["x"] = value
-        try:
-            return self.eva.eval(self._write_formula)
-        except Exception as e:
-            raise ValueError(f"Error evaluating calculation formula: {e}")
+        if self._conversion_type == "Simple Function":
+            self.eva.namespace[self.name] = value
+            self.eva.namespace["x"] = value
+            try:
+                return self.eva.eval(self._write_formula)
+            except Exception as e:
+                raise ValueError(f"Error evaluating calculation formula: {e}")
+        else:
+            if not self._conversion_function:
+                self._set_conversion_function()
+            return self._conversion_function(value)
 
     @property
     def connected(self):
@@ -132,6 +168,8 @@ class MultiDerivedSignalRO(SignalRO, MultiDerivedSignal):
         name=None,
         parent=None,
         read_formula=None,
+        conversion_type="Simple Function",
+        conversion_file="",
         **kwargs,
     ):
         super().__init__(
@@ -141,5 +179,7 @@ class MultiDerivedSignalRO(SignalRO, MultiDerivedSignal):
             parent=parent,
             read_formula=read_formula,
             write_formula=None,
+            conversion_type=conversion_type,
+            conversion_file=conversion_file,
             **kwargs,
         )
