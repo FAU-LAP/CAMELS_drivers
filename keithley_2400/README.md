@@ -8,6 +8,10 @@ Currently supported are basic voltage and current setting and reading.
 
 ## Changes
 
+### 0.1.4
+
+- Added pyvisa as a dependency in pyproject.toml. Fixes errors when installing.
+
 ### 0.1.3
 
 - Now does not turn off the output when a protocol ends that uses the Keithley 2400.

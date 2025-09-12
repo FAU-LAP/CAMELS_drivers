@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nomad_camels_driver_keithley_2400"
-version = "0.1.3"
+version = "0.1.4"
 authors = [
     { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
 ]
@@ -17,7 +17,8 @@ classifiers = [
 
 ]
 dependencies = [
-    'nomad-camels >= 0.2',
+    "pyvisa",
+    "pyvisa-py"
 ]
 [project.urls]
 "GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
