@@ -86,7 +86,7 @@ class Keithley_197A(VISA_Device):
             write_termination=write_termination,
             **kwargs,
         )
-        self.measure_range.write = self.measure_range_write_function
+        # self.measure_range.write = self.measure_range_write_function
         if name == "test":
             return
         self.visa_instrument.write(
@@ -95,9 +95,11 @@ class Keithley_197A(VISA_Device):
 
     def finalize_steps(self):
         """This function is called when the device is not used anymore. It is used for example to close the connection to the device."""
-        self.visa_instrument.close()
+        pass
+        # self.visa_instrument.close()
 
     def measure_range_write_function(self, value):
+        # pass
         if value == "Auto":
             self.visa_instrument.write("R0")
         elif value == "200mV":

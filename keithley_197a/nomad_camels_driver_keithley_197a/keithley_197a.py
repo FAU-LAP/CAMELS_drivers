@@ -6,10 +6,10 @@ from nomad_camels.main_classes import device_class
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
         super().__init__(
-            name="Keithley_197a",
+            name="keithley_197a",
             virtual=False,
             tags=["DMM", "voltage", "current"],
-            directory="Keithley_197a",
+            directory="keithley_197a",
             ophyd_device=Keithley_197A,
             ophyd_class_name="Keithley_197A",
             **kwargs,
