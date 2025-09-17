@@ -5,6 +5,7 @@ from nomad_camels.main_classes.manual_control import (
     Manual_Control_Config,
 )
 from .PID_config_sub import subclass_config_sub
+from .PID_ophyd  import PID_Controller
 
 from PySide6.QtWidgets import (
     QCheckBox,
@@ -23,6 +24,7 @@ from nomad_camels.utility import variables_handling, device_handling
 
 
 class PID_manual_control(Manual_Control):
+    ophyd_device: PID_Controller
     def __init__(self, parent=None, control_data=None):
         control_data = control_data or {}
         if "name" in control_data:
@@ -183,7 +185,7 @@ class PID_manual_control(Manual_Control):
         self.ophyd_device._configuring = False
         self.ophyd_device.update_read_conv_func()
         self.ophyd_device.update_set_conv_func()
-        self.ophyd_device.update_pid_settings()
+        self.ophyd_device.update_PID_vals(float(self.lineEdit_setpoint.text()))
 
     def data_update(self, setp, pid_val, output, on, ramp_on, ramp_to, ramp_speed):
         self.lineEdit_setpoint_show.setText(f"{setp:.3e}")
