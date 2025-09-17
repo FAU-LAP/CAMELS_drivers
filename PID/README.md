@@ -38,6 +38,10 @@ For more information and documentation visit [this page](https://fau-lap.github.
 
 ## Changelog
 
+### 0.3.1
+Fixed:
+- Broken updating of PID settings fixed.
+
 ### 0.3.0
 Added functionality to ramp the PID setpoint.
 
