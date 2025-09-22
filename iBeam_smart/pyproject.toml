@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_driver_iBeam_smart"
+version = "0.1.1"
+authors = [
+	{name="FAIRmat - HU Berlin", email="nomad-camels@fau.de"}
+]
+description = "Instrument driver for iBeam_smart for NOMAD CAMELS using pylablib as the backend."
+readme = "README.md"
+requires-python = ">=3.9.6"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+
+dependencies = [
+	"nomad-camels>=1.0.6",
+	"pyvisa",
+	"pyvisa-py",
+    "pylablib>=1.4.2",
+]
+
+[project.urls]
+"NOMAD Camels GitHub" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
+"CAMELS Drivers GitHub" = "https://github.com/FAU-LAP/CAMELS_drivers"
+"NOMAD Camels Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"

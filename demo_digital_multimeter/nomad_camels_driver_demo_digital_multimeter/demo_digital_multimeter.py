@@ -29,7 +29,7 @@ class subclass_config(device_class.Simple_Config):
         additional_info=None,
     ):
         super().__init__(
-            parent, "Keithley 2000", data, settings_dict, config_dict, additional_info
+            parent, "SandboxForCAMELS Demo Digital Multimeter", data, settings_dict, config_dict, additional_info
         )
         self.comboBox_connection_type.addItem("Local VISA")
         self.load_settings()

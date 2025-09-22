@@ -212,11 +212,11 @@ class Channel_Settings(QWidget):
         settings = {}
         settings_fall = {}
         settings["trigger_level"] = float(self.line_trigger_level.text())
-        settings["dead_time"] = int(self.line_dead_time.text())
-        settings["input_delay"] = int(self.line_input_delay.text())
+        settings["dead_time"] = int(float(self.line_dead_time.text()))
+        settings["input_delay"] = int(float(self.line_input_delay.text()))
         settings["test_signal"] = self.check_test_signal.isChecked()
         settings_fall["trigger_level"] = float(self.line_trigger_level.text())
-        settings_fall["dead_time"] = int(self.line_dead_time_fall.text())
-        settings_fall["input_delay"] = int(self.line_input_delay_fall.text())
+        settings_fall["dead_time"] = int(float(self.line_dead_time_fall.text()))
+        settings_fall["input_delay"] = int(float(self.line_input_delay_fall.text()))
         settings_fall["test_signal"] = self.check_test_signal.isChecked()
         return settings, settings_fall

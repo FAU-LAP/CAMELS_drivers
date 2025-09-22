@@ -1,39 +1,103 @@
 from ophyd import Component as Cpt
 import pylablib as pll
 
-from ophyd import Device
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
     Custom_Function_SignalRO,
+    Sequential_Device,
 )
 
 
-class Andor_Shamrock_500(Device):
+class Andor_Shamrock_500(Sequential_Device):
     """
     Driver for the Andor Shamrock 500 spectrometer (not the camera!).
     The camera is implemented separately.
     """
 
-    spectrum = Cpt(Custom_Function_SignalRO, name="spectrum")
+    spectrum = Cpt(
+        Custom_Function_SignalRO,
+        name="spectrum",
+        metadata={
+            "units": "counts",
+            "description": "Intensity of the spectrum (comes from the camera)",
+        },
+    )
     wavelength = Cpt(
-        Custom_Function_SignalRO, name="wavelength", metadata={"units": "nm"}
+        Custom_Function_SignalRO,
+        name="wavelength",
+        metadata={
+            "units": "nm",
+            "description": "Wavelengths of the spectrum; each index corresponds to the same index in the spectrum",
+        },
     )
 
     set_grating_number = Cpt(
-        Custom_Function_Signal, name="set_grating_number", kind="config"
+        Custom_Function_Signal,
+        name="set_grating_number",
+        kind="config",
+        metadata={
+            "description": "Set the grating of the spectrometer",
+        },
     )
     center_wavelength = Cpt(
-        Custom_Function_Signal, name="center_wavelength", kind="config"
+        Custom_Function_Signal,
+        name="center_wavelength",
+        kind="config",
+        metadata={
+            "units": "nm",
+            "description": "Set the center wavelength of the spectrometer",
+        },
     )
-    input_port = Cpt(Custom_Function_Signal, name="input_port", kind="config")
-    output_port = Cpt(Custom_Function_Signal, name="output_port", kind="config")
-    camera = Cpt(Custom_Function_Signal, name="camera", kind="config")
-    input_slit_size = Cpt(Custom_Function_Signal, name="input_slit_size", kind="config")
+    input_port = Cpt(
+        Custom_Function_Signal,
+        name="input_port",
+        kind="config",
+        metadata={
+            "description": "Set the input port of the spectrometer",
+        },
+    )
+    output_port = Cpt(
+        Custom_Function_Signal,
+        name="output_port",
+        kind="config",
+        metadata={
+            "description": "Set the output port of the spectrometer",
+        },
+    )
+    camera = Cpt(
+        Custom_Function_Signal,
+        name="camera",
+        kind="config",
+        metadata={
+            "description": "Set the camera of the spectrometer",
+        },
+    )
+    input_slit_size = Cpt(
+        Custom_Function_Signal,
+        name="input_slit_size",
+        kind="config",
+        metadata={
+            "units": "mm",
+            "description": "Set the input slit size of the spectrometer",
+        },
+    )
     output_slit_size = Cpt(
-        Custom_Function_Signal, name="output_slit_size", kind="config"
+        Custom_Function_Signal,
+        name="output_slit_size",
+        kind="config",
+        metadata={
+            "units": "mm",
+            "description": "Set the output slit size of the spectrometer",
+        },
     )
     horizontal_cam_flip = Cpt(
-        Custom_Function_Signal, name="horizontal_cam_flip", kind="config"
+        Custom_Function_Signal,
+        value=False,
+        name="horizontal_cam_flip",
+        kind="config",
+        metadata={
+            "description": "If True, the camera image is flipped horizontally (use this if you mounted the camera upside down).",
+        },
     )
 
     def __init__(
@@ -56,6 +120,7 @@ class Andor_Shamrock_500(Device):
             read_attrs=read_attrs,
             configuration_attrs=configuration_attrs,
             parent=parent,
+            force_sequential=True,
             **kwargs,
         )
         if name == "test":
@@ -64,8 +129,12 @@ class Andor_Shamrock_500(Device):
         from pylablib.devices import Andor
 
         specs = Andor.list_shamrock_spectrographs()
-        spec = specs.index(spectrometer)
-        self.spectrometer = Andor.ShamrockSpectrograph(idx=spec)
+        try:
+            spec = specs.index(spectrometer)
+            self.spectrometer = Andor.ShamrockSpectrograph(idx=spec)
+        except:
+            self.spectrometer = Andor.ShamrockSpectrograph(idx=0)
+
         self.set_grating_number.put_function = self.set_grating_number_function
         self.center_wavelength.put_function = self.center_wavelength_function
         self.input_port.put_function = self.input_port_function

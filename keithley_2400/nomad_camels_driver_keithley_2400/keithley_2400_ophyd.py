@@ -148,6 +148,8 @@ class Keithley_2400(VISA_Device):
         self.set_current_range_source = (
             None  # None if nothing was set and True if it was set
         )
+        # Set the data format to ASCII
+        self.visa_instrument.write(":FORM:DATA ASC")
 
     def measure_voltage_query_function(self):
         # check if the voltage sensing range was set and if not set it
@@ -291,4 +293,4 @@ class Keithley_2400(VISA_Device):
     # 	return f':VOLT:RANG {value}'
 
     def finalize_steps(self):
-        self.visa_instrument.write("OUTP 0")
+        pass

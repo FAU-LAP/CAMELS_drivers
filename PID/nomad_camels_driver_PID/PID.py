@@ -6,20 +6,20 @@ from .PID_config_sub import subclass_config_sub
 from nomad_camels.main_classes import device_class
 import nomad_camels.main_classes.loop_step as steps
 
-from PySide6.QtWidgets import QComboBox
+from PySide6.QtWidgets import QComboBox, QLabel
 
 from nomad_camels.utility import variables_handling
 
 default_pid_val_table = {
-    "setpoint": [0],
-    "kp": [1],
-    "ki": [1],
-    "kd": [1],
-    "max_value": [2],
-    "min_value": [-2],
-    "bias": [0],
+    "setpoint": [0.0],
+    "kp": [1.0],
+    "ki": [1.0],
+    "kd": [1.0],
+    "max_value": [2.0],
+    "min_value": [-2.0],
+    "bias": [0.0],
     "stability-delta": [0.5],
-    "stability-time": [10],
+    "stability-time": [10.0],
 }
 
 
@@ -33,9 +33,9 @@ class subclass(device_class.Device):
             ophyd_class_name="PID_Controller",
             **kwargs,
         )
-        self.settings["pid_val_table"] = default_pid_val_table
+        self.config["pid_val_table"] = default_pid_val_table
         self.settings["auto_pid"] = True
-        self.settings["show_plot"] = True
+        self.config["show_plot"] = True
         self.config["dt"] = 0.5
         self.main_thread_only = True
 
@@ -137,6 +137,7 @@ class PID_wait_for_stable(steps.Loop_Step):
         protocol_string += f'{tabs}while not devs["{self.pid}"].pid_stable.get() and not boxes["bar_{self.name}"].skip:\n'
         # protocol_string += f'{tabs}\tprint(devs["{self.pid}"].pid_val.just_readback(), devs["{self.pid}"].pid_cval.just_readback())\n'
         protocol_string += f"{tabs}\tyield from bps.sleep(delta_t)\n"
+        protocol_string += f'{tabs}\tboxes["bar_{self.name}"].setter.set_signal.emit(devs["{self.pid}"].pid_thread.stable_time / devs["{self.pid}"].stability_time * 100)\n'
         protocol_string += f'{tabs}boxes["bar_{self.name}"].setter.hide_signal.emit()\n'
         # protocol_string += f'{tabs}\tif np.abs(devs["{self.pid}"].pid_val.just_readback() - devs["{self.pid}"].pid_cval.get()) > devs["{self.pid}"].stability_delta:\n'
         # protocol_string += f'{tabs}\t\tstable_time = datetime.timedelta(0)\n'
@@ -155,7 +156,8 @@ class PID_wait_for_stable_config(steps.Loop_Step_Config):
     def __init__(self, loop_step: PID_wait_for_stable, parent=None):
         super().__init__(parent, loop_step)
         self.pid_box = QComboBox()
-        self.layout().addWidget(self.pid_box, 1, 0)
+        self.layout().addWidget(QLabel("PID:"), 1, 0, 1, 2)
+        self.layout().addWidget(self.pid_box, 1, 2, 1, 3)
         pids = []
         for name, device in variables_handling.devices.items():
             if isinstance(device, subclass):

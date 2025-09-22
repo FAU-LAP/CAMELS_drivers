@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_driver_SweepMe_device"
+version = "0.2.0"
+authors = [
+    { name="FAIRmat - HU Berlin", email="nomad-camels@fau.de" }
+]
+description = "Instrument driver wrapper to enable usage of SweepMe! drivers"
+readme = "README.md"
+requires-python = ">=3.9.6"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+
+]
+dependencies = [
+    "nomad-camels>=1.1.2",
+    "pysweepme>=1.5.6",
+]
+
+[project.urls]
+"GitHub Page" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
+"GitHub Drivers" = "https://github.com/FAU-LAP/CAMELS_drivers"
+"Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"

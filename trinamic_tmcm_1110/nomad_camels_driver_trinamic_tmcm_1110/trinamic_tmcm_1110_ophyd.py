@@ -41,39 +41,126 @@ step_mode = {
 
 class TMCM_1110(Device):
 
-    set_position = Cpt(Custom_Function_Signal, name="set_position")
-    get_position = Cpt(Custom_Function_SignalRO, name="get_position")
+    set_position = Cpt(
+        Custom_Function_Signal,
+        name="set_position",
+        metadata={"description": "Set the motor position.", "unit": "steps"},
+    )
+    get_position = Cpt(
+        Custom_Function_SignalRO,
+        name="get_position",
+        metadata={"unit": "steps", "description": "Read the motor position."},
+    )
 
-    ref_search_mode = Cpt(Custom_Function_Signal, name="ref_search_mode", kind="config")
+    ref_search_mode = Cpt(
+        Custom_Function_Signal,
+        name="ref_search_mode",
+        kind="config",
+        metadata={"description": "How the reference search is defined."},
+    )
     right_lim_switch_disable = Cpt(
-        Custom_Function_Signal, name="right_lim_switch_disable", kind="config"
+        Custom_Function_Signal,
+        name="right_lim_switch_disable",
+        kind="config",
+        metadata={"description": "Ignore the right limit switch."},
     )
     left_lim_switch_disable = Cpt(
-        Custom_Function_Signal, name="left_lim_switch_disable", kind="config"
+        Custom_Function_Signal,
+        name="left_lim_switch_disable",
+        kind="config",
+        metadata={"description": "Ignore the left limit switch."},
     )
     ref_search_speed = Cpt(
-        Custom_Function_Signal, name="ref_search_speed", kind="config"
+        Custom_Function_Signal,
+        name="ref_search_speed",
+        kind="config",
+        metadata={
+            "description": "Speed when searching for reference. Numbers from 0 to 2047."
+        },
     )
     ref_switch_speed = Cpt(
-        Custom_Function_Signal, name="ref_switch_speed", kind="config"
+        Custom_Function_Signal,
+        name="ref_switch_speed",
+        kind="config",
+        metadata={
+            "description": "Speed when searching the switching point during reference search. Numbers from 0 to 2047."
+        },
     )
     max_acceleration = Cpt(
-        Custom_Function_Signal, name="max_acceleration", kind="config"
+        Custom_Function_Signal,
+        name="max_acceleration",
+        kind="config",
+        metadata={"description": "Maximum acceleration. Numbers from 1 to 2047."},
     )
-    max_velocity = Cpt(Custom_Function_Signal, name="max_velocity", kind="config")
+    max_velocity = Cpt(
+        Custom_Function_Signal,
+        name="max_velocity",
+        kind="config",
+        metadata={"description": "Maximum velocity. Numbers from 1 to 2047."},
+    )
     power_down_delay = Cpt(
-        Custom_Function_Signal, name="power_down_delay", kind="config"
+        Custom_Function_Signal,
+        name="power_down_delay",
+        kind="config",
+        metadata={
+            "description": "How long to wait before switching from motor current to standby current.",
+            "unit": "10 ms",
+        },
     )
-    standby_current = Cpt(Custom_Function_Signal, name="standby_current", kind="config")
-    max_current = Cpt(Custom_Function_Signal, name="max_current", kind="config")
+    standby_current = Cpt(
+        Custom_Function_Signal,
+        name="standby_current",
+        kind="config",
+        metadata={
+            "description": "Current flowing at standby. From 0 to 255 meaning 0% up to 100%."
+        },
+    )
+    max_current = Cpt(
+        Custom_Function_Signal,
+        name="max_current",
+        kind="config",
+        metadata={
+            "description": "Maximum allowed current. From 0 to 255 meaning 0% up to 100%.",
+        },
+    )
     freewheeling_delay = Cpt(
-        Custom_Function_Signal, name="freewheeling_delay", kind="config"
+        Custom_Function_Signal,
+        name="freewheeling_delay",
+        kind="config",
+        metadata={
+            "description": "Time after which the power to the motor is cut after velocity is 0.",
+            "unit": "10 ms.",
+        },
     )
-    pulse_divisor = Cpt(Custom_Function_Signal, name="pulse_divisor", kind="config")
-    ramp_divisor = Cpt(Custom_Function_Signal, name="ramp_divisor", kind="config")
-    soft_stop_flag = Cpt(Custom_Function_Signal, name="soft_stop_flag", kind="config")
+    pulse_divisor = Cpt(
+        Custom_Function_Signal,
+        name="pulse_divisor",
+        kind="config",
+        metadata={
+            "description": "The exponent of the scaling factor for the pulse (step) generator. Change this parameter carefully (in steps of one) and only while the motor is not moving. Lower values lead to higher speeds. This parameter specifies the relation between internal and real world velocity units."
+        },
+    )
+    ramp_divisor = Cpt(
+        Custom_Function_Signal,
+        name="ramp_divisor",
+        kind="config",
+        metadata={
+            "description": "The exponent of the scaling factor for the ramp generator. Change this parameter carefully (in steps of one) and only while the motor is not moving. Lower values lead to higher accelerations. This parameter specifies the relation between internal and real world acceleration units."
+        },
+    )
+    soft_stop_flag = Cpt(
+        Custom_Function_Signal,
+        name="soft_stop_flag",
+        kind="config",
+        metadata={
+            "description": "0 - Hard stop when a stop switch is hit. 1 - Soft stop (using deceleration ramp) when a stop switch is hit"
+        },
+    )
     microstep_resolution = Cpt(
-        Custom_Function_Signal, name="microstep_resolution", kind="config"
+        Custom_Function_Signal,
+        name="microstep_resolution",
+        kind="config",
+        metadata={"description": "Microstep resolution."},
     )
 
     def __init__(

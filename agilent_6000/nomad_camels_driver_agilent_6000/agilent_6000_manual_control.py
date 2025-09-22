@@ -69,6 +69,7 @@ class Agilent_6000_Manual_Control(Manual_Control):
         self.osci_thread = None
         self.adjustSize()
         self.start_device(control_data["device"])
+        self.last_path = ""
 
     def device_ready(self):
         super().device_ready()
@@ -86,11 +87,13 @@ class Agilent_6000_Manual_Control(Manual_Control):
         raise exception
 
     def close(self):
-        self.osci_thread.still_running = False
+        if self.osci_thread:
+            self.osci_thread.still_running = False
         return super().close()
 
     def closeEvent(self, a0):
-        self.osci_thread.still_running = False
+        if self.osci_thread:
+            self.osci_thread.still_running = False
         if self.shown_image is not None:
             plt.close(self.shown_image)
         if self.analog_plot is not None:
@@ -192,10 +195,11 @@ class Agilent_6000_Manual_Control(Manual_Control):
         if self.image is None:
             return
         file_name, _ = QFileDialog.getSaveFileName(
-            self, "Save image", "", "Images (*.png *.bmp)"
+            self, "Save image", self.last_path, "Images (*.png *.bmp)"
         )
         if file_name:
             plt.imsave(file_name, self.image)
+            self.last_path = file_name
 
     def save_data(self):
         if self.data is None:

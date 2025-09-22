@@ -30,10 +30,11 @@ class Custom_DAQ_Device(Device):
     out8 = Cpt(DAQ_Signal_Output, name="out8")
 
     samples_per_channel = Cpt(
-        Custom_Function_Signal, name="samples_per_channel", kind="config"
+        Custom_Function_Signal, value=1, name="samples_per_channel", kind="config"
     )
     sample_rate = Cpt(
         Custom_Function_Signal,
+        value=50,
         name="sample_rate",
         kind="config",
         metadata={"units": "Hz"},
@@ -60,6 +61,8 @@ class Custom_DAQ_Device(Device):
             parent=parent,
             **kwargs,
         )
+        self.sample_rate.put_function = self.set_sample_rate
+        self.samples_per_channel.put_function = self.set_samples_per_channel
         self.component_setups = component_setups or {}
         if component_setups:
             comps = list(self.component_names)
@@ -92,6 +95,7 @@ class Custom_DAQ_Device(Device):
             comp.setup_line(
                 info["line_name"],
                 digital=info["digital"],
+                boolean=info["boolean"],
                 terminal_config=info["terminal_config"],
                 minV=info["minV"],
                 maxV=info["maxV"],
@@ -107,7 +111,14 @@ class Custom_DAQ_Device(Device):
                 comp, DAQ_Signal_Output
             ):
                 continue
-            comp.task.timing.samp_timing.samp_quant_samp_per_chan = value
+            if comp.task.number_of_devices < 1:
+                continue
+            comp.actual_samples_per_channel = value
+            if value < 2:
+                val = 2
+            else:
+                val = value
+            comp.task.timing.cfg_samp_clk_timing(self.sample_rate.get(), samps_per_chan=val)
 
     def set_sample_rate(self, value):
         for comp in self.comps.values():
@@ -115,7 +126,12 @@ class Custom_DAQ_Device(Device):
                 comp, DAQ_Signal_Output
             ):
                 continue
-            comp.task.timing.samp_timing.samp_clk_rate = value
+            if comp.task.number_of_devices < 1:
+                continue
+            samps = self.samples_per_channel.get()
+            if samps < 2:
+                samps = 2
+            comp.task.timing.cfg_samp_clk_timing(value, samps_per_chan=samps)
 
     def wait_for_connection(self, all_signals=False, timeout=2.0):
         self.wait_conn_sub(all_signals, timeout)

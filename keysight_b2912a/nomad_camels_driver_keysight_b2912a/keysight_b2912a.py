@@ -2,7 +2,8 @@ from nomad_camels.main_classes import device_class
 from .keysight_b2912a_channel_config import Ui_B2912_channel
 from .keysight_b2912a_ophyd import Keysight_B2912
 
-from PySide6.QtWidgets import QTabWidget
+from PySide6.QtWidgets import QTabWidget, QCheckBox
+import copy
 
 
 default_settings = {
@@ -44,6 +45,40 @@ class subclass(device_class.Device):
         for key, val in default_settings.items():
             self.config[f"{key}1"] = val
             self.config[f"{key}2"] = val
+        self.settings["has_second_channel"] = True
+
+    def get_channels(self):
+        channels = copy.deepcopy(super().get_channels())
+        removes = []
+        if not self.settings.get("has_second_channel", True):
+            for key in self.channels:
+                if key.endswith("2"):
+                    removes.append(key)
+        is_voltage1 = self.config.get(f"source1", "Voltage") == "Voltage"
+        is_voltage2 = self.config.get(f"source2", "Voltage") == "Voltage"
+        for key in self.channels:
+            if key.endswith("_setV1") and not is_voltage1:
+                removes.append(key)
+            elif key.endswith("_setV2") and not is_voltage2:
+                removes.append(key)
+            elif key.endswith("_setI1") and is_voltage1:
+                removes.append(key)
+            elif key.endswith("_setI2") and is_voltage2:
+                removes.append(key)
+        for r in list(set(removes)):
+            channels.pop(r)
+        return channels
+
+    def get_config(self):
+        config_dict = copy.deepcopy(self.config)
+        removes = []
+        if not self.settings["has_second_channel"]:
+            for key in self.config:
+                if key.endswith("2"):
+                    removes.append(key)
+        for r in removes:
+            config_dict.pop(r)
+        return config_dict
 
 
 class subclass_config(device_class.Device_Config):
@@ -82,8 +117,27 @@ class subclass_config(device_class.Device_Config):
         )
         self.tab_widget.addTab(self.channel_widge_1, "Channel 1")
         self.tab_widget.addTab(self.channel_widge_2, "Channel 2")
+        self.checkbox_has_second_channel = QCheckBox("Has second channel")
+        self.checkbox_has_second_channel.setChecked(
+            self.settings_dict.get("has_second_channel", True)
+        )
+        self.checkbox_has_second_channel.stateChanged.connect(
+            self._second_channel_changed
+        )
+        self._second_channel_changed()
+        self.layout().addWidget(self.checkbox_has_second_channel, 19, 0, 1, 5)
         self.layout().addWidget(self.tab_widget, 20, 0, 1, 5)
         self.load_settings()
+
+    def _second_channel_changed(self):
+        channel_2 = self.checkbox_has_second_channel.isChecked()
+        self.channel_widge_2.setEnabled(channel_2)
+
+    def get_settings(self):
+        self.settings_dict["has_second_channel"] = (
+            self.checkbox_has_second_channel.isChecked()
+        )
+        return super().get_settings()
 
     def get_config(self):
         conf1 = self.channel_widge_1.get_config()

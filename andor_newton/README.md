@@ -4,6 +4,25 @@ This package provides a driver of the Andor Newton CCD for the measurement softw
 It uses [pylablib](https://pylablib.readthedocs.io/en/latest/devices/Andor.html#cameras-andor-sdk2) for communication.
 
 
+## Features
+Apart from reading out the camera, the driver allows to set the desired camera temperature, shutter mode, exposure time, and several camera-specific settings.
+
+
 ## Documentation
 
 For more information and documentation visit the [CAMELS documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+
+
+## Changelog
+### 0.1.5
+Improved metadata
+
+### 0.1.4
+Now exposure times above 99 seconds are possible.
+
+### 0.1.3
+Fix of reading which did end in an endless loop before
+
+### 0.1.2
+Fixed camera selection to actually always use the selected camera.

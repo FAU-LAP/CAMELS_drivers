@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nomad_camels_driver_epics_instrument"
+version = "0.1.3"
+authors = [
+	{name="LAP", email="nomad-camels@fau.de"}
+]
+description = "Instrument driver for epics_instrument for NOMAD CAMELS"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: GNU Lesser General Public License v2 (LGPLv2)",
+]
+
+dependencies = [
+	"nomad-camels",
+	"pyepics",
+]
+
+[project.urls]
+"NOMAD Camels GitHub" = "https://github.com/FAU-LAP/NOMAD-CAMELS"
+"CAMELS Drivers GitHub" = "https://github.com/FAU-LAP/CAMELS_drivers"
+"NOMAD Camels Documentation" = "https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html"

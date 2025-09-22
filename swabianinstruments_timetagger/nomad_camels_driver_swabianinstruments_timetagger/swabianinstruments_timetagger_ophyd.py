@@ -9,40 +9,135 @@ import TimeTagger as TT
 
 
 class TimeTagger(Device):
-    countrate = Cpt(Custom_Function_SignalRO, name="countrate")
-    correlation = Cpt(Custom_Function_SignalRO, name="correlation")
-    count_between_markers = Cpt(Custom_Function_SignalRO, name="count_between_markers")
+    countrate = Cpt(
+        Custom_Function_SignalRO,
+        name="countrate",
+        metadata={
+            "unit": "counts/s",
+            "description": "Countrate measurement with specified config",
+        },
+    )
+    correlation = Cpt(
+        Custom_Function_SignalRO,
+        name="correlation",
+        metadata={
+            "description": "Correlation measurement with specified config",
+            "unit": "counts",
+        },
+    )
+    count_between_markers = Cpt(
+        Custom_Function_SignalRO,
+        name="count_between_markers",
+        metadata={
+            "description": "Count between markers with specified config",
+            "unit": "counts",
+        },
+    )
 
-    countrate_time = Cpt(Custom_Function_Signal, name="countrate_time", kind="config")
+    countrate_time = Cpt(
+        Custom_Function_Signal,
+        name="countrate_time",
+        kind="config",
+        metadata={
+            "description": "How long the countrate measurement runs",
+            "unit": "s",
+        },
+    )
     countrate_channels = Cpt(
-        Custom_Function_Signal, name="countrate_channels", kind="config"
+        Custom_Function_Signal,
+        name="countrate_channels",
+        kind="config",
+        metadata={
+            "description": "Channels used for countrate measurement.\n"
+            "List them e.g. like `0, 1`",
+        },
     )
 
     correlation_channel_1 = Cpt(
-        Custom_Function_Signal, name="correlation_channel_1", kind="config"
+        Custom_Function_Signal,
+        name="correlation_channel_1",
+        kind="config",
+        metadata={
+            "description": "First channel used for correlation measurement.",
+        },
     )
     correlation_channel_2 = Cpt(
-        Custom_Function_Signal, name="correlation_channel_2", kind="config"
+        Custom_Function_Signal,
+        name="correlation_channel_2",
+        kind="config",
+        metadata={
+            "description": "Second channel used for correlation measurement.",
+        },
     )
     correlation_binwidth = Cpt(
-        Custom_Function_Signal, name="correlation_binwidth", kind="config"
+        Custom_Function_Signal,
+        name="correlation_binwidth",
+        kind="config",
+        metadata={
+            "description": "Bin width used for correlation measurement.",
+            "unit": "ps",
+        },
     )
     correlation_bins = Cpt(
-        Custom_Function_Signal, name="correlation_bins", kind="config"
+        Custom_Function_Signal,
+        name="correlation_bins",
+        kind="config",
+        metadata={
+            "description": "Number of bins used for correlation measurement.",
+        },
     )
     correlation_meas_time = Cpt(
-        Custom_Function_Signal, name="correlation_meas_time", kind="config"
+        Custom_Function_Signal,
+        name="correlation_meas_time",
+        kind="config",
+        metadata={
+            "description": "How long to run a correlation measurement.",
+            "unit": "s",
+        },
     )
 
     cbm_click_channel = Cpt(
-        Custom_Function_Signal, name="cbm_click_channel", kind="config"
+        Custom_Function_Signal,
+        name="cbm_click_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for counting in `count_between_markers`.",
+        },
     )
     cbm_begin_channel = Cpt(
-        Custom_Function_Signal, name="cbm_begin_channel", kind="config"
+        Custom_Function_Signal,
+        name="cbm_begin_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for beginning the count in `count_between_markers`.",
+        },
     )
-    cbm_end_channel = Cpt(Custom_Function_Signal, name="cbm_end_channel", kind="config")
-    cbm_n_values = Cpt(Custom_Function_Signal, name="cbm_n_values", kind="config")
-    cbm_meas_time = Cpt(Custom_Function_Signal, name="cbm_meas_time", kind="config")
+    cbm_end_channel = Cpt(
+        Custom_Function_Signal,
+        name="cbm_end_channel",
+        kind="config",
+        metadata={
+            "description": "Channel used for ending the count in `count_between_markers`.",
+        },
+    )
+    cbm_n_values = Cpt(
+        Custom_Function_Signal,
+        name="cbm_n_values",
+        kind="config",
+        metadata={
+            "description": "Number of values stored for `count_between_markers` in buffer.\n"
+            "One value is the number of counts for a trigger.",
+        },
+    )
+    cbm_meas_time = Cpt(
+        Custom_Function_Signal,
+        name="cbm_meas_time",
+        kind="config",
+        metadata={
+            "description": "Measurement time for `count_between_markers`.",
+            "unit": "s",
+        },
+    )
 
     def __init__(
         self,
@@ -79,22 +174,23 @@ class TimeTagger(Device):
 
         channels = channels or {}
         for channel, info in channels.items():
-            self.tagger.setTriggerLevel(int(channel), float(info["trigger_level"]))
             self.tagger.setInputDelay(int(channel), int(info["input_delay"]))
             self.tagger.setDeadtime(int(channel), int(info["dead_time"]))
             self.tagger.setTestSignal(int(channel), info["test_signal"])
+            self.tagger.setEventDivider(int(channel), 1)
+            self.tagger.setTriggerLevel(int(channel), float(info["trigger_level"]))
 
         self.countrate.read_function = self.read_countrate
         self.countrate.trigger_function = self.start_countrate
 
-        self._countrate_avg_time = 1e12
+        self._countrate_avg_time = int(1e12)
         self.countrate_time.put_function = self._set_countrate_time
         self.countrate_channels.put_function = self._update_countrate_channels
 
         self.correlation.trigger_function = self.start_correlation
         self.correlation.read_function = self.read_correlation
 
-        self._correlation_meas_time = 1e12
+        self._correlation_meas_time = int(1e12)
         self.correlation_bins.put_function = self._set_correlation_config
         self.correlation_binwidth.put_function = self._set_correlation_config
         self.correlation_channel_1.put_function = self._set_correlation_config
@@ -104,7 +200,7 @@ class TimeTagger(Device):
         self.count_between_markers.trigger_function = self.start_cbm
         self.count_between_markers.read_function = self.read_cbm
 
-        self._cbm_meas_time = 1e12
+        self._cbm_meas_time = int(1e12)
         self.cbm_n_values.put_function = self._set_cbm_config
         self.cbm_click_channel.put_function = self._set_cbm_config
         self.cbm_begin_channel.put_function = self._set_cbm_config
@@ -121,7 +217,9 @@ class TimeTagger(Device):
                 channels = channels.split(",")
             elif ";" in channels:
                 channels = channels.split(";")
-        if isinstance(channels[0], str):
+        if isinstance(channels, str):
+            channels = [int(channels)]
+        elif isinstance(channels[0], str):
             for i, chan in enumerate(channels):
                 channels[i] = int(chan)
         self.tt_countrate.stop()
@@ -129,19 +227,19 @@ class TimeTagger(Device):
         self.tt_countrate.stop()
 
     def _set_countrate_time(self, value):
-        self._countrate_avg_time = value * 1e12
+        self._countrate_avg_time = int(value * 1e12)
 
     def _set_correlation_config(self, value):
         self.correlation_config_change = True
 
     def _set_correlation_meas_time(self, value):
-        self._correlation_meas_time = value * 1e12
+        self._correlation_meas_time = int(value * 1e12)
 
     def _set_cbm_config(self, value):
         self.cbm_config_change = True
 
     def _set_cbm_meas_time(self, value):
-        self._cbm_meas_time = value * 1e12
+        self._cbm_meas_time = int(value * 1e12)
 
     def start_correlation(self):
         if self.correlation_config_change:
@@ -195,118 +293,3 @@ class TimeTagger(Device):
 
     def finalize_steps(self):
         TT.freeTimeTagger(self.tagger)
-
-
-if __name__ == "__main__":
-    # tagg = TimeTagger(name='tagg', serial_number='1729000IDH')
-
-    settings = {
-        "serial_number": "1729000IDH",
-        "channels": {
-            "0": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "8": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "1": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "9": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": True,
-            },
-            "2": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "10": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "3": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "11": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "4": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "12": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "5": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "13": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "6": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "14": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "7": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-            "15": {
-                "trigger_level": 0.5,
-                "dead_time": 6000,
-                "input_delay": 0,
-                "test_signal": False,
-            },
-        },
-    }
-    additional_info = {"description": "", "device_class_name": "TimeTagger"}
-    tagg = TimeTagger(
-        "swabianinstruments_timetagger:",
-        name="swabianinstruments_timetagger",
-        **settings
-    )
-    tagg.countrate.trigger()
-    print(tagg.countrate.get())
-    tagg.finalize_steps()
