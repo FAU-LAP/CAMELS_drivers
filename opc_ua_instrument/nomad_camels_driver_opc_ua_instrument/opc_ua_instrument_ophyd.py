@@ -1,4 +1,5 @@
 from ophyd import Component as Cpt
+import asyncio
 
 from nomad_camels.bluesky_handling.custom_function_signal import (
     Custom_Function_Signal,
@@ -180,7 +181,15 @@ class Opc_Ua_instrument(Sequential_Device):
                 f"0:Objects/{nsidx}:MyObject/{nsidx}:{name}"
             )
             self.variables_dict[name] = var
-        return var.read_value()
+        result = var.read_value()
+        
+        # This should catch any coroutine that might be returned
+        # This should not happen with sync client, but just in case
+        if asyncio.iscoroutine(result):
+            # Execute the coroutine on the SyncClient's internal loop and wait for the result
+            return self.client.tloop.post(result)
+        
+        return result
 
     def set_opc_ua(self, name, path, value):
         if name in self.variables_dict:
@@ -221,7 +230,12 @@ class Opc_Ua_instrument(Sequential_Device):
 
         # Write the converted value to the OPC UA variable
         data_value = ua.DataValue(ua.Variant(cast_value, expected_type))
-        var.write_value(data_value)
+        write_result = var.write_value(data_value)
+        
+        # This should catch any coroutine that might be returned
+        # This should not happen with sync client, but just in case
+        if asyncio.iscoroutine(write_result):
+            self.client.tloop.post(write_result)
 
     def finalize_steps(self):
         # Disconnect the client when done
