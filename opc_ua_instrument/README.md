@@ -27,6 +27,9 @@ The variable is accessed using its browse path and should look something like th
 
 ## Changes
 
+### 0.1.9
+- Tried to fix issues where the synchronous client might not always return values directly but coroutines. Added checks to run these coroutines on the internal loop of the SyncClient.
+
 ### 0.1.8
 - improved visual user-feedback while searching for variables
 
