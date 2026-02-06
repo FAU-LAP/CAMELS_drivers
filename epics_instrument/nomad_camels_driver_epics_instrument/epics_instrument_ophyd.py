@@ -86,7 +86,7 @@ def make_ophyd_class(pvs):
     pvs_dict_list = [dict(zip(pvs.keys(), values)) for values in zip(*pvs.values())]
     for pv_dict in pvs_dict_list:
         # For each channel add read_power function
-        if pv_dict["PV-Type"] == "read-only":
+        if pv_dict["PV-Type"] in ["read-only", "config - read-only"]:
             signal_dictionary[pv_dict["PV Short Name"]] = Cpt(
                 Custom_Function_SignalRO,
                 name=pv_dict["PV Short Name"],
@@ -96,7 +96,7 @@ def make_ophyd_class(pvs):
                     full_name=pv_dict["PV Full Name"],
                 ),
             )
-        elif pv_dict["PV-Type"] == "set":
+        elif pv_dict["PV-Type"] in ["set", "config"]:
             signal_dictionary[pv_dict["PV Short Name"]] = Cpt(
                 Custom_Function_Signal,
                 name=pv_dict["PV Short Name"],

@@ -64,11 +64,14 @@ class subclass_config(device_class.Device_Config):
             "PV-Type",
             "Unit",
             "Description",
+            "Default Value",
         ]
         comboboxes = {
             "PV-Type": [
                 "read-only",
                 "set",
+                "config",
+                "config - read-only",
             ],
         }
         if "pvs" not in self.settings_dict:
