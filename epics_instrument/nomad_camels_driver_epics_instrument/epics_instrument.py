@@ -3,6 +3,8 @@ from .epics_instrument_ophyd import make_ophyd_class
 from nomad_camels.main_classes import device_class
 from nomad_camels.ui_widgets.add_remove_table import AddRemoveTable
 
+from PySide6.QtWidgets import QLineEdit, QLabel
+
 
 class subclass(device_class.Device):
     def __init__(self, **kwargs):
@@ -64,6 +66,7 @@ class subclass_config(device_class.Device_Config):
             "PV-Type",
             "Unit",
             "Description",
+            "Docs URI",
         ]
         comboboxes = {
             "PV-Type": [
@@ -73,6 +76,18 @@ class subclass_config(device_class.Device_Config):
         }
         if "pvs" not in self.settings_dict:
             self.settings_dict["pvs"] = {}
+
+        # Label and line edit for EPICS environment documentation URI
+        self.docs_uri_label = QLabel("Docs URI:")
+        self.docs_uri_line_edit = QLineEdit()
+        if "docs_uri" in self.settings_dict:
+            self.docs_uri_line_edit.setText(self.settings_dict["docs_uri"])
+        self.docs_uri_line_edit.setToolTip(
+            "URI linking to external documentation of the EPICS IOC or environment "
+            "(e.g., GitHub repository with commit/release, DOI-linked repository)"
+        )
+        self.layout().addWidget(self.docs_uri_label, 29, 0, 1, 1)
+        self.layout().addWidget(self.docs_uri_line_edit, 29, 1, 1, 4)
 
         # Table for adding and removing EPICS PVs
         self.pv_table = AddRemoveTable(
@@ -85,6 +100,7 @@ class subclass_config(device_class.Device_Config):
 
     def get_settings(self):
         self.settings_dict["pvs"] = self.pv_table.update_table_data()
+        self.settings_dict["docs_uri"] = self.docs_uri_line_edit.text()
         return super().get_settings()
 
 
