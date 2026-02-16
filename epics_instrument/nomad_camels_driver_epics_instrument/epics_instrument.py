@@ -84,7 +84,24 @@ class subclass_config(device_class.Device_Config):
             tableData=self.settings_dict["pvs"],
         )
         self.layout().addWidget(self.pv_table, 30, 0, 1, 5)
+        
+        # Setup conditional editability
+        pv_type_col = pv_info.index("PV-Type")
+        default_value_col = pv_info.index("Default Value")
+        self.pv_table.added.connect(
+            lambda: self._set_default_value_editability(pv_type_col, default_value_col)
+        )
+        
         self.load_settings()
+
+    def _set_default_value_editability(self, pv_type_col, default_value_col):
+        for row in range(self.pv_table.table_model.rowCount()):
+            pv_type = self.pv_table.table_model.item(row, pv_type_col).text()
+            item = self.pv_table.table_model.item(row, default_value_col)
+            is_config = pv_type == "config"
+            item.setEditable(is_config)
+            if not is_config:
+                item.setToolTip("Only editable for 'config' PV type")
 
     def get_settings(self):
         self.settings_dict["pvs"] = self.pv_table.update_table_data()
