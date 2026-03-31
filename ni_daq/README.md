@@ -9,3 +9,7 @@ This driver supports usage of up to 8 digital/analog in and outputs of an NI-DAQ
 ## Documentation
 
 For more information and documentation visit [this page](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+## Usage
+
+In `Manage Instruments` set the `line name` to the correct string. Most likely this will be something like `Dev1/ai0` for input channel 1 or `Dev1/ao0` for output channel 1. The `line name` can be found in the NI Measurement & Automation Explorer (NI MAX) software.
