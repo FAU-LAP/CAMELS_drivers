@@ -10,3 +10,13 @@ The settable configuration is the number of PLC for a measurement.
 ## Documentation
 
 For more information and documentation visit the NOMAD-CAMELS [documentation](https://fau-lap.github.io/NOMAD-CAMELS/doc/instruments/instruments.html).
+
+## Changelog
+
+### 0.1.2
+
+Fixes and more functionality.
+
+### 0.1.1
+
+Initial upload, basic functionality.
