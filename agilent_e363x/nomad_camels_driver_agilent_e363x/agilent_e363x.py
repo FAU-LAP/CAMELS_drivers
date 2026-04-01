@@ -13,9 +13,6 @@ class subclass(device_class.Device):
             ophyd_class_name="Agilent_E363X",
             **kwargs
         )
-        self.config["current_limit_1"] = 0
-        self.config["current_limit_2"] = 0
-        self.config["current_limit_3"] = 0
 
 
 class subclass_config(device_class.Simple_Config):

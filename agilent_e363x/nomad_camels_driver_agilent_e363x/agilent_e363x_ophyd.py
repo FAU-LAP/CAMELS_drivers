@@ -8,70 +8,55 @@ from nomad_camels.bluesky_handling.visa_signal import (
 
 
 class Agilent_E363X(VISA_Device):
-    current_limit_1 = Cpt(
+    current_P6V = Cpt(
         VISA_Signal,
-        name="current_limit_1",
-        kind="config",
+        name="current_P6V",
         write=":INST:NSEL 1;:CURR {value:g}",
-        metadata={"units": "A", "description": "Sets the current limit for channel 1."},
+        metadata={"units": "A", "description": "Sets the current limit for the +6 V channel."},
         write_delay=0.5,
     )
-    current_limit_2 = Cpt(
+    current_P25V = Cpt(
         VISA_Signal,
-        name="current_limit_2",
-        kind="config",
+        name="current_P25V",
         write=":INST:NSEL 2;:CURR {value:g}",
-        metadata={"units": "A", "description": "Sets the current limit for channel 2."},
+        metadata={"units": "A", "description": "Sets the current limit for the +25 V channel."},
         write_delay=0.5,
     )
-    current_limit_3 = Cpt(
+    current_N25V = Cpt(
         VISA_Signal,
-        name="current_limit_3",
-        kind="config",
+        name="current_N25V",
         write=":INST:NSEL 3;:CURR {value:g}",
-        metadata={"units": "A", "description": "Sets the current limit for channel 3."},
+        metadata={"units": "A", "description": "Sets the current limit for the -25 V channel."},
         write_delay=0.5,
     )
 
     idn = Cpt(VISA_Signal_RO, name="idn", kind="config", query="*IDN?", write_delay=0.5)
 
-    voltage_1 = Cpt(
+    voltage_P6V = Cpt(
         VISA_Signal,
-        name="voltage_1",
+        name="voltage_P6V",
         write=":INST:NSEL 1;:VOLT {value:g}",
-        metadata={"units": "V", "description": "Sets the voltage for channel 1."},
+        metadata={"units": "V", "description": "Sets the voltage for the +6 V channel."},
         write_delay=0.5,
     )
-    voltage_2 = Cpt(
+    voltage_P25V = Cpt(
         VISA_Signal,
-        name="voltage_2",
+        name="voltage_P25V",
         write=":INST:NSEL 2;:VOLT {value:g}",
-        metadata={"units": "V", "description": "Sets the voltage for channel 2."},
+        metadata={"units": "V", "description": "Sets the voltage for the +25 V channel."},
         write_delay=0.5,
     )
-    voltage_3 = Cpt(
+    voltage_N25V = Cpt(
         VISA_Signal,
-        name="voltage_3",
+        name="voltage_N25V",
         write=":INST:NSEL 3;:VOLT {value:g}",
-        metadata={"units": "V", "description": "Sets the voltage for channel 3."},
+        metadata={"units": "V", "description": "Sets the voltage for the -25 V channel."},
         write_delay=0.5,
     )
-    output_1 = Cpt(
+    output = Cpt(
         VISA_Signal,
         name="output_1",
-        metadata={"description": "Enables the output for channel 1."},
-        write_delay=0.5,
-    )
-    output_2 = Cpt(
-        VISA_Signal,
-        name="output_2",
-        metadata={"description": "Enables the output for channel 2."},
-        write_delay=0.5,
-    )
-    output_3 = Cpt(
-        VISA_Signal,
-        name="output_3",
-        metadata={"description": "Enables the output for channel 3."},
+        metadata={"description": "Enables (1) or disables (0) the output for all three channels."},
         write_delay=0.5,
     )
 
@@ -109,12 +94,10 @@ class Agilent_E363X(VISA_Device):
             retry_on_error=retry_on_error,
             **kwargs,
         )
-        self.output_1.write = lambda x: self.enable_disable_output(1, x)
-        self.output_2.write = lambda x: self.enable_disable_output(2, x)
-        self.output_3.write = lambda x: self.enable_disable_output(3, x)
+        self.output.write = lambda x: self.enable_disable_output(x)
 
-    def enable_disable_output(self, channel, value):
-        return f":INST:NSEL {channel};:OUTP {int(value):d}"
+    def enable_disable_output(self, value):
+        return f":OUTP {int(value):d}"
 
 
 if __name__ == "__main__":
