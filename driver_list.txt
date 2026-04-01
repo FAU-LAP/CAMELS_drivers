@@ -2,7 +2,7 @@ ADALM1000==0.1.0
 agilent_33220a==0.1.2
 agilent_34401a==0.1.2
 agilent_34970==0.1.3
-agilent_e363x==0.1.0
+agilent_e363x==0.1.2
 andor_newton==0.1.5
 andor_shamrock_500==0.1.4
 cam_control_pylablib==0.1.4
