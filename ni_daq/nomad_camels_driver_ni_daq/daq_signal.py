@@ -127,6 +127,7 @@ class DAQ_Signal_Output(Signal):
         else:
             val = value
         try:
+            self.task.stop()
             self.task.write(val)
         except Exception as e:
             print(f"Error writing to task: {e}")
