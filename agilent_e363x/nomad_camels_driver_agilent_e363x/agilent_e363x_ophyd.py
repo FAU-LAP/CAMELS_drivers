@@ -11,56 +11,60 @@ class Agilent_E363X(VISA_Device):
     current_P6V = Cpt(
         VISA_Signal,
         name="current_P6V",
-        write=":INST:NSEL 1;:CURR {value:g}",
+        # write=":INST:NSEL 1;:CURR {value:g}",
         metadata={"units": "A", "description": "Sets the current limit for the +6 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
     current_P25V = Cpt(
         VISA_Signal,
         name="current_P25V",
         write=":INST:NSEL 2;:CURR {value:g}",
         metadata={"units": "A", "description": "Sets the current limit for the +25 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
     current_N25V = Cpt(
         VISA_Signal,
         name="current_N25V",
         write=":INST:NSEL 3;:CURR {value:g}",
         metadata={"units": "A", "description": "Sets the current limit for the -25 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
 
-    idn = Cpt(VISA_Signal_RO, name="idn", kind="config", query="*IDN?", write_delay=0.5)
+    idn = Cpt(VISA_Signal_RO, name="idn", kind="config", query="*IDN?", 
+            #   write_delay=0.5,
+              )
 
     voltage_P6V = Cpt(
         VISA_Signal,
         name="voltage_P6V",
         write=":INST:NSEL 1;:VOLT {value:g}",
         metadata={"units": "V", "description": "Sets the voltage for the +6 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
     voltage_P25V = Cpt(
         VISA_Signal,
         name="voltage_P25V",
         write=":INST:NSEL 2;:VOLT {value:g}",
         metadata={"units": "V", "description": "Sets the voltage for the +25 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
     voltage_N25V = Cpt(
         VISA_Signal,
         name="voltage_N25V",
         write=":INST:NSEL 3;:VOLT {value:g}",
         metadata={"units": "V", "description": "Sets the voltage for the -25 V channel."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
     output = Cpt(
         VISA_Signal,
         name="output_1",
         metadata={"description": "Enables (1) or disables (0) the output for all three channels."},
-        write_delay=0.5,
+        # write_delay=0.5,
     )
 
-    error = Cpt(VISA_Signal_RO, query="SYST:ERR?", name="error", write_delay=0.5)
+    error = Cpt(VISA_Signal_RO, query="SYST:ERR?", name="error", 
+                # write_delay=0.5,
+                )
 
     def __init__(
         self,
@@ -95,9 +99,36 @@ class Agilent_E363X(VISA_Device):
             **kwargs,
         )
         self.output.write = lambda x: self.enable_disable_output(x)
+        
+        self.used_channel = None # the channel currently used for writing voltage or current, to avoid unnecessary channel switching commands
+
+        self.current_P6V.write = lambda value: self.source_current(value, 1)
+        self.voltage_P6V.write = lambda value: self.source_voltage(value, 1)
+
+        self.current_P25V.write = lambda value: self.source_current(value, 2)
+        self.voltage_P25V.write = lambda value: self.source_voltage(value, 2)
+
+        self.current_N25V.write = lambda value: self.source_current(value, 3)
+        self.voltage_N25V.write = lambda value: self.source_voltage(value, 3)
+
+
 
     def enable_disable_output(self, value):
         return f":OUTP {int(value):d}"
+    
+    def source_current(self, value, channel):
+        if self.used_channel != channel:
+            self.visa_instrument.write(f":INST:NSEL {channel}")
+            self.used_channel = channel
+        return f":CURR {value:g}"
+    
+    def source_voltage(self, value, channel):
+        if self.used_channel != channel:
+            self.visa_instrument.write(f":INST:NSEL {channel}")
+            self.used_channel = channel
+        return f":VOLT {value:g}"
+
+
 
 
 if __name__ == "__main__":
